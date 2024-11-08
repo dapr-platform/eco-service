@@ -1,0 +1,3173 @@
+basePath: /swagger/eco-service
+definitions:
+  common.Page:
+    properties:
+      items: {}
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  common.Response:
+    properties:
+      data: {}
+      msg:
+        type: string
+      status:
+        type: integer
+    type: object
+  model.Ecgateway:
+    properties:
+      building_no:
+        description: 楼栋号
+        type: string
+      channel_no:
+        description: 通道号
+        type: string
+      cm_code:
+        description: 通信码
+        type: string
+      created_by:
+        description: 创建人
+        type: string
+      created_time:
+        description: 创建时间
+        type: string
+      dev_name:
+        description: 设备名称
+        type: string
+      floor_no:
+        description: 楼层号
+        type: string
+      id:
+        description: 主键ID
+        type: string
+      location:
+        description: 组织名称
+        type: string
+      model_name:
+        description: 型号名称
+        type: string
+      updated_by:
+        description: 更新人
+        type: string
+      updated_time:
+        description: 更新时间
+        type: string
+    type: object
+  model.Eco_building_1d:
+    properties:
+      building_id:
+        description: building_id
+        type: string
+      power_consumption:
+        description: power_consumption
+        type: number
+      time:
+        description: time
+        type: string
+    type: object
+  model.Eco_building_1m:
+    properties:
+      building_id:
+        description: building_id
+        type: string
+      power_consumption:
+        description: power_consumption
+        type: number
+      time:
+        description: time
+        type: string
+    type: object
+  model.Eco_building_1y:
+    properties:
+      building_id:
+        description: building_id
+        type: string
+      power_consumption:
+        description: power_consumption
+        type: number
+      time:
+        description: time
+        type: string
+    type: object
+  model.Eco_floor_1d:
+    properties:
+      building_id:
+        description: building_id
+        type: string
+      floor_id:
+        description: floor_id
+        type: string
+      power_consumption:
+        description: power_consumption
+        type: number
+      time:
+        description: time
+        type: string
+    type: object
+  model.Eco_floor_1m:
+    properties:
+      building_id:
+        description: building_id
+        type: string
+      floor_id:
+        description: floor_id
+        type: string
+      power_consumption:
+        description: power_consumption
+        type: number
+      time:
+        description: time
+        type: string
+    type: object
+  model.Eco_floor_1y:
+    properties:
+      building_id:
+        description: building_id
+        type: string
+      floor_id:
+        description: floor_id
+        type: string
+      power_consumption:
+        description: power_consumption
+        type: number
+      time:
+        description: time
+        type: string
+    type: object
+  model.Eco_gateway_1d:
+    properties:
+      building_id:
+        description: building_id
+        type: string
+      floor_id:
+        description: floor_id
+        type: string
+      gateway_id:
+        description: gateway_id
+        type: string
+      power_consumption:
+        description: power_consumption
+        type: number
+      time:
+        description: time
+        type: string
+    type: object
+  model.Eco_gateway_1h:
+    properties:
+      building_id:
+        description: 楼栋ID
+        type: string
+      floor_id:
+        description: 楼层ID
+        type: string
+      gateway_id:
+        description: 网关ID
+        type: string
+      id:
+        description: id
+        type: string
+      power_consumption:
+        description: 用电量(kWh)
+        type: number
+      time:
+        description: 时间
+        type: string
+    type: object
+  model.Eco_gateway_1m:
+    properties:
+      building_id:
+        description: building_id
+        type: string
+      floor_id:
+        description: floor_id
+        type: string
+      gateway_id:
+        description: gateway_id
+        type: string
+      power_consumption:
+        description: power_consumption
+        type: number
+      time:
+        description: time
+        type: string
+    type: object
+  model.Eco_gateway_1y:
+    properties:
+      building_id:
+        description: building_id
+        type: string
+      floor_id:
+        description: floor_id
+        type: string
+      gateway_id:
+        description: gateway_id
+        type: string
+      power_consumption:
+        description: power_consumption
+        type: number
+      time:
+        description: time
+        type: string
+    type: object
+info:
+  contact: {}
+  description: eco-service API
+  title: eco-service API
+  version: "1.0"
+paths:
+  /ecgateway:
+    get:
+      description: query objects
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        type: string
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: id
+        in: query
+        name: id
+        type: string
+      - description: created_by
+        in: query
+        name: created_by
+        type: string
+      - description: created_time
+        in: query
+        name: created_time
+        type: string
+      - description: updated_by
+        in: query
+        name: updated_by
+        type: string
+      - description: updated_time
+        in: query
+        name: updated_time
+        type: string
+      - description: model_name
+        in: query
+        name: model_name
+        type: string
+      - description: dev_name
+        in: query
+        name: dev_name
+        type: string
+      - description: channel_no
+        in: query
+        name: channel_no
+        type: string
+      - description: cm_code
+        in: query
+        name: cm_code
+        type: string
+      - description: location
+        in: query
+        name: location
+        type: string
+      - description: floor_no
+        in: query
+        name: floor_no
+        type: string
+      - description: building_no
+        in: query
+        name: building_no
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Ecgateway'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: query objects
+      tags:
+      - Ecgateway
+    post:
+      consumes:
+      - application/json
+      description: save
+      parameters:
+      - description: object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/model.Ecgateway'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Ecgateway'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: save
+      tags:
+      - Ecgateway
+  /ecgateway/{id}:
+    delete:
+      description: delete
+      parameters:
+      - description: 实例id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Ecgateway'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: delete
+      tags:
+      - Ecgateway
+  /ecgateway/batch-delete:
+    post:
+      consumes:
+      - application/json
+      description: batch delete
+      parameters:
+      - description: id array
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch delete
+      tags:
+      - Ecgateway
+  /ecgateway/batch-upsert:
+    post:
+      consumes:
+      - application/json
+      description: batch update
+      parameters:
+      - description: objects array
+        in: body
+        name: entities
+        required: true
+        schema:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch update
+      tags:
+      - Ecgateway
+  /ecgateway/groupby:
+    get:
+      description: GroupBy, for example,  _select=level, then return  {level_val1:sum1,level_val2:sum2},
+        _where can input status=0
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
+      - description: _where
+        in: query
+        name: _where
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: GroupBy
+      tags:
+      - Ecgateway
+  /ecgateway/page:
+    get:
+      description: page query, _page(from 1 begin), _page_size, _order, and others
+        fields, status=1, name=$like.%CAM%
+      parameters:
+      - description: current page
+        in: query
+        name: _page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: _page_size
+        required: true
+        type: integer
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: id
+        in: query
+        name: id
+        type: string
+      - description: created_by
+        in: query
+        name: created_by
+        type: string
+      - description: created_time
+        in: query
+        name: created_time
+        type: string
+      - description: updated_by
+        in: query
+        name: updated_by
+        type: string
+      - description: updated_time
+        in: query
+        name: updated_time
+        type: string
+      - description: model_name
+        in: query
+        name: model_name
+        type: string
+      - description: dev_name
+        in: query
+        name: dev_name
+        type: string
+      - description: channel_no
+        in: query
+        name: channel_no
+        type: string
+      - description: cm_code
+        in: query
+        name: cm_code
+        type: string
+      - description: location
+        in: query
+        name: location
+        type: string
+      - description: floor_no
+        in: query
+        name: floor_no
+        type: string
+      - description: building_no
+        in: query
+        name: building_no
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/common.Page'
+                  - properties:
+                      items:
+                        items:
+                          $ref: '#/definitions/model.Ecgateway'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: page query
+      tags:
+      - Ecgateway
+  /eco-building-1d:
+    get:
+      description: query objects
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        type: string
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Eco_building_1d'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: query objects
+      tags:
+      - Eco_building_1d
+    post:
+      consumes:
+      - application/json
+      description: save
+      parameters:
+      - description: object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/model.Eco_building_1d'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_building_1d'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: save
+      tags:
+      - Eco_building_1d
+  /eco-building-1d/{id}:
+    delete:
+      description: delete
+      parameters:
+      - description: 实例id
+        in: path
+        name: time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_building_1d'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: delete
+      tags:
+      - Eco_building_1d
+  /eco-building-1d/batch-delete:
+    post:
+      consumes:
+      - application/json
+      description: batch delete
+      parameters:
+      - description: id array
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch delete
+      tags:
+      - Eco_building_1d
+  /eco-building-1d/batch-upsert:
+    post:
+      consumes:
+      - application/json
+      description: batch update
+      parameters:
+      - description: objects array
+        in: body
+        name: entities
+        required: true
+        schema:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch update
+      tags:
+      - Eco_building_1d
+  /eco-building-1d/groupby:
+    get:
+      description: GroupBy, for example,  _select=level, then return  {level_val1:sum1,level_val2:sum2},
+        _where can input status=0
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
+      - description: _where
+        in: query
+        name: _where
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: GroupBy
+      tags:
+      - Eco_building_1d
+  /eco-building-1d/page:
+    get:
+      description: page query, _page(from 1 begin), _page_size, _order, and others
+        fields, status=1, name=$like.%CAM%
+      parameters:
+      - description: current page
+        in: query
+        name: _page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: _page_size
+        required: true
+        type: integer
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/common.Page'
+                  - properties:
+                      items:
+                        items:
+                          $ref: '#/definitions/model.Eco_building_1d'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: page query
+      tags:
+      - Eco_building_1d
+  /eco-building-1m:
+    get:
+      description: query objects
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        type: string
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Eco_building_1m'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: query objects
+      tags:
+      - Eco_building_1m
+    post:
+      consumes:
+      - application/json
+      description: save
+      parameters:
+      - description: object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/model.Eco_building_1m'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_building_1m'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: save
+      tags:
+      - Eco_building_1m
+  /eco-building-1m/{id}:
+    delete:
+      description: delete
+      parameters:
+      - description: 实例id
+        in: path
+        name: time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_building_1m'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: delete
+      tags:
+      - Eco_building_1m
+  /eco-building-1m/batch-delete:
+    post:
+      consumes:
+      - application/json
+      description: batch delete
+      parameters:
+      - description: id array
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch delete
+      tags:
+      - Eco_building_1m
+  /eco-building-1m/batch-upsert:
+    post:
+      consumes:
+      - application/json
+      description: batch update
+      parameters:
+      - description: objects array
+        in: body
+        name: entities
+        required: true
+        schema:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch update
+      tags:
+      - Eco_building_1m
+  /eco-building-1m/groupby:
+    get:
+      description: GroupBy, for example,  _select=level, then return  {level_val1:sum1,level_val2:sum2},
+        _where can input status=0
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
+      - description: _where
+        in: query
+        name: _where
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: GroupBy
+      tags:
+      - Eco_building_1m
+  /eco-building-1m/page:
+    get:
+      description: page query, _page(from 1 begin), _page_size, _order, and others
+        fields, status=1, name=$like.%CAM%
+      parameters:
+      - description: current page
+        in: query
+        name: _page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: _page_size
+        required: true
+        type: integer
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/common.Page'
+                  - properties:
+                      items:
+                        items:
+                          $ref: '#/definitions/model.Eco_building_1m'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: page query
+      tags:
+      - Eco_building_1m
+  /eco-building-1y:
+    get:
+      description: query objects
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        type: string
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Eco_building_1y'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: query objects
+      tags:
+      - Eco_building_1y
+    post:
+      consumes:
+      - application/json
+      description: save
+      parameters:
+      - description: object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/model.Eco_building_1y'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_building_1y'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: save
+      tags:
+      - Eco_building_1y
+  /eco-building-1y/{id}:
+    delete:
+      description: delete
+      parameters:
+      - description: 实例id
+        in: path
+        name: time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_building_1y'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: delete
+      tags:
+      - Eco_building_1y
+  /eco-building-1y/batch-delete:
+    post:
+      consumes:
+      - application/json
+      description: batch delete
+      parameters:
+      - description: id array
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch delete
+      tags:
+      - Eco_building_1y
+  /eco-building-1y/batch-upsert:
+    post:
+      consumes:
+      - application/json
+      description: batch update
+      parameters:
+      - description: objects array
+        in: body
+        name: entities
+        required: true
+        schema:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch update
+      tags:
+      - Eco_building_1y
+  /eco-building-1y/groupby:
+    get:
+      description: GroupBy, for example,  _select=level, then return  {level_val1:sum1,level_val2:sum2},
+        _where can input status=0
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
+      - description: _where
+        in: query
+        name: _where
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: GroupBy
+      tags:
+      - Eco_building_1y
+  /eco-building-1y/page:
+    get:
+      description: page query, _page(from 1 begin), _page_size, _order, and others
+        fields, status=1, name=$like.%CAM%
+      parameters:
+      - description: current page
+        in: query
+        name: _page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: _page_size
+        required: true
+        type: integer
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/common.Page'
+                  - properties:
+                      items:
+                        items:
+                          $ref: '#/definitions/model.Eco_building_1y'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: page query
+      tags:
+      - Eco_building_1y
+  /eco-floor-1d:
+    get:
+      description: query objects
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        type: string
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Eco_floor_1d'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: query objects
+      tags:
+      - Eco_floor_1d
+    post:
+      consumes:
+      - application/json
+      description: save
+      parameters:
+      - description: object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/model.Eco_floor_1d'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_floor_1d'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: save
+      tags:
+      - Eco_floor_1d
+  /eco-floor-1d/{id}:
+    delete:
+      description: delete
+      parameters:
+      - description: 实例id
+        in: path
+        name: time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_floor_1d'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: delete
+      tags:
+      - Eco_floor_1d
+  /eco-floor-1d/batch-delete:
+    post:
+      consumes:
+      - application/json
+      description: batch delete
+      parameters:
+      - description: id array
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch delete
+      tags:
+      - Eco_floor_1d
+  /eco-floor-1d/batch-upsert:
+    post:
+      consumes:
+      - application/json
+      description: batch update
+      parameters:
+      - description: objects array
+        in: body
+        name: entities
+        required: true
+        schema:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch update
+      tags:
+      - Eco_floor_1d
+  /eco-floor-1d/groupby:
+    get:
+      description: GroupBy, for example,  _select=level, then return  {level_val1:sum1,level_val2:sum2},
+        _where can input status=0
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
+      - description: _where
+        in: query
+        name: _where
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: GroupBy
+      tags:
+      - Eco_floor_1d
+  /eco-floor-1d/page:
+    get:
+      description: page query, _page(from 1 begin), _page_size, _order, and others
+        fields, status=1, name=$like.%CAM%
+      parameters:
+      - description: current page
+        in: query
+        name: _page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: _page_size
+        required: true
+        type: integer
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/common.Page'
+                  - properties:
+                      items:
+                        items:
+                          $ref: '#/definitions/model.Eco_floor_1d'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: page query
+      tags:
+      - Eco_floor_1d
+  /eco-floor-1m:
+    get:
+      description: query objects
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        type: string
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Eco_floor_1m'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: query objects
+      tags:
+      - Eco_floor_1m
+    post:
+      consumes:
+      - application/json
+      description: save
+      parameters:
+      - description: object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/model.Eco_floor_1m'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_floor_1m'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: save
+      tags:
+      - Eco_floor_1m
+  /eco-floor-1m/{id}:
+    delete:
+      description: delete
+      parameters:
+      - description: 实例id
+        in: path
+        name: time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_floor_1m'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: delete
+      tags:
+      - Eco_floor_1m
+  /eco-floor-1m/batch-delete:
+    post:
+      consumes:
+      - application/json
+      description: batch delete
+      parameters:
+      - description: id array
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch delete
+      tags:
+      - Eco_floor_1m
+  /eco-floor-1m/batch-upsert:
+    post:
+      consumes:
+      - application/json
+      description: batch update
+      parameters:
+      - description: objects array
+        in: body
+        name: entities
+        required: true
+        schema:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch update
+      tags:
+      - Eco_floor_1m
+  /eco-floor-1m/groupby:
+    get:
+      description: GroupBy, for example,  _select=level, then return  {level_val1:sum1,level_val2:sum2},
+        _where can input status=0
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
+      - description: _where
+        in: query
+        name: _where
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: GroupBy
+      tags:
+      - Eco_floor_1m
+  /eco-floor-1m/page:
+    get:
+      description: page query, _page(from 1 begin), _page_size, _order, and others
+        fields, status=1, name=$like.%CAM%
+      parameters:
+      - description: current page
+        in: query
+        name: _page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: _page_size
+        required: true
+        type: integer
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/common.Page'
+                  - properties:
+                      items:
+                        items:
+                          $ref: '#/definitions/model.Eco_floor_1m'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: page query
+      tags:
+      - Eco_floor_1m
+  /eco-floor-1y:
+    get:
+      description: query objects
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        type: string
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Eco_floor_1y'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: query objects
+      tags:
+      - Eco_floor_1y
+    post:
+      consumes:
+      - application/json
+      description: save
+      parameters:
+      - description: object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/model.Eco_floor_1y'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_floor_1y'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: save
+      tags:
+      - Eco_floor_1y
+  /eco-floor-1y/{id}:
+    delete:
+      description: delete
+      parameters:
+      - description: 实例id
+        in: path
+        name: time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_floor_1y'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: delete
+      tags:
+      - Eco_floor_1y
+  /eco-floor-1y/batch-delete:
+    post:
+      consumes:
+      - application/json
+      description: batch delete
+      parameters:
+      - description: id array
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch delete
+      tags:
+      - Eco_floor_1y
+  /eco-floor-1y/batch-upsert:
+    post:
+      consumes:
+      - application/json
+      description: batch update
+      parameters:
+      - description: objects array
+        in: body
+        name: entities
+        required: true
+        schema:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch update
+      tags:
+      - Eco_floor_1y
+  /eco-floor-1y/groupby:
+    get:
+      description: GroupBy, for example,  _select=level, then return  {level_val1:sum1,level_val2:sum2},
+        _where can input status=0
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
+      - description: _where
+        in: query
+        name: _where
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: GroupBy
+      tags:
+      - Eco_floor_1y
+  /eco-floor-1y/page:
+    get:
+      description: page query, _page(from 1 begin), _page_size, _order, and others
+        fields, status=1, name=$like.%CAM%
+      parameters:
+      - description: current page
+        in: query
+        name: _page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: _page_size
+        required: true
+        type: integer
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/common.Page'
+                  - properties:
+                      items:
+                        items:
+                          $ref: '#/definitions/model.Eco_floor_1y'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: page query
+      tags:
+      - Eco_floor_1y
+  /eco-gateway-1d:
+    get:
+      description: query objects
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        type: string
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: gateway_id
+        in: query
+        name: gateway_id
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Eco_gateway_1d'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: query objects
+      tags:
+      - Eco_gateway_1d
+    post:
+      consumes:
+      - application/json
+      description: save
+      parameters:
+      - description: object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/model.Eco_gateway_1d'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_gateway_1d'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: save
+      tags:
+      - Eco_gateway_1d
+  /eco-gateway-1d/{id}:
+    delete:
+      description: delete
+      parameters:
+      - description: 实例id
+        in: path
+        name: time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_gateway_1d'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: delete
+      tags:
+      - Eco_gateway_1d
+  /eco-gateway-1d/batch-delete:
+    post:
+      consumes:
+      - application/json
+      description: batch delete
+      parameters:
+      - description: id array
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch delete
+      tags:
+      - Eco_gateway_1d
+  /eco-gateway-1d/batch-upsert:
+    post:
+      consumes:
+      - application/json
+      description: batch update
+      parameters:
+      - description: objects array
+        in: body
+        name: entities
+        required: true
+        schema:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch update
+      tags:
+      - Eco_gateway_1d
+  /eco-gateway-1d/groupby:
+    get:
+      description: GroupBy, for example,  _select=level, then return  {level_val1:sum1,level_val2:sum2},
+        _where can input status=0
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
+      - description: _where
+        in: query
+        name: _where
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: GroupBy
+      tags:
+      - Eco_gateway_1d
+  /eco-gateway-1d/page:
+    get:
+      description: page query, _page(from 1 begin), _page_size, _order, and others
+        fields, status=1, name=$like.%CAM%
+      parameters:
+      - description: current page
+        in: query
+        name: _page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: _page_size
+        required: true
+        type: integer
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: gateway_id
+        in: query
+        name: gateway_id
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/common.Page'
+                  - properties:
+                      items:
+                        items:
+                          $ref: '#/definitions/model.Eco_gateway_1d'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: page query
+      tags:
+      - Eco_gateway_1d
+  /eco-gateway-1h:
+    get:
+      description: query objects
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        type: string
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: id
+        in: query
+        name: id
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: gateway_id
+        in: query
+        name: gateway_id
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Eco_gateway_1h'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: query objects
+      tags:
+      - Eco_gateway_1h
+    post:
+      consumes:
+      - application/json
+      description: save
+      parameters:
+      - description: object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/model.Eco_gateway_1h'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_gateway_1h'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: save
+      tags:
+      - Eco_gateway_1h
+  /eco-gateway-1h/{id}:
+    delete:
+      description: delete
+      parameters:
+      - description: 实例id
+        in: path
+        name: idtime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_gateway_1h'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: delete
+      tags:
+      - Eco_gateway_1h
+  /eco-gateway-1h/batch-delete:
+    post:
+      consumes:
+      - application/json
+      description: batch delete
+      parameters:
+      - description: id array
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch delete
+      tags:
+      - Eco_gateway_1h
+  /eco-gateway-1h/batch-upsert:
+    post:
+      consumes:
+      - application/json
+      description: batch update
+      parameters:
+      - description: objects array
+        in: body
+        name: entities
+        required: true
+        schema:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch update
+      tags:
+      - Eco_gateway_1h
+  /eco-gateway-1h/groupby:
+    get:
+      description: GroupBy, for example,  _select=level, then return  {level_val1:sum1,level_val2:sum2},
+        _where can input status=0
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
+      - description: _where
+        in: query
+        name: _where
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: GroupBy
+      tags:
+      - Eco_gateway_1h
+  /eco-gateway-1h/page:
+    get:
+      description: page query, _page(from 1 begin), _page_size, _order, and others
+        fields, status=1, name=$like.%CAM%
+      parameters:
+      - description: current page
+        in: query
+        name: _page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: _page_size
+        required: true
+        type: integer
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: id
+        in: query
+        name: id
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: gateway_id
+        in: query
+        name: gateway_id
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/common.Page'
+                  - properties:
+                      items:
+                        items:
+                          $ref: '#/definitions/model.Eco_gateway_1h'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: page query
+      tags:
+      - Eco_gateway_1h
+  /eco-gateway-1m:
+    get:
+      description: query objects
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        type: string
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: gateway_id
+        in: query
+        name: gateway_id
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Eco_gateway_1m'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: query objects
+      tags:
+      - Eco_gateway_1m
+    post:
+      consumes:
+      - application/json
+      description: save
+      parameters:
+      - description: object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/model.Eco_gateway_1m'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_gateway_1m'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: save
+      tags:
+      - Eco_gateway_1m
+  /eco-gateway-1m/{id}:
+    delete:
+      description: delete
+      parameters:
+      - description: 实例id
+        in: path
+        name: time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_gateway_1m'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: delete
+      tags:
+      - Eco_gateway_1m
+  /eco-gateway-1m/batch-delete:
+    post:
+      consumes:
+      - application/json
+      description: batch delete
+      parameters:
+      - description: id array
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch delete
+      tags:
+      - Eco_gateway_1m
+  /eco-gateway-1m/batch-upsert:
+    post:
+      consumes:
+      - application/json
+      description: batch update
+      parameters:
+      - description: objects array
+        in: body
+        name: entities
+        required: true
+        schema:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch update
+      tags:
+      - Eco_gateway_1m
+  /eco-gateway-1m/groupby:
+    get:
+      description: GroupBy, for example,  _select=level, then return  {level_val1:sum1,level_val2:sum2},
+        _where can input status=0
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
+      - description: _where
+        in: query
+        name: _where
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: GroupBy
+      tags:
+      - Eco_gateway_1m
+  /eco-gateway-1m/page:
+    get:
+      description: page query, _page(from 1 begin), _page_size, _order, and others
+        fields, status=1, name=$like.%CAM%
+      parameters:
+      - description: current page
+        in: query
+        name: _page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: _page_size
+        required: true
+        type: integer
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: gateway_id
+        in: query
+        name: gateway_id
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/common.Page'
+                  - properties:
+                      items:
+                        items:
+                          $ref: '#/definitions/model.Eco_gateway_1m'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: page query
+      tags:
+      - Eco_gateway_1m
+  /eco-gateway-1y:
+    get:
+      description: query objects
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        type: string
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: gateway_id
+        in: query
+        name: gateway_id
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Eco_gateway_1y'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: query objects
+      tags:
+      - Eco_gateway_1y
+    post:
+      consumes:
+      - application/json
+      description: save
+      parameters:
+      - description: object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/model.Eco_gateway_1y'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_gateway_1y'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: save
+      tags:
+      - Eco_gateway_1y
+  /eco-gateway-1y/{id}:
+    delete:
+      description: delete
+      parameters:
+      - description: 实例id
+        in: path
+        name: time
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Eco_gateway_1y'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: delete
+      tags:
+      - Eco_gateway_1y
+  /eco-gateway-1y/batch-delete:
+    post:
+      consumes:
+      - application/json
+      description: batch delete
+      parameters:
+      - description: id array
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch delete
+      tags:
+      - Eco_gateway_1y
+  /eco-gateway-1y/batch-upsert:
+    post:
+      consumes:
+      - application/json
+      description: batch update
+      parameters:
+      - description: objects array
+        in: body
+        name: entities
+        required: true
+        schema:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch update
+      tags:
+      - Eco_gateway_1y
+  /eco-gateway-1y/groupby:
+    get:
+      description: GroupBy, for example,  _select=level, then return  {level_val1:sum1,level_val2:sum2},
+        _where can input status=0
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
+      - description: _where
+        in: query
+        name: _where
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: GroupBy
+      tags:
+      - Eco_gateway_1y
+  /eco-gateway-1y/page:
+    get:
+      description: page query, _page(from 1 begin), _page_size, _order, and others
+        fields, status=1, name=$like.%CAM%
+      parameters:
+      - description: current page
+        in: query
+        name: _page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: _page_size
+        required: true
+        type: integer
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: time
+        in: query
+        name: time
+        type: string
+      - description: gateway_id
+        in: query
+        name: gateway_id
+        type: string
+      - description: floor_id
+        in: query
+        name: floor_id
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: power_consumption
+        in: query
+        name: power_consumption
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/common.Page'
+                  - properties:
+                      items:
+                        items:
+                          $ref: '#/definitions/model.Eco_gateway_1y'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: page query
+      tags:
+      - Eco_gateway_1y
+swagger: "2.0"
