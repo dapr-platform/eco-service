@@ -1,15 +1,17 @@
 package main
 
 import (
+	"eco-service/api"
 	_ "eco-service/docs"
+	"net/http"
+	"os"
+	"strconv"
+
 	"github.com/dapr-platform/common"
 	daprd "github.com/dapr/go-sdk/service/http"
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpSwagger "github.com/swaggo/http-swagger"
-	"net/http"
-	"os"
-	"strconv"
 )
 
 var (
@@ -30,6 +32,7 @@ func init() {
 // @BasePath /swagger/eco-service
 func main() {
 	mux := chi.NewRouter()
+	api.InitRoute(mux)
 	mux.Handle("/metrics", promhttp.Handler())
 	mux.Handle("/swagger*", httpSwagger.WrapHandler)
 	s := daprd.NewServiceWithMux(":"+strconv.Itoa(PORT), mux)

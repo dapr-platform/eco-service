@@ -20,12 +20,13 @@ DB Table Details
 Table: f_eco_building_1m
 [ 0] time                                           TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: []
 [ 1] building_id                                    VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[ 2] power_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
+[ 2] type                                           INT4                 null: true   primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[ 3] power_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "time": 23,    "building_id": "AmucGJwOWSckrqtpxfTMjmZSm",    "power_consumption": 0.7316963478962915}
+{    "time": 51,    "building_id": "XvUdwagSStifuFlbxiElNqQQe",    "type": 25,    "power_consumption": 0.67324080809627}
 
 
 Comments
@@ -43,6 +44,8 @@ var (
 
 	Eco_building_1m_FIELD_NAME_building_id = "building_id"
 
+	Eco_building_1m_FIELD_NAME_type = "type"
+
 	Eco_building_1m_FIELD_NAME_power_consumption = "power_consumption"
 )
 
@@ -50,6 +53,7 @@ var (
 type Eco_building_1m struct {
 	Time             common.LocalTime `json:"time"`              //time
 	BuildingID       string           `json:"building_id"`       //building_id
+	Type             int32            `json:"type"`              //type
 	PowerConsumption float64          `json:"power_consumption"` //power_consumption
 
 }
@@ -104,6 +108,27 @@ Warning table: f_eco_building_1m primary key column time is nullable column, set
 
 		&ColumnInfo{
 			Index:              2,
+			Name:               "type",
+			Comment:            `type`,
+			Notes:              ``,
+			Nullable:           true,
+			DatabaseTypeName:   "INT4",
+			DatabaseTypePretty: "INT4",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "INT4",
+			ColumnLength:       -1,
+			GoFieldName:        "Type",
+			GoFieldType:        "int32",
+			JSONFieldName:      "type",
+			ProtobufFieldName:  "type",
+			ProtobufType:       "int32",
+			ProtobufPos:        3,
+		},
+
+		&ColumnInfo{
+			Index:              3,
 			Name:               "power_consumption",
 			Comment:            `power_consumption`,
 			Notes:              ``,
@@ -120,7 +145,7 @@ Warning table: f_eco_building_1m primary key column time is nullable column, set
 			JSONFieldName:      "power_consumption",
 			ProtobufFieldName:  "power_consumption",
 			ProtobufType:       "float",
-			ProtobufPos:        3,
+			ProtobufPos:        4,
 		},
 	},
 }

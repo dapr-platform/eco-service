@@ -22,12 +22,13 @@ Table: f_eco_gateway_1y
 [ 1] gateway_id                                     VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 2] floor_id                                       VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 3] building_id                                    VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[ 4] power_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
+[ 4] type                                           INT4                 null: true   primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[ 5] power_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "time": 62,    "gateway_id": "vPnwOwFNGrbBfntOAhYrZrueS",    "floor_id": "NtGrOMIsgSPVQZLaINZDadmTj",    "building_id": "kJgwJgqrmPJbLhhsfBHNcCAsM",    "power_consumption": 0.7275186589881771}
+{    "time": 56,    "gateway_id": "fvPrWlvGsRycGjVPsUPMKlFoO",    "floor_id": "RjfyweIIKtIdupRmcGwyuIhMC",    "building_id": "olJmNCQDxtiRjVouTHNcuxHCM",    "type": 29,    "power_consumption": 0.29144779568245105}
 
 
 Comments
@@ -49,6 +50,8 @@ var (
 
 	Eco_gateway_1y_FIELD_NAME_building_id = "building_id"
 
+	Eco_gateway_1y_FIELD_NAME_type = "type"
+
 	Eco_gateway_1y_FIELD_NAME_power_consumption = "power_consumption"
 )
 
@@ -58,6 +61,7 @@ type Eco_gateway_1y struct {
 	GatewayID        string           `json:"gateway_id"`        //gateway_id
 	FloorID          string           `json:"floor_id"`          //floor_id
 	BuildingID       string           `json:"building_id"`       //building_id
+	Type             int32            `json:"type"`              //type
 	PowerConsumption float64          `json:"power_consumption"` //power_consumption
 
 }
@@ -154,6 +158,27 @@ Warning table: f_eco_gateway_1y primary key column time is nullable column, sett
 
 		&ColumnInfo{
 			Index:              4,
+			Name:               "type",
+			Comment:            `type`,
+			Notes:              ``,
+			Nullable:           true,
+			DatabaseTypeName:   "INT4",
+			DatabaseTypePretty: "INT4",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "INT4",
+			ColumnLength:       -1,
+			GoFieldName:        "Type",
+			GoFieldType:        "int32",
+			JSONFieldName:      "type",
+			ProtobufFieldName:  "type",
+			ProtobufType:       "int32",
+			ProtobufPos:        5,
+		},
+
+		&ColumnInfo{
+			Index:              5,
 			Name:               "power_consumption",
 			Comment:            `power_consumption`,
 			Notes:              ``,
@@ -170,7 +195,7 @@ Warning table: f_eco_gateway_1y primary key column time is nullable column, sett
 			JSONFieldName:      "power_consumption",
 			ProtobufFieldName:  "power_consumption",
 			ProtobufType:       "float",
-			ProtobufPos:        5,
+			ProtobufPos:        6,
 		},
 	},
 }

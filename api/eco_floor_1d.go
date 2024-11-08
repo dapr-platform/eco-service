@@ -72,6 +72,7 @@ func batchUpsertEco_floor_1dHandler(w http.ResponseWriter, r *http.Request) {
 // @Param time query string false "time"
 // @Param floor_id query string false "floor_id"
 // @Param building_id query string false "building_id"
+// @Param type query string false "type"
 // @Param power_consumption query string false "power_consumption"
 // @Produce  json
 // @Success 200 {object} common.Response{data=common.Page{items=[]model.Eco_floor_1d}} "objects array"
@@ -97,6 +98,7 @@ func Eco_floor_1dPageListHandler(w http.ResponseWriter, r *http.Request) {
 // @Param time query string false "time"
 // @Param floor_id query string false "floor_id"
 // @Param building_id query string false "building_id"
+// @Param type query string false "type"
 // @Param power_consumption query string false "power_consumption"
 // @Produce  json
 // @Success 200 {object} common.Response{data=[]model.Eco_floor_1d} "objects array"

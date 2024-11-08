@@ -141,11 +141,6 @@ COMMENT ON COLUMN f_eco_gateway_1h.building_id IS '楼栋ID';
 COMMENT ON COLUMN f_eco_gateway_1h.type IS '网关类型(1:AL,2:AP)';
 COMMENT ON COLUMN f_eco_gateway_1h.power_consumption IS '用电量(kWh)';
 
-
-
--- Example usage:
--- SELECT generate_gateway_test_data('2024-01-01', '2024-01-31');
-
 -- Create continuous aggregates for gateway daily metrics
 CREATE MATERIALIZED VIEW f_eco_gateway_1d
 WITH (timescaledb.continuous) AS
@@ -254,6 +249,135 @@ FROM f_eco_gateway_1h
 GROUP BY time_bucket('1 year', time), building_id, type
 WITH NO DATA;
 
+-- Create view for building daily metrics with floor details
+CREATE OR REPLACE VIEW v_eco_building_info_1d AS
+WITH floor_stats AS (
+    SELECT 
+        f.time,
+        f.floor_id,
+        f.building_id,
+        fl.floor_name,
+        sum(f.power_consumption) as floor_total,
+        json_agg(json_build_object(
+            'id', f.type,
+            'total', f.power_consumption
+        )) as floor_types
+    FROM f_eco_floor_1d f
+    LEFT JOIN o_eco_floor fl ON f.floor_id = fl.id
+    GROUP BY f.time, f.floor_id, f.building_id, fl.floor_name
+)
+SELECT 
+    b.time,
+    b.building_id,
+    bld.building_name,
+    concat(b.building_id, '_', b.time) as id,
+    sum(b.power_consumption) as total,
+    json_agg(json_build_object(
+        'id', b.type,
+        'total', b.power_consumption
+    )) as types,
+    (
+        SELECT json_agg(json_build_object(
+            'id', concat(fs.floor_id, '_', b.time),
+            'floor_id', fs.floor_id,
+            'floor_name', fs.floor_name,
+            'total', fs.floor_total,
+            'types', fs.floor_types
+        ))
+        FROM floor_stats fs
+        WHERE fs.time = b.time 
+        AND fs.building_id = b.building_id
+    ) as floors
+FROM f_eco_building_1d b
+LEFT JOIN o_eco_building bld ON b.building_id = bld.id
+GROUP BY b.time, b.building_id, bld.building_name;
+
+-- Create view for building monthly metrics with floor details
+CREATE OR REPLACE VIEW v_eco_building_info_1m AS
+WITH floor_stats AS (
+    SELECT 
+        f.time,
+        f.floor_id,
+        f.building_id,
+        fl.floor_name,
+        sum(f.power_consumption) as floor_total,
+        json_agg(json_build_object(
+            'id', f.type,
+            'total', f.power_consumption
+        )) as floor_types
+    FROM f_eco_floor_1m f
+    LEFT JOIN o_eco_floor fl ON f.floor_id = fl.id
+    GROUP BY f.time, f.floor_id, f.building_id, fl.floor_name
+)
+SELECT 
+    b.time,
+    b.building_id,
+    bld.building_name,
+    concat(b.building_id, '_', b.time) as id,
+    sum(b.power_consumption) as total,
+    json_agg(json_build_object(
+        'id', b.type,
+        'total', b.power_consumption
+    )) as types,
+    (
+        SELECT json_agg(json_build_object(
+            'id', concat(fs.floor_id, '_', b.time),
+            'floor_id', fs.floor_id,
+            'floor_name', fs.floor_name,
+            'total', fs.floor_total,
+            'types', fs.floor_types
+        ))
+        FROM floor_stats fs
+        WHERE fs.time = b.time 
+        AND fs.building_id = b.building_id
+    ) as floors
+FROM f_eco_building_1m b
+LEFT JOIN o_eco_building bld ON b.building_id = bld.id
+GROUP BY b.time, b.building_id, bld.building_name;
+
+-- Create view for building yearly metrics with floor details
+CREATE OR REPLACE VIEW v_eco_building_info_1y AS
+WITH floor_stats AS (
+    SELECT 
+        f.time,
+        f.floor_id,
+        f.building_id,
+        fl.floor_name,
+        sum(f.power_consumption) as floor_total,
+        json_agg(json_build_object(
+            'id', f.type,
+            'total', f.power_consumption
+        )) as floor_types
+    FROM f_eco_floor_1y f
+    LEFT JOIN o_eco_floor fl ON f.floor_id = fl.id
+    GROUP BY f.time, f.floor_id, f.building_id, fl.floor_name
+)
+SELECT 
+    b.time,
+    b.building_id,
+    bld.building_name,
+    concat(b.building_id, '_', b.time) as id,
+    sum(b.power_consumption) as total,
+    json_agg(json_build_object(
+        'id', b.type,
+        'total', b.power_consumption
+    )) as types,
+    (
+        SELECT json_agg(json_build_object(
+            'id', concat(fs.floor_id, '_', b.time),
+            'floor_id', fs.floor_id,
+            'floor_name', fs.floor_name,
+            'total', fs.floor_total,
+            'types', fs.floor_types
+        ))
+        FROM floor_stats fs
+        WHERE fs.time = b.time 
+        AND fs.building_id = b.building_id
+    ) as floors
+FROM f_eco_building_1y b
+LEFT JOIN o_eco_building bld ON b.building_id = bld.id
+GROUP BY b.time, b.building_id, bld.building_name;
+
 -- Insert buildings
 INSERT INTO o_eco_building (id, created_by, updated_by, building_name)
 VALUES 
@@ -344,6 +468,9 @@ VALUES
 
 -- +goose Down
 -- +goose StatementBegin
+DROP VIEW IF EXISTS v_eco_building_info_1y;
+DROP VIEW IF EXISTS v_eco_building_info_1m;
+DROP VIEW IF EXISTS v_eco_building_info_1d;
 DROP FUNCTION IF EXISTS generate_gateway_test_data;
 DROP MATERIALIZED VIEW IF EXISTS f_eco_building_1y;
 DROP MATERIALIZED VIEW IF EXISTS f_eco_building_1m;
