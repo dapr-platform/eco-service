@@ -25,16 +25,17 @@ Table: o_eco_gateway
 [ 4] updated_time                                   TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: [CURRENT_TIMESTAMP]
 [ 5] model_name                                     VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
 [ 6] dev_name                                       VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
-[ 7] channel_no                                     VARCHAR(64)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 64      default: []
+[ 7] mac_addr                                       VARCHAR(64)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 64      default: []
 [ 8] cm_code                                        VARCHAR(64)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 64      default: []
 [ 9] location                                       VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
-[10] floor_no                                       VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
-[11] building_no                                    VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
+[10] floor_id                                       VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
+[11] building_id                                    VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
+[12] type                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "id": "KIUcvMRhULMrcNqMtwMMkSVyX",    "created_by": "EbmmCUkdYNNaNZRemoprvHYGQ",    "created_time": 52,    "updated_by": "YSVJQtcBYhutpjdjFqqQEvSop",    "updated_time": 83,    "model_name": "rcmZjphhaILkiQYNdlJFhMDPr",    "dev_name": "QMFujOGWECNhDFUiPVodtZWFn",    "channel_no": "owdgiPjLiOGyCfErphpSjenOO",    "cm_code": "hrIabecFmvgyenFvAyQTLDrnk",    "location": "hxoplLFKnZtfKAVEVfgdhKEsE",    "floor_no": "YqgoqumBCWorgPXYLaXCNRQJU",    "building_no": "CkgFxJvPcioAEaRxrcNwNXqyI"}
+{    "id": "BalKQvKqZwgJptcjbJRObNQeK",    "created_by": "cEoMIOofLsEeBbjbAUgDWtTxJ",    "created_time": 28,    "updated_by": "AaisGGdnSRrlovCeZucsHuaMo",    "updated_time": 24,    "model_name": "cBhITMVJAPPXmLbrWTdHxKFxD",    "dev_name": "RUDPydLGcFCFwOQBsykROKrmN",    "mac_addr": "XAfilxxnwCeAEiXBiLDwxTjKL",    "cm_code": "SxVLTaNeTmcQjyfhEAUvwHWLB",    "location": "AUISVtBAaxNkOCgAyUKnHMYHZ",    "floor_id": "axOwqxRyIhEsSKEBtcfQlFMUm",    "building_id": "iEmGImXMmnlJbskgaLLqqgSRp",    "type": 60}
 
 
 
@@ -55,15 +56,17 @@ var (
 
 	Ecgateway_FIELD_NAME_dev_name = "dev_name"
 
-	Ecgateway_FIELD_NAME_channel_no = "channel_no"
+	Ecgateway_FIELD_NAME_mac_addr = "mac_addr"
 
 	Ecgateway_FIELD_NAME_cm_code = "cm_code"
 
 	Ecgateway_FIELD_NAME_location = "location"
 
-	Ecgateway_FIELD_NAME_floor_no = "floor_no"
+	Ecgateway_FIELD_NAME_floor_id = "floor_id"
 
-	Ecgateway_FIELD_NAME_building_no = "building_no"
+	Ecgateway_FIELD_NAME_building_id = "building_id"
+
+	Ecgateway_FIELD_NAME_type = "type"
 )
 
 // Ecgateway struct is a row record of the o_eco_gateway table in the  database
@@ -75,11 +78,12 @@ type Ecgateway struct {
 	UpdatedTime common.LocalTime `json:"updated_time"` //更新时间
 	ModelName   string           `json:"model_name"`   //型号名称
 	DevName     string           `json:"dev_name"`     //设备名称
-	ChannelNo   string           `json:"channel_no"`   //通道号
+	MacAddr     string           `json:"mac_addr"`     //MAC地址
 	CmCode      string           `json:"cm_code"`      //通信码
 	Location    string           `json:"location"`     //组织名称
-	FloorNo     string           `json:"floor_no"`     //楼层号
-	BuildingNo  string           `json:"building_no"`  //楼栋号
+	FloorID     string           `json:"floor_id"`     //楼层ID
+	BuildingID  string           `json:"building_id"`  //楼栋ID
+	Type        int32            `json:"type"`         //网关类型(1:AL,2:AP)
 
 }
 
@@ -236,8 +240,8 @@ var EcgatewayTableInfo = &TableInfo{
 
 		&ColumnInfo{
 			Index:              7,
-			Name:               "channel_no",
-			Comment:            `通道号`,
+			Name:               "mac_addr",
+			Comment:            `MAC地址`,
 			Notes:              ``,
 			Nullable:           false,
 			DatabaseTypeName:   "VARCHAR",
@@ -247,10 +251,10 @@ var EcgatewayTableInfo = &TableInfo{
 			IsArray:            false,
 			ColumnType:         "VARCHAR",
 			ColumnLength:       64,
-			GoFieldName:        "ChannelNo",
+			GoFieldName:        "MacAddr",
 			GoFieldType:        "string",
-			JSONFieldName:      "channel_no",
-			ProtobufFieldName:  "channel_no",
+			JSONFieldName:      "mac_addr",
+			ProtobufFieldName:  "mac_addr",
 			ProtobufType:       "string",
 			ProtobufPos:        8,
 		},
@@ -299,44 +303,65 @@ var EcgatewayTableInfo = &TableInfo{
 
 		&ColumnInfo{
 			Index:              10,
-			Name:               "floor_no",
-			Comment:            `楼层号`,
+			Name:               "floor_id",
+			Comment:            `楼层ID`,
 			Notes:              ``,
 			Nullable:           false,
 			DatabaseTypeName:   "VARCHAR",
-			DatabaseTypePretty: "VARCHAR(128)",
+			DatabaseTypePretty: "VARCHAR(32)",
 			IsPrimaryKey:       false,
 			IsAutoIncrement:    false,
 			IsArray:            false,
 			ColumnType:         "VARCHAR",
-			ColumnLength:       128,
-			GoFieldName:        "FloorNo",
+			ColumnLength:       32,
+			GoFieldName:        "FloorID",
 			GoFieldType:        "string",
-			JSONFieldName:      "floor_no",
-			ProtobufFieldName:  "floor_no",
+			JSONFieldName:      "floor_id",
+			ProtobufFieldName:  "floor_id",
 			ProtobufType:       "string",
 			ProtobufPos:        11,
 		},
 
 		&ColumnInfo{
 			Index:              11,
-			Name:               "building_no",
-			Comment:            `楼栋号`,
+			Name:               "building_id",
+			Comment:            `楼栋ID`,
 			Notes:              ``,
 			Nullable:           false,
 			DatabaseTypeName:   "VARCHAR",
-			DatabaseTypePretty: "VARCHAR(128)",
+			DatabaseTypePretty: "VARCHAR(32)",
 			IsPrimaryKey:       false,
 			IsAutoIncrement:    false,
 			IsArray:            false,
 			ColumnType:         "VARCHAR",
-			ColumnLength:       128,
-			GoFieldName:        "BuildingNo",
+			ColumnLength:       32,
+			GoFieldName:        "BuildingID",
 			GoFieldType:        "string",
-			JSONFieldName:      "building_no",
-			ProtobufFieldName:  "building_no",
+			JSONFieldName:      "building_id",
+			ProtobufFieldName:  "building_id",
 			ProtobufType:       "string",
 			ProtobufPos:        12,
+		},
+
+		&ColumnInfo{
+			Index:              12,
+			Name:               "type",
+			Comment:            `网关类型(1:AL,2:AP)`,
+			Notes:              ``,
+			Nullable:           false,
+			DatabaseTypeName:   "INT4",
+			DatabaseTypePretty: "INT4",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "INT4",
+			ColumnLength:       -1,
+			GoFieldName:        "Type",
+			GoFieldType:        "int32",
+			JSONFieldName:      "type",
+			ProtobufFieldName:  "type",
+			ProtobufType:       "int32",
+			ProtobufPos:        13,
 		},
 	},
 }
