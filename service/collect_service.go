@@ -13,9 +13,33 @@ import (
 	"github.com/pkg/errors"
 )
 
+func init() {
+	// Start goroutine to collect stats every hour at 5 minutes past
+	go func() {
+		for {
+			now := time.Now()
+			// Calculate next run time (next hour at 5 minutes past)
+			next := time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, 5, 0, 0, now.Location())
+			time.Sleep(next.Sub(now))
+
+			if err := CollectGatewayHourlyStats(); err != nil {
+				common.Logger.Errorf("Failed to collect gateway hourly stats: %v", err)
+			}
+		}
+	}()
+}
+
 // CollectGatewayHourlyStats collects gateway hourly stats at 5 minutes past each hour
-// Gets data for previous 4 hours and stores in database
-func CollectGatewayHourlyStats() error {
+// Gets data for previous hours and stores in database
+// hoursAgo specifies how many previous hours to collect, defaults to 4 if not specified
+func CollectGatewayHourlyStats(hoursAgo ...int) error {
+	common.Logger.Infof("Collecting gateway hourly stats")
+	// Get hours to collect, default to 4 if not specified
+	hours := 4
+	if len(hoursAgo) > 0 && hoursAgo[0] > 0 {
+		hours = hoursAgo[0]
+	}
+
 	// Get current time
 	now := time.Now()
 
@@ -54,8 +78,8 @@ func CollectGatewayHourlyStats() error {
 			macAddrs[i] = gateway.MacAddr
 		}
 
-		// Collect stats for previous 4 hours
-		for i := 1; i <= 4; i++ {
+		// Collect stats for previous hours
+		for i := 1; i <= hours; i++ {
 			// Calculate hour timestamp
 			hourTime := now.Add(time.Duration(-i) * time.Hour)
 			hourTime = time.Date(hourTime.Year(), hourTime.Month(), hourTime.Day(),
