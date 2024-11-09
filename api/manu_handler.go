@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func InitTestRoute(r chi.Router) {
+func InitManuCollectRoute(r chi.Router) {
 	r.Get(common.BASE_CONTEXT+"/manu_collect", ManuCollectHandler)
 }
 
