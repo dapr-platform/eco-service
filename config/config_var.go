@@ -11,6 +11,7 @@ var ECO_OAUTH_TOKEN_URL = ""
 var ECO_OAUTH_CLIENT_ID = ""
 var ECO_PROJECT_MAPPING = ""
 var ECO_INVOKE_URL = ""
+var ECO_PASSWORD = ""
 
 func init() {
 	if v := os.Getenv("ECO_USER"); v != "" {
@@ -39,5 +40,8 @@ func init() {
 	}
 	if v := os.Getenv("ECO_INVOKE_URL"); v != "" {
 		ECO_INVOKE_URL = v
+	}
+	if v := os.Getenv("ECO_PASSWORD"); v != "" {
+		ECO_PASSWORD = v
 	}
 }
