@@ -28,7 +28,7 @@ Table: o_eco_building
 
 JSON Sample
 -------------------------------------
-{    "id": "mrEHwUlmRltsuKJFbiaAgGiVl",    "created_by": "DfQhOWCyFLnfcTokgFtsGJMdg",    "created_time": 23,    "updated_by": "RtIIylEvZLWGxdusfghRJfoNJ",    "updated_time": 14,    "building_name": "ubYmMVyJmcVOkZewkttjxKXES"}
+{    "id": "chUfabukReejAIDDSpcTpcjnY",    "created_by": "rPwMKtebODxcPymjHHZcLTEmb",    "created_time": 3,    "updated_by": "tfOvDRkxRpYegYMVWnMfXZeXO",    "updated_time": 49,    "building_name": "tMrFbgFLacUrqpYstmaGicVbR"}
 
 
 

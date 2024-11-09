@@ -7,5 +7,7 @@ func InitRoute(r chi.Router) {
 	InitEco_building_info_1mRoute(r)
 	InitEco_building_info_1yRoute(r)
 	InitEcgatewayRoute(r)
+	InitEcfloorRoute(r)
+	InitEcbuildingRoute(r)
 	InitManuCollectRoute(r)
 }
