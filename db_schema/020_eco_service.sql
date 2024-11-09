@@ -144,109 +144,109 @@ COMMENT ON COLUMN f_eco_gateway_1h.power_consumption IS '用电量(kWh)';
 -- Create continuous aggregates for gateway daily metrics
 CREATE MATERIALIZED VIEW f_eco_gateway_1d
 WITH (timescaledb.continuous) AS
-SELECT time_bucket('1 day', time) AS time,
+SELECT time_bucket(INTERVAL '1 day', time) AS time,
        gateway_id,
        floor_id,
        building_id,
        type,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket('1 day', time), gateway_id, floor_id, building_id, type
+GROUP BY time_bucket(INTERVAL '1 day', time), gateway_id, floor_id, building_id, type
 WITH NO DATA;
 
 -- Create continuous aggregates for gateway monthly metrics
 CREATE MATERIALIZED VIEW f_eco_gateway_1m
 WITH (timescaledb.continuous) AS
-SELECT time_bucket('1 month', time) AS time,
+SELECT time_bucket(INTERVAL '1 month', time) AS time,
        gateway_id,
        floor_id,
        building_id,
        type,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket('1 month', time), gateway_id, floor_id, building_id, type
+GROUP BY time_bucket(INTERVAL '1 month', time), gateway_id, floor_id, building_id, type
 WITH NO DATA;
 
 -- Create continuous aggregates for gateway yearly metrics
 CREATE MATERIALIZED VIEW f_eco_gateway_1y
 WITH (timescaledb.continuous) AS
-SELECT time_bucket('1 year', time) AS time,
+SELECT time_bucket(INTERVAL '1 year', time) AS time,
        gateway_id,
        floor_id,
        building_id,
        type,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket('1 year', time), gateway_id, floor_id, building_id, type
+GROUP BY time_bucket(INTERVAL '1 year', time), gateway_id, floor_id, building_id, type
 WITH NO DATA;
 
 -- Create continuous aggregates for floor daily metrics
 CREATE MATERIALIZED VIEW f_eco_floor_1d
 WITH (timescaledb.continuous) AS
-SELECT time_bucket('1 day', time) AS time,
+SELECT time_bucket(INTERVAL '1 day', time) AS time,
        floor_id,
        building_id,
        type,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket('1 day', time), floor_id, building_id, type
+GROUP BY time_bucket(INTERVAL '1 day', time), floor_id, building_id, type
 WITH NO DATA;
 
 -- Create continuous aggregates for floor monthly metrics
 CREATE MATERIALIZED VIEW f_eco_floor_1m
 WITH (timescaledb.continuous) AS
-SELECT time_bucket('1 month', time) AS time,
+SELECT time_bucket(INTERVAL '1 month', time) AS time,
        floor_id,
        building_id,
        type,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket('1 month', time), floor_id, building_id, type
+GROUP BY time_bucket(INTERVAL '1 month', time), floor_id, building_id, type
 WITH NO DATA;
 
 -- Create continuous aggregates for floor yearly metrics
 CREATE MATERIALIZED VIEW f_eco_floor_1y
 WITH (timescaledb.continuous) AS
-SELECT time_bucket('1 year', time) AS time,
+SELECT time_bucket(INTERVAL '1 year', time) AS time,
        floor_id,
        building_id,
        type,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket('1 year', time), floor_id, building_id, type
+GROUP BY time_bucket(INTERVAL '1 year', time), floor_id, building_id, type
 WITH NO DATA;
 
 -- Create continuous aggregates for building daily metrics
 CREATE MATERIALIZED VIEW f_eco_building_1d
 WITH (timescaledb.continuous) AS
-SELECT time_bucket('1 day', time) AS time,
+SELECT time_bucket(INTERVAL '1 day', time) AS time,
        building_id,
        type,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket('1 day', time), building_id, type
+GROUP BY time_bucket(INTERVAL '1 day', time), building_id, type
 WITH NO DATA;
 
 -- Create continuous aggregates for building monthly metrics
 CREATE MATERIALIZED VIEW f_eco_building_1m
 WITH (timescaledb.continuous) AS
-SELECT time_bucket('1 month', time) AS time,
+SELECT time_bucket(INTERVAL '1 month', time) AS time,
        building_id,
        type,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket('1 month', time), building_id, type
+GROUP BY time_bucket(INTERVAL '1 month', time), building_id, type
 WITH NO DATA;
 
 -- Create continuous aggregates for building yearly metrics
 CREATE MATERIALIZED VIEW f_eco_building_1y
 WITH (timescaledb.continuous) AS
-SELECT time_bucket('1 year', time) AS time,
+SELECT time_bucket(INTERVAL '1 year', time) AS time,
        building_id,
        type,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket('1 year', time), building_id, type
+GROUP BY time_bucket(INTERVAL '1 year', time), building_id, type
 WITH NO DATA;
 
 -- Create view for building daily metrics with floor details
