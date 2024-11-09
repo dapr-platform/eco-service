@@ -12,6 +12,17 @@ import (
 	"github.com/dapr-platform/common"
 	"github.com/pkg/errors"
 )
+var needRefreshContinuousAggregateMap = map[string]string{
+	"f_eco_gateway_1d":  "day",
+	"f_eco_gateway_1m":  "month",
+	"f_eco_gateway_1y":  "year",
+	"f_eco_floor_1d":    "day",
+	"f_eco_floor_1m":    "month", 
+	"f_eco_floor_1y":    "year",
+	"f_eco_building_1d": "day",
+	"f_eco_building_1m": "month",
+	"f_eco_building_1y": "year",
+}
 
 func init() {
 	// Start goroutine to collect stats every hour at 5 minutes past
@@ -139,12 +150,32 @@ func CollectGatewayHourlyStats(hoursAgo ...int) error {
 					}
 				}
 
-				// Save to database using common.DbSave
-				err = common.DbUpsert[model.Eco_gateway_1h](context.Background(), common.GetDaprClient(), hourlyStats, model.Eco_gateway_1hTableInfo.Name, model.Eco_gateway_1h_FIELD_NAME_id)
-				if err != nil {
-					return err
-				}
+				
 			}
+		}
+		
+	}
+
+	// Refresh continuous aggregates based on type
+	for tableName, refreshType := range needRefreshContinuousAggregateMap {
+		startTime := time.Now()
+		endTime := startTime
+		
+		switch refreshType {
+		case "day":
+			startTime = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), 0, 0, 0, 0, startTime.Location())
+			endTime = startTime.AddDate(0, 0, 1)
+		case "month":
+			startTime = time.Date(startTime.Year(), startTime.Month(), 1, 0, 0, 0, 0, startTime.Location())
+			endTime = startTime.AddDate(0, 1, 0)
+		case "year":
+			startTime = time.Date(startTime.Year(), 1, 1, 0, 0, 0, 0, startTime.Location())
+			endTime = startTime.AddDate(1, 0, 0)
+		}
+
+		if err := common.DbRefreshContinuousAggregate(context.Background(), common.GetDaprClient(), 
+			tableName, startTime.Format("2006-01-02"), endTime.Format("2006-01-02")); err != nil {
+			return err
 		}
 	}
 
