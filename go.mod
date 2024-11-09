@@ -5,7 +5,7 @@ go 1.22.7
 toolchain go1.23.1
 
 require (
-	github.com/dapr-platform/common v0.0.0-20241109064225-7b10713a0824
+	github.com/dapr-platform/common v0.0.0-20241109075644-1d3eef0fccc1
 	github.com/dapr/go-sdk v1.11.0
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/pkg/errors v0.9.1

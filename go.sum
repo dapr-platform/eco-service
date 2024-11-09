@@ -5,8 +5,8 @@ github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6r
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
-github.com/dapr-platform/common v0.0.0-20241109064225-7b10713a0824 h1:8n9KO1oj395CKUiglf7pD/EBcEdHxihLVx/EhUxlBDU=
-github.com/dapr-platform/common v0.0.0-20241109064225-7b10713a0824/go.mod h1:bvLwDx2IWA2rv9gngEm5I1C5iSkVzPA2t/ozjN/5s34=
+github.com/dapr-platform/common v0.0.0-20241109075644-1d3eef0fccc1 h1:8+9sPO+nLZGaNmWTJqX3ymuC9Neh8HiDV8LgjAutgV8=
+github.com/dapr-platform/common v0.0.0-20241109075644-1d3eef0fccc1/go.mod h1:bvLwDx2IWA2rv9gngEm5I1C5iSkVzPA2t/ozjN/5s34=
 github.com/dapr/dapr v1.14.4 h1:OEyAFvpW4AK+MWyX5xp9zVLiC+oY/5ziDzh16F+aoWU=
 github.com/dapr/dapr v1.14.4/go.mod h1:pZGJvUGT4IDhEuWVXBvJ73TkPnLAW34SDagth7G3f8w=
 github.com/dapr/go-sdk v1.11.0 h1:clANpOQd6MsfvSa6snaX8MVk6eRx26Vsj5GxGdQ6mpE=

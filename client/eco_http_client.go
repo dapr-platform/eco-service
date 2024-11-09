@@ -99,9 +99,6 @@ func (c *EcoClient) getInitialToken() error {
 	data.Set("uname", config.ECO_USER)
 	data.Set("passwd", config.ECO_PASSWORD)
 
-	fmt.Printf("Getting auth code with data: %+v\n", data)
-	fmt.Printf("Auth code URL: %s\n", config.ECO_OAUTH_CODE_URL)
-
 	req, err := http.NewRequest("POST", config.ECO_OAUTH_CODE_URL, strings.NewReader(data.Encode()))
 	if err != nil {
 		return fmt.Errorf("failed to create auth code request: %v", err)
@@ -118,7 +115,6 @@ func (c *EcoClient) getInitialToken() error {
 	if err != nil {
 		return fmt.Errorf("failed to read auth code response body: %v", err)
 	}
-	fmt.Printf("Auth code response: %s\n", string(respBody))
 
 	var codeResp struct {
 		Code    string `json:"code"`
@@ -140,9 +136,6 @@ func (c *EcoClient) getInitialToken() error {
 	tokenData.Set("code", codeResp.Code)
 	tokenData.Set("client_secret", c.getClientSecret("authorization_code", config.ECO_CALL_BACK_URL, codeResp.Code))
 
-	fmt.Printf("Getting token with data: %+v\n", tokenData)
-	fmt.Printf("Token URL: %s\n", config.ECO_OAUTH_TOKEN_URL)
-
 	tokenReq, err := http.NewRequest("POST", config.ECO_OAUTH_TOKEN_URL, strings.NewReader(tokenData.Encode()))
 	if err != nil {
 		return fmt.Errorf("failed to create token request: %v", err)
@@ -159,7 +152,6 @@ func (c *EcoClient) getInitialToken() error {
 	if err != nil {
 		return fmt.Errorf("failed to read token response body: %v", err)
 	}
-	fmt.Printf("Token response: %s\n", string(tokenRespBody))
 
 	var tr TokenResponse
 	if err := json.Unmarshal(tokenRespBody, &tr); err != nil {
@@ -192,8 +184,6 @@ func (c *EcoClient) refreshAccessToken() error {
 	data.Set("refresh_token", c.refreshToken)
 	data.Set("client_secret", c.getClientSecret("refresh_token", config.ECO_CALL_BACK_URL, c.refreshToken))
 
-	fmt.Printf("Refreshing token with data: %+v\n", data)
-
 	req, err := http.NewRequest("POST", config.ECO_OAUTH_TOKEN_URL, strings.NewReader(data.Encode()))
 	if err != nil {
 		return fmt.Errorf("failed to create refresh token request: %v", err)
@@ -210,7 +200,6 @@ func (c *EcoClient) refreshAccessToken() error {
 	if err != nil {
 		return fmt.Errorf("failed to read refresh token response body: %v", err)
 	}
-	fmt.Printf("Refresh token response: %s\n", string(respBody))
 
 	var tokenResp TokenResponse
 	if err := json.Unmarshal(respBody, &tokenResp); err != nil {
