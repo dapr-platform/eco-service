@@ -60,7 +60,7 @@ func CollectGatewayHourlyStats(hoursAgo ...int) error {
 				return errors.Wrap(err, "Failed to get project code for gateway")
 			}
 			gateway.ProjectCode = projectCode
-			err = common.DbUpsert[model.Ecgateway](context.Background(), common.GetDaprClient(), gateway, model.EcgatewayTableInfo.Name, gateway.ID)
+			err = common.DbUpsert[model.Ecgateway](context.Background(), common.GetDaprClient(), gateway, model.EcgatewayTableInfo.Name, model.Ecgateway_FIELD_NAME_id)
 			if err != nil {
 				common.Logger.Errorf("Failed to update project code for gateway %s: %v", gateway.ID, err)
 				return errors.Wrap(err, "Failed to update project code for gateway")
@@ -140,7 +140,7 @@ func CollectGatewayHourlyStats(hoursAgo ...int) error {
 				}
 
 				// Save to database using common.DbSave
-				err = common.DbUpsert[model.Eco_gateway_1h](context.Background(), common.GetDaprClient(), hourlyStats, model.Eco_gateway_1hTableInfo.Name, hourlyStats.ID)
+				err = common.DbUpsert[model.Eco_gateway_1h](context.Background(), common.GetDaprClient(), hourlyStats, model.Eco_gateway_1hTableInfo.Name, model.Eco_gateway_1h_FIELD_NAME_id)
 				if err != nil {
 					return err
 				}
