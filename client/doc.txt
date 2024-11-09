@@ -1,0 +1,83 @@
+客户系统采用后台程序的方式获取CODE，程序发起HTTP 的 POST请求调用接口：
+
+http://ip:port/oauth/authverify2.as，将返回JSON格式的响应数据。
+
+传递的参数如下：
+        Map pm = new HashMap();
+        pm.put("response_type", "code");
+        pm.put("client_id", "O000000049");
+        pm.put("redirect_uri", "http://you-domain/xxx.jsp");
+        pm.put("uname", "aaaa");
+        pm.put("passwd", "bbbb");
+        String ret = HttpClientUtil.post("http://ip:por/oauth/authverify2.as", pm, "utf-8");
+                        
+响应结果如下：
+{"code":"5198a7417068bd560d9ec86bdf4eb9e7","success":"true"}
+
+
+步骤2：根据获取到的临时码 获取access token值，采用POST方式请求：
+http://ip:port/oauth/token.as
+
+post参数如下：
+        client_id=1000
+        client_secret=211bf0ecfba5b007b5255387297d7bc0
+        grant_type=authorization_code
+        redirect_uri=http://xxxxx/receiveXXX
+        code= a9aa00070e1cdcd9e71a1ea10b91c37d
+提示：
+client_secret和appSecret不是同一个参数，其值生成方法见下表
+
+异常：
+如果出现“OAuth callback url needs to be provided!”的错误信息，请检查：
+
+1. 请求头content-type加入 'application/x-www-form-urlencoded'
+
+2. 请求post的body体采用序列化（querystring）
+
+3. redirect_uri 必须有值
+
+授权平台将以JSON格式返回授权码，如:
+
+        {
+        "data":{
+           "tokenType":"Bearer",
+           "accessToken":"0d7cf29a1bf071e3e319cd75f484dbda",
+           "expiresIn":3600,
+           "refreshToken":"598aa1e15366aa393ed64f8ced7228c2"
+        },
+        "success":true,
+        "code":"0"
+        }
+说明：
+accessToken的时效是3600秒，在有效期内，可用refreshToken重新获取新的accessToken，新的accessToken的时效也是3600秒。
+
+刷新token的调用方法如下：
+
+POST请求：http://ip:port/oauth/refresh.as
+
+post参数如下：
+        client_id=1000
+        client_secret=211bf0ecfba5b007b5255387297d7bc0
+        grant_type = refresh_token
+        redirect_uri=http://xxxxx/receiveXXX
+        refresh_token= 598aa1e15366aa393ed64f8ced7228c2
+                               
+
+
+
+相关请求参数的说明：
+数据字段名	类型	说明
+client_id	string	就是appKey
+client_secret	string	如果是请求accessToken，其值加密方式： MD5(appKey + grant_type + redirect_uri + code + appSecret) 如果是请求refreshToken，其值加密方式： MD5(appKey + grant_type + redirect_uri + refreshToken+ appSecret)
+redirect_uri	string	获得code后的反馈地址（必须与申请配置时提供的一致）
+response_type	string	固定字符串值：code
+grant_type	string	如果是想获取accessToken，传固定字符串：authorization_code
+如果是想获取refreshToken，传固定字符串：refresh_token
+code	string	用于获取accessToken值
+refresh_token	string	用于获取refreshToken值
+相关返回值的说明：
+数据字段名	类型	说明
+code	string	登录后返回的临时码
+accessToken	string	授权码，用于调用接口
+expiresIn	long	授权码过期时效，单位秒
+refreshToken	string	用于获取新的accessToken，延长时效

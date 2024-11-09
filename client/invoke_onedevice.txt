@@ -1,0 +1,61 @@
+获取单个设备信息
+详细说明
+接口名称	GET_BOX
+提交参数（post提交）
+参数名称	参数类型	取值说明	必选	参数说明
+…	…	公共参数	是	请参考“接口公共参数
+mac	string		是	设备号
+返回值（返回JSON格式的数据）
+参数名称	参数类型	参数说明
+code	string	返回码（0表示是成功，1表示是失败，2表示accessToken过期）
+message	string	操作结果描述
+data	string	具体数据对象
+data数据元素字段定义:
+mac	string	设备号
+projectCode	string	项目编号
+equipmentType	int	设备类型:
+1-微型断路器
+2-电气火灾监测
+4-液位(TL)
+5-压力(TL)
+6-感烟(FS)
+7-燃气(FS)
+10-感烟(ZAC)
+13-燃气(ZAC)
+29-感烟(WANLIN)
+aliasName	string	设备别名
+build	string	楼栋
+unit	string	单元
+room	string	房号
+linkman	string	联系人
+name	string	联系人
+（注意：请使用linkman参数，name参数将于2020年后移除）
+phone	string	联系电话
+online	int	设备通信模块是否在线（-1未曾连接；0离线；1在线）
+onlineLastTime	String	在线的最后时间
+protocol	string	通讯模块类型：HTTP/UDP
+返回结果示例
+	{
+     "code":"0",
+     "message":"成功",
+     "data":{
+         "mac":"12344556678D",
+         "aliasName":"我家的空开",
+		 "projectCode":"P00000000001",
+         "unit":"A单元",
+         "protocol":"UDP",
+         "build":"1栋",
+         "phone":"13344445555",
+         "linkman":"张三",
+         "online":0,
+         "room":"AAA"
+     },
+     "success":true
+	}    
+	
+失败返回示例:
+	{
+	 "code":"1",
+	 "message":"没有找到匹配的电箱！",
+	}
+	

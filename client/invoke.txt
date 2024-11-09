@@ -1,0 +1,49 @@
+API调用说明
+采用HTTP POST方式调用接口，地址是：http://ip:port/invoke/router.as, 所有的请求和响应数据编码皆为utf-8格式。
+参数签名
+为了防止API调用过程中被黑客恶意篡改，调用任何一个API都需要携带签名（sign），平台会对传递过来的参数进行签名验证。
+
+签名方法：
+将接口要求的所有参数(包括公共参数和方法的其他参数，sign除外)按参数名称排序（参数名称字母顺序升序）后，拼接每个参数的参数值，最后将appSecret拼在参数串后面，采用MD5进行加密拼接的参数串.
+
+示例：
+假如您的appSecret=9a1bf071e3
+
+参数:
+method=GET_BOXES
+client_id=1000
+access_token=0d7cf2
+timestamp=20161231012518
+projectCode=P00000001
+								
+排序后拼接值如下：
+0d7cf21000GET_BOXESP0000000120161231012518
+
+MD5加密:
+sign = MD5(0d7cf21000GET_BOXESP00000001201612310125189a1bf071e3)
+
+java代码：
+static char[] hc = "0123456789abcdef".toCharArray();
+
+public static String MD5(String param){
+   MessageDigest md = MessageDigest.getInstance("MD5");
+   md.reset(); 
+   md.update(param.getBytes("utf-8"));
+   byte[] d = md.digest();
+   StringBuilder r = new StringBuilder(d.length*2);
+   for (byte b : d) {
+	r.append(hc[(b >> 4) & 0xF]);
+	r.append(hc[(b & 0xF)]);
+   }
+	return r.toString();
+}
+
+
+接口公共参数
+提交参数
+参数名称	类型	取值说明	必选	参数说明
+client_id	string		是	分配的appKey
+method	string	如：GET_BOXES	是	接口名称
+access_token	string	参考平台接入规范	是	授权码
+timestamp	string	yyyyMMddHHmmss	是	当前时间截
+sign	string		是	参数签名串

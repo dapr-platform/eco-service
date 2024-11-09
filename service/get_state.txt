@@ -1,0 +1,183 @@
+获取设备小时区间统计(电量、电流、电压、温度、漏电)
+详细说明
+接口名称	GET_BOXES_HOUR_STATS
+提交参数（post提交）
+参数名称	参数类型	取值说明	必选	参数说明
+…	…	公共参数	是	请参考“接口公共参数
+projectCode	string		是	项目编号
+mac	string		是	设备号(mac最多20个，以逗号分隔)
+year	string	格式：yyyy	是	年份
+month	string	格式：MM	是	月份
+day	string	格式：dd	是	日
+hour	String	格式：HH	否	小时（24时制）, 不传将返回当天每小时数据
+返回值（返回JSON格式的数据）
+参数名称	参数类型	参数说明
+code	string	返回码（0表示是成功，1表示是失败，2表示accessToken过期）
+message	string	操作结果描述
+data		具体数据对象
+data数据元素字段定义:
+mac	String	设备号
+addr	int	线路地址，addr=0的表示此设备小时总电量
+electricity	float	小时区间的用电量（单位：kWh）
+currentValue	float	小时区间的平均电流（单位：A）
+voltage	float	小时区间的平均电压（单位是：V）
+tempA	float	小时区间的A相温度的峰值（单位是：℃）
+tempB	float	小时区间的B相温度的峰值（单位是：℃）
+tempC	float	小时区间的C相温度的峰值（单位是：℃）
+tempN	float	小时区间的综合温度的峰值（单位是：℃）
+leakageValue	float	小时区间的漏电流峰值（单位是：mA）
+gatherAddr	int	-1为进线直连，非-1表示电量目标节点号
+返回结果示例
+1、传入hour时的返回结果
+	{
+    "code": "0",
+    "message": "成功",
+    "data": {
+        "98CC4D000000": [
+            {
+                "addr": 0,
+                "electricity": 973.44,
+                "currentValue": 0,
+                "voltage": 0,
+                "tempA": 0,
+                "tempB": 0,
+                "tempC": 0,
+                "tempN": 0,
+                "leakageValue": 0
+            },
+            {
+                "addr": 1,
+                "electricity": 454.272,
+                "currentValue": 700,
+                "voltage": 381,
+                "tempA": 0,
+                "tempB": 0,
+                "tempC": 0,
+                "tempN": 29.3,
+                "leakageValue": 300
+            }
+         ....
+        ]
+    },
+    "success": true
+}
+	 
+    
+2、未传入hour的返回结果
+	{
+	 "code":"0",
+	 "message":"ok",
+	 "data": {
+	 "98CC4D000000":{
+		 "00":[{
+			 "addr":0,
+			 "electricity":971.264,
+			 "totalElectricity":0,
+			 "currentValue":0,
+			 "voltage":0,
+			 "tempA":0,
+			 "tempB":0,
+			 "tempC":0,
+			 "tempN":0,
+			 "leakageValue":0
+			},
+			{
+			 "addr":1,
+			 "electricity":971.264,
+			 "totalElectricity":0,
+			 "currentValue":0,
+			 "voltage":0,
+			 "tempA":0,
+			 "tempB":0,
+			 "tempC":0,
+			 "tempN":0,
+			 "leakageValue":0
+			}
+		 …
+		],
+		 "01":[{
+			 "addr":0,
+			 "electricity":971.264,
+			 "totalElectricity":0,
+			 "currentValue":0,
+			 "voltage":0,
+			 "tempA":0,
+			 "tempB":0,
+			 "tempC":0,
+			 "tempN":0,
+			 "leakageValue":0
+			},
+			{
+			 "addr":1,
+			 "electricity":971.264,
+			 "totalElectricity":0,
+			 "currentValue":0,
+			 "voltage":0,
+			 "tempA":0,
+			 "tempB":0,
+			 "tempC":0,
+			 "tempN":0,
+			 "leakageValue":0
+			}
+		 …
+		],
+		 …
+	}
+	 "98CC4D000000":{
+		 "00":[{
+			 "addr":0,
+			 "electricity":971.264,
+			 "totalElectricity":0,
+			 "currentValue":0,
+			 "voltage":0,
+			 "tempA":0,
+			 "tempB":0,
+			 "tempC":0,
+			 "tempN":0,
+			 "leakageValue":0
+			},
+			{
+			 "addr":1,
+			 "electricity":971.264,
+			 "totalElectricity":0,
+			 "currentValue":0,
+			 "voltage":0,
+			 "tempA":0,
+			 "tempB":0,
+			 "tempC":0,
+			 "tempN":0,
+			 "leakageValue":0
+			}
+		 …
+		],
+		 "01":[{
+			 "addr":0,
+			 "electricity":971.264,
+			 "totalElectricity":0,
+			 "currentValue":0,
+			 "voltage":0,
+			 "tempA":0,
+			 "tempB":0,
+			 "tempC":0,
+			 "tempN":0,
+			 "leakageValue":0
+			},
+			{
+			 "addr":1,
+			 "electricity":971.264,
+			 "totalElectricity":0,
+			 "currentValue":0,
+			 "voltage":0,
+			 "tempA":0,
+			 "tempB":0,
+			 "tempC":0,
+			 "tempN":0,
+			 "leakageValue":0
+			}
+		 …
+		],
+		 …
+	 }
+	}
+	}
+    
