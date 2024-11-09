@@ -2362,16 +2362,30 @@ const docTemplate = `{
                 }
             }
         },
-        "/test": {
+        "/manu_collect": {
             "get": {
-                "description": "Test",
+                "description": "Manually collect data",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Test"
+                    "Manually collect data"
                 ],
-                "summary": "Test",
+                "summary": "Manually collect data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start time (2024-01-01)",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End time (2024-01-01)",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "success",

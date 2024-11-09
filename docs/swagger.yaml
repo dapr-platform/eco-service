@@ -1629,9 +1629,18 @@ paths:
       summary: page query
       tags:
       - Eco_building_info_1y
-  /test:
+  /manu_collect:
     get:
-      description: Test
+      description: Manually collect data
+      parameters:
+      - description: Start time (2024-01-01)
+        in: query
+        name: start
+        type: string
+      - description: End time (2024-01-01)
+        in: query
+        name: end
+        type: string
       produces:
       - application/json
       responses:
@@ -1639,7 +1648,7 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/common.Response'
-      summary: Test
+      summary: Manually collect data
       tags:
-      - Test
+      - Manually collect data
 swagger: "2.0"
