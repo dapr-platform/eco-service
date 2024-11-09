@@ -27,15 +27,16 @@ Table: o_eco_gateway
 [ 6] dev_name                                       VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
 [ 7] mac_addr                                       VARCHAR(64)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 64      default: []
 [ 8] cm_code                                        VARCHAR(64)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 64      default: []
-[ 9] location                                       VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
-[10] floor_id                                       VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[11] building_id                                    VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[12] type                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[ 9] project_code                                   VARCHAR(64)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 64      default: []
+[10] location                                       VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
+[11] floor_id                                       VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
+[12] building_id                                    VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
+[13] type                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "id": "BalKQvKqZwgJptcjbJRObNQeK",    "created_by": "cEoMIOofLsEeBbjbAUgDWtTxJ",    "created_time": 28,    "updated_by": "AaisGGdnSRrlovCeZucsHuaMo",    "updated_time": 24,    "model_name": "cBhITMVJAPPXmLbrWTdHxKFxD",    "dev_name": "RUDPydLGcFCFwOQBsykROKrmN",    "mac_addr": "XAfilxxnwCeAEiXBiLDwxTjKL",    "cm_code": "SxVLTaNeTmcQjyfhEAUvwHWLB",    "location": "AUISVtBAaxNkOCgAyUKnHMYHZ",    "floor_id": "axOwqxRyIhEsSKEBtcfQlFMUm",    "building_id": "iEmGImXMmnlJbskgaLLqqgSRp",    "type": 60}
+{    "id": "QfWEJGsHxAEjKiYFSOhXEBsiw",    "created_by": "UKhXLBosBBjbAkKceITfbcjWQ",    "created_time": 92,    "updated_by": "sOthZteTDdnslUjvCYuJddIVD",    "updated_time": 66,    "model_name": "VPwLycdDZOHaELBCJTTTSggcE",    "dev_name": "YkLavnxjpdvuCDVLCRfxwQlAL",    "mac_addr": "cMYwAftApOZmQuEyRKDUhNAcy",    "cm_code": "AoVcxPKFiENCgNLtAovSmadav",    "project_code": "psogaEwRnSPCuMsPPYXMHqSwH",    "location": "awACrxJOBfJrlvRubmLgaYvmE",    "floor_id": "sknwQMWUGStEtdCnQvpOaAfMj",    "building_id": "HBkDQoqGObyZeltargJJuwGDZ",    "type": 57}
 
 
 
@@ -60,6 +61,8 @@ var (
 
 	Ecgateway_FIELD_NAME_cm_code = "cm_code"
 
+	Ecgateway_FIELD_NAME_project_code = "project_code"
+
 	Ecgateway_FIELD_NAME_location = "location"
 
 	Ecgateway_FIELD_NAME_floor_id = "floor_id"
@@ -80,6 +83,7 @@ type Ecgateway struct {
 	DevName     string           `json:"dev_name"`     //设备名称
 	MacAddr     string           `json:"mac_addr"`     //MAC地址
 	CmCode      string           `json:"cm_code"`      //通信码
+	ProjectCode string           `json:"project_code"` //项目编码
 	Location    string           `json:"location"`     //组织名称
 	FloorID     string           `json:"floor_id"`     //楼层ID
 	BuildingID  string           `json:"building_id"`  //楼栋ID
@@ -282,6 +286,27 @@ var EcgatewayTableInfo = &TableInfo{
 
 		&ColumnInfo{
 			Index:              9,
+			Name:               "project_code",
+			Comment:            `项目编码`,
+			Notes:              ``,
+			Nullable:           false,
+			DatabaseTypeName:   "VARCHAR",
+			DatabaseTypePretty: "VARCHAR(64)",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "VARCHAR",
+			ColumnLength:       64,
+			GoFieldName:        "ProjectCode",
+			GoFieldType:        "string",
+			JSONFieldName:      "project_code",
+			ProtobufFieldName:  "project_code",
+			ProtobufType:       "string",
+			ProtobufPos:        10,
+		},
+
+		&ColumnInfo{
+			Index:              10,
 			Name:               "location",
 			Comment:            `组织名称`,
 			Notes:              ``,
@@ -298,11 +323,11 @@ var EcgatewayTableInfo = &TableInfo{
 			JSONFieldName:      "location",
 			ProtobufFieldName:  "location",
 			ProtobufType:       "string",
-			ProtobufPos:        10,
+			ProtobufPos:        11,
 		},
 
 		&ColumnInfo{
-			Index:              10,
+			Index:              11,
 			Name:               "floor_id",
 			Comment:            `楼层ID`,
 			Notes:              ``,
@@ -319,11 +344,11 @@ var EcgatewayTableInfo = &TableInfo{
 			JSONFieldName:      "floor_id",
 			ProtobufFieldName:  "floor_id",
 			ProtobufType:       "string",
-			ProtobufPos:        11,
+			ProtobufPos:        12,
 		},
 
 		&ColumnInfo{
-			Index:              11,
+			Index:              12,
 			Name:               "building_id",
 			Comment:            `楼栋ID`,
 			Notes:              ``,
@@ -340,11 +365,11 @@ var EcgatewayTableInfo = &TableInfo{
 			JSONFieldName:      "building_id",
 			ProtobufFieldName:  "building_id",
 			ProtobufType:       "string",
-			ProtobufPos:        12,
+			ProtobufPos:        13,
 		},
 
 		&ColumnInfo{
-			Index:              12,
+			Index:              13,
 			Name:               "type",
 			Comment:            `网关类型(1:AL,2:AP)`,
 			Notes:              ``,
@@ -361,7 +386,7 @@ var EcgatewayTableInfo = &TableInfo{
 			JSONFieldName:      "type",
 			ProtobufFieldName:  "type",
 			ProtobufType:       "int32",
-			ProtobufPos:        13,
+			ProtobufPos:        14,
 		},
 	},
 }

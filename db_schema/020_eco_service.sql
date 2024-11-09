@@ -48,6 +48,7 @@ CREATE TABLE o_eco_gateway (
     dev_name VARCHAR(128) NOT NULL,
     mac_addr VARCHAR(64) NOT NULL,
     cm_code VARCHAR(64) NOT NULL,
+    project_code VARCHAR(64) NOT NULL DEFAULT '',
     location VARCHAR(128) NOT NULL,
     floor_id VARCHAR(32) NOT NULL,
     building_id VARCHAR(32) NOT NULL,
@@ -62,6 +63,7 @@ COMMENT ON COLUMN o_eco_gateway.model_name IS '型号名称';
 COMMENT ON COLUMN o_eco_gateway.dev_name IS '设备名称';
 COMMENT ON COLUMN o_eco_gateway.mac_addr IS 'MAC地址';
 COMMENT ON COLUMN o_eco_gateway.cm_code IS '通信码';
+COMMENT ON COLUMN o_eco_gateway.project_code IS '项目编码';
 COMMENT ON COLUMN o_eco_gateway.location IS '组织名称';
 COMMENT ON COLUMN o_eco_gateway.created_time IS '创建时间';
 COMMENT ON COLUMN o_eco_gateway.updated_time IS '更新时间';
