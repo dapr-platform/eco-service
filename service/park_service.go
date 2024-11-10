@@ -27,6 +27,7 @@ func GetParkWaterConsumption(period string, queryTime time.Time) ([]entity.Label
 		return getParkDataYear(queryTime, 0)
 	}
 
+	return nil, fmt.Errorf("unsupported period: %s", period)
 }
 
 func GetParkCarbonEmissionRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
