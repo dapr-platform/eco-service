@@ -69,9 +69,10 @@ func BuildingTypePowerConsumptionHandler(w http.ResponseWriter, r *http.Request)
 }
 
 // @Summary 建筑楼层用电量
-// @Description 建筑楼层用电量，根据粒度获取所有建筑的用电量
+// @Description 建筑楼层用电量，根据粒度获取建筑所有楼层的用电量
 // @Tags Dashboard
 // @Param period query string true "period"
+// @Param building_id query string true "building_id"
 // @Param query_time query string false "query_time,格式2024-01-01,不传则默认当天"
 // @Produce  json
 // @Success 200 {object} common.Response{data=[]entity.LabelData} "objects array"
