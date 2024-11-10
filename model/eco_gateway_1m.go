@@ -29,7 +29,7 @@ Table: f_eco_gateway_1m
 
 JSON Sample
 -------------------------------------
-{    "time": 50,    "gateway_id": "WSpxmOrdunchSkEwOqmglHCKq",    "floor_id": "IEMfqHETHOdhfyyOcfNjqAKwb",    "building_id": "RqSBttmrPJabLdNwxEiJJHLOf",    "park_id": "XlDlEHtcnnBIMvmhmaSMhVrZA",    "type": 81,    "power_consumption": 0.2284259363229661}
+{    "time": 50,    "gateway_id": "NJVBXSgOkLgaGRiAiYnRmkKPf",    "floor_id": "ZvFwCgCHqLEsZIxcoHeRlNmmh",    "building_id": "TXqsDgIRggODXpBDcHNAjNZHB",    "park_id": "sCiIXTuXMwYdAOcrBYsWBdjCr",    "type": 98,    "power_consumption": 0.47597540148719125}
 
 
 Comments

@@ -37,7 +37,7 @@ Table: o_eco_gateway
 
 JSON Sample
 -------------------------------------
-{    "id": "vJfqvtSskLTvZQnrYXrHppJMK",    "created_by": "hsiFVMQShajacRskgffpHoBah",    "created_time": 1,    "updated_by": "GteGgNOhxVkYigHSUGIcbYkwL",    "updated_time": 60,    "model_name": "ikBfJvPCbYysfPvRrGygOjIWF",    "dev_name": "gaXTXVRjRUOjQuGkNkGWIwmMs",    "mac_addr": "DaYUQPckQBKrLIVPjtkykgyVD",    "cm_code": "XjjcSwlhUxjyJonOYASQNqerV",    "project_code": "LGSunNlcRnSnyTHVVeWDHdNgG",    "location": "LfHTeGEOyFXFWGEBfZOtgZoHR",    "floor_id": "LrUeZqHhWUiPSPfgbcgYSrLei",    "building_id": "ypOurYvxPGCLGujLGMdKgdulH",    "park_id": "HHNZZcNkhnebhlbhVjIQlRCjH",    "type": 41}
+{    "id": "wRHKrkPCLeOweiUkYXDZMhkrV",    "created_by": "xrmJGBoveyTgvnbyfTjrYYmGK",    "created_time": 21,    "updated_by": "ojctSCZQviQRSvlhvNehcXOAC",    "updated_time": 86,    "model_name": "OuKaMotRvmQIXGWaXtVoPXxBq",    "dev_name": "oOnpbAJdZOdAkcEZjDknTONvP",    "mac_addr": "WpyxVnNnuvsBMMWgJVhbQnlRw",    "cm_code": "wUpohZqCPrTUYBUdeIKSKqCjn",    "project_code": "wORVBRVFejZDDJioWAHcJHvQt",    "location": "IEbaMUJDokyuytaoYxwvtBSqi",    "floor_id": "jPKniXKcpsUbdiCGwSAfAhwRJ",    "building_id": "juBsfITcFZlwBdOcGTjVhBBAa",    "park_id": "SfZRiHfQixDNVJjvXNmoFrCvk",    "type": 51}
 
 
 

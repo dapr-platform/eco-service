@@ -26,11 +26,12 @@ Table: o_eco_floor
 [ 5] floor_name                                     VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
 [ 6] building_id                                    VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 7] park_id                                        VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
+[ 8] index                                          INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: [0]
 
 
 JSON Sample
 -------------------------------------
-{    "id": "YoDQiQMyQoFwjOPWiAdFtmMGC",    "created_by": "WKeQGVKfCjXuOFZPVWoErcoeF",    "created_time": 62,    "updated_by": "HhKWbcsLUIKSucJWAEFbTqhTf",    "updated_time": 84,    "floor_name": "JPWTlSyjFbYpUDOiBgFbISuyi",    "building_id": "msoMdHUOQakLxsgSscUFpcVwo",    "park_id": "PwjmgHDZgLDkQMJxMkOraKuKS"}
+{    "id": "GVarvqeaKTaahkAxhCcWaByjM",    "created_by": "iQBfryRkiqZXjCyEXKplFqPJO",    "created_time": 23,    "updated_by": "EViYcMjXhIeBWcatlTxrbCKVw",    "updated_time": 54,    "floor_name": "xbGfHSANTbieacoqHJwMOWVBH",    "building_id": "hajnMmuTDfcmeotObRFoPMSao",    "park_id": "jglQdaAUTSQkGQwKSsqXrYgDm",    "index": 15}
 
 
 
@@ -52,6 +53,8 @@ var (
 	Ecfloor_FIELD_NAME_building_id = "building_id"
 
 	Ecfloor_FIELD_NAME_park_id = "park_id"
+
+	Ecfloor_FIELD_NAME_index = "index"
 )
 
 // Ecfloor struct is a row record of the o_eco_floor table in the  database
@@ -64,6 +67,7 @@ type Ecfloor struct {
 	FloorName   string           `json:"floor_name"`   //楼层名称
 	BuildingID  string           `json:"building_id"`  //楼栋ID
 	ParkID      string           `json:"park_id"`      //园区ID
+	Index       int32            `json:"index"`        //排序索引
 
 }
 
@@ -237,6 +241,27 @@ var EcfloorTableInfo = &TableInfo{
 			ProtobufFieldName:  "park_id",
 			ProtobufType:       "string",
 			ProtobufPos:        8,
+		},
+
+		&ColumnInfo{
+			Index:              8,
+			Name:               "index",
+			Comment:            `排序索引`,
+			Notes:              ``,
+			Nullable:           false,
+			DatabaseTypeName:   "INT4",
+			DatabaseTypePretty: "INT4",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "INT4",
+			ColumnLength:       -1,
+			GoFieldName:        "Index",
+			GoFieldType:        "int32",
+			JSONFieldName:      "index",
+			ProtobufFieldName:  "index",
+			ProtobufType:       "int32",
+			ProtobufPos:        9,
 		},
 	},
 }

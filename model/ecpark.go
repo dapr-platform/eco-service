@@ -17,58 +17,50 @@ DB Table Details
 -------------------------------------
 
 
-Table: o_eco_building
+Table: o_eco_park
 [ 0] id                                             VARCHAR(32)          null: false  primary: true   isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 1] created_by                                     VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 2] created_time                                   TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: [CURRENT_TIMESTAMP]
 [ 3] updated_by                                     VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 4] updated_time                                   TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: [CURRENT_TIMESTAMP]
-[ 5] building_name                                  VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
-[ 6] park_id                                        VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[ 7] index                                          INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: [0]
+[ 5] park_name                                      VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
 
 
 JSON Sample
 -------------------------------------
-{    "id": "oXHHpAGsCwfbbKtWgMQJSDYDh",    "created_by": "EgLTIYhICIidgRfsnZNvQaqdq",    "created_time": 89,    "updated_by": "bRRjAuqgaKoeZoSxsIPpTWmDL",    "updated_time": 23,    "building_name": "fqDObngfQSsrUOwSFymdbuVOq",    "park_id": "dXmyoIXYmlNuBlRomGtNZcRRA",    "index": 8}
+{    "id": "PKqnwReflfIcIIDbPalPiVtLb",    "created_by": "JsCEuKAGPBSjaAfhVsOgubUxQ",    "created_time": 85,    "updated_by": "lIIwMBZVhtGUcldGswWJiVwpd",    "updated_time": 27,    "park_name": "vpVQKPEftoWQuUZDqQsamdSyq"}
 
 
 
 */
 
 var (
-	Ecbuilding_FIELD_NAME_id = "id"
+	Ecpark_FIELD_NAME_id = "id"
 
-	Ecbuilding_FIELD_NAME_created_by = "created_by"
+	Ecpark_FIELD_NAME_created_by = "created_by"
 
-	Ecbuilding_FIELD_NAME_created_time = "created_time"
+	Ecpark_FIELD_NAME_created_time = "created_time"
 
-	Ecbuilding_FIELD_NAME_updated_by = "updated_by"
+	Ecpark_FIELD_NAME_updated_by = "updated_by"
 
-	Ecbuilding_FIELD_NAME_updated_time = "updated_time"
+	Ecpark_FIELD_NAME_updated_time = "updated_time"
 
-	Ecbuilding_FIELD_NAME_building_name = "building_name"
-
-	Ecbuilding_FIELD_NAME_park_id = "park_id"
-
-	Ecbuilding_FIELD_NAME_index = "index"
+	Ecpark_FIELD_NAME_park_name = "park_name"
 )
 
-// Ecbuilding struct is a row record of the o_eco_building table in the  database
-type Ecbuilding struct {
-	ID           string           `json:"id"`            //主键ID
-	CreatedBy    string           `json:"created_by"`    //创建人
-	CreatedTime  common.LocalTime `json:"created_time"`  //创建时间
-	UpdatedBy    string           `json:"updated_by"`    //更新人
-	UpdatedTime  common.LocalTime `json:"updated_time"`  //更新时间
-	BuildingName string           `json:"building_name"` //楼栋名称
-	ParkID       string           `json:"park_id"`       //园区ID
-	Index        int32            `json:"index"`         //排序索引
+// Ecpark struct is a row record of the o_eco_park table in the  database
+type Ecpark struct {
+	ID          string           `json:"id"`           //主键ID
+	CreatedBy   string           `json:"created_by"`   //创建人
+	CreatedTime common.LocalTime `json:"created_time"` //创建时间
+	UpdatedBy   string           `json:"updated_by"`   //更新人
+	UpdatedTime common.LocalTime `json:"updated_time"` //更新时间
+	ParkName    string           `json:"park_name"`    //园区名称
 
 }
 
-var EcbuildingTableInfo = &TableInfo{
-	Name: "o_eco_building",
+var EcparkTableInfo = &TableInfo{
+	Name: "o_eco_park",
 	Columns: []*ColumnInfo{
 
 		&ColumnInfo{
@@ -178,8 +170,8 @@ var EcbuildingTableInfo = &TableInfo{
 
 		&ColumnInfo{
 			Index:              5,
-			Name:               "building_name",
-			Comment:            `楼栋名称`,
+			Name:               "park_name",
+			Comment:            `园区名称`,
 			Notes:              ``,
 			Nullable:           false,
 			DatabaseTypeName:   "VARCHAR",
@@ -189,78 +181,36 @@ var EcbuildingTableInfo = &TableInfo{
 			IsArray:            false,
 			ColumnType:         "VARCHAR",
 			ColumnLength:       128,
-			GoFieldName:        "BuildingName",
+			GoFieldName:        "ParkName",
 			GoFieldType:        "string",
-			JSONFieldName:      "building_name",
-			ProtobufFieldName:  "building_name",
+			JSONFieldName:      "park_name",
+			ProtobufFieldName:  "park_name",
 			ProtobufType:       "string",
 			ProtobufPos:        6,
-		},
-
-		&ColumnInfo{
-			Index:              6,
-			Name:               "park_id",
-			Comment:            `园区ID`,
-			Notes:              ``,
-			Nullable:           false,
-			DatabaseTypeName:   "VARCHAR",
-			DatabaseTypePretty: "VARCHAR(32)",
-			IsPrimaryKey:       false,
-			IsAutoIncrement:    false,
-			IsArray:            false,
-			ColumnType:         "VARCHAR",
-			ColumnLength:       32,
-			GoFieldName:        "ParkID",
-			GoFieldType:        "string",
-			JSONFieldName:      "park_id",
-			ProtobufFieldName:  "park_id",
-			ProtobufType:       "string",
-			ProtobufPos:        7,
-		},
-
-		&ColumnInfo{
-			Index:              7,
-			Name:               "index",
-			Comment:            `排序索引`,
-			Notes:              ``,
-			Nullable:           false,
-			DatabaseTypeName:   "INT4",
-			DatabaseTypePretty: "INT4",
-			IsPrimaryKey:       false,
-			IsAutoIncrement:    false,
-			IsArray:            false,
-			ColumnType:         "INT4",
-			ColumnLength:       -1,
-			GoFieldName:        "Index",
-			GoFieldType:        "int32",
-			JSONFieldName:      "index",
-			ProtobufFieldName:  "index",
-			ProtobufType:       "int32",
-			ProtobufPos:        8,
 		},
 	},
 }
 
 // TableName sets the insert table name for this struct type
-func (e *Ecbuilding) TableName() string {
-	return "o_eco_building"
+func (e *Ecpark) TableName() string {
+	return "o_eco_park"
 }
 
 // BeforeSave invoked before saving, return an error if field is not populated.
-func (e *Ecbuilding) BeforeSave() error {
+func (e *Ecpark) BeforeSave() error {
 	return nil
 }
 
 // Prepare invoked before saving, can be used to populate fields etc.
-func (e *Ecbuilding) Prepare() {
+func (e *Ecpark) Prepare() {
 }
 
 // Validate invoked before performing action, return an error if field is not populated.
-func (e *Ecbuilding) Validate(action Action) error {
+func (e *Ecpark) Validate(action Action) error {
 	return nil
 }
 
 // TableInfo return table meta data
-func (e *Ecbuilding) TableInfo() *TableInfo {
-	return EcbuildingTableInfo
+func (e *Ecpark) TableInfo() *TableInfo {
+	return EcparkTableInfo
 }

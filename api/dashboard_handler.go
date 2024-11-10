@@ -3,6 +3,7 @@ package api
 import (
 	"eco-service/service"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/dapr-platform/common"
@@ -46,7 +47,7 @@ func BuildingPowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 		common.HttpResult(w, common.ErrParam.AppendMsg("query_time is invalid"))
 		return
 	}
-	data, err := service.GetBuildingsPowerConsumption(period, queryTime)
+	data, err := service.GetBuildingsPowerConsumption(period, queryTime,0)
 	if err != nil {
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
 		return
@@ -65,7 +66,37 @@ func BuildingPowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} common.Response ""
 // @Router /dashboard/building-power-consumption [get]
 func BuildingTypePowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
+	period := r.URL.Query().Get("period")
+	if period == "" {
+		common.HttpResult(w, common.ErrParam.AppendMsg("period is required"))
+		return
+	}
+	queryTimeStr := r.URL.Query().Get("query_time")
+	if queryTimeStr == "" {
+		queryTimeStr = time.Now().Format("2006-01-02")
+	}
+	queryTime, err := time.Parse("2006-01-02", queryTimeStr)
 
+	if err != nil {
+		common.HttpResult(w, common.ErrParam.AppendMsg("query_time is invalid"))
+		return
+	}
+	typeStr := r.URL.Query().Get("type")
+	if typeStr == "" {
+		common.HttpResult(w, common.ErrParam.AppendMsg("type is required"))
+		return
+	}
+	typeInt, err := strconv.Atoi(typeStr)
+	if err != nil {
+		common.HttpResult(w, common.ErrParam.AppendMsg("type is invalid"))
+		return
+	}
+	data, err := service.GetBuildingsPowerConsumption(period, queryTime, typeInt)
+	if err != nil {
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
+	}
+	common.HttpResult(w, common.OK.WithData(data))
 }
 
 // @Summary 建筑楼层用电量
@@ -79,7 +110,31 @@ func BuildingTypePowerConsumptionHandler(w http.ResponseWriter, r *http.Request)
 // @Failure 500 {object} common.Response ""
 // @Router /dashboard/building-power-consumption [get]
 func BuildingFloorPowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
-
+	period := r.URL.Query().Get("period")
+	if period == "" {
+		common.HttpResult(w, common.ErrParam.AppendMsg("period is required"))
+		return
+	}
+	buildingId := r.URL.Query().Get("building_id")
+	if buildingId == "" {
+		common.HttpResult(w, common.ErrParam.AppendMsg("building_id is required"))
+		return
+	}
+	queryTimeStr := r.URL.Query().Get("query_time")
+	if queryTimeStr == "" {
+		queryTimeStr = time.Now().Format("2006-01-02")
+	}
+	queryTime, err := time.Parse("2006-01-02", queryTimeStr)
+	if err != nil {
+		common.HttpResult(w, common.ErrParam.AppendMsg("query_time is invalid"))
+		return
+	}
+	data, err := service.GetBuildingFloorsPowerConsumption	(period, buildingId, queryTime, 0)
+	if err != nil {
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
+	}
+	common.HttpResult(w, common.OK.WithData(data))
 }
 
 // @Summary 园区碳排放
@@ -92,7 +147,26 @@ func BuildingFloorPowerConsumptionHandler(w http.ResponseWriter, r *http.Request
 // @Failure 500 {object} common.Response ""
 // @Router /dashboard/park-carbon-emission [get]
 func ParkCarbonEmissionHandler(w http.ResponseWriter, r *http.Request) {
-
+	period := r.URL.Query().Get("period")
+	if period == "" {
+		common.HttpResult(w, common.ErrParam.AppendMsg("period is required"))
+		return
+	}
+	queryTimeStr := r.URL.Query().Get("query_time")
+	if queryTimeStr == "" {
+		queryTimeStr = time.Now().Format("2006-01-02")
+	}
+	queryTime, err := time.Parse("2006-01-02", queryTimeStr)
+	if err != nil {
+		common.HttpResult(w, common.ErrParam.AppendMsg("query_time is invalid"))
+		return
+	}
+	data, err := service.GetParkCarbonEmissionRange(period, queryTime, 0)
+	if err != nil {
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
+	}
+	common.HttpResult(w, common.OK.WithData(data))
 }
 
 // @Summary 园区标准煤排放
@@ -105,7 +179,26 @@ func ParkCarbonEmissionHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} common.Response ""
 // @Router /dashboard/park-standard-coal-emission [get]
 func ParkStandardCoalEmissionHandler(w http.ResponseWriter, r *http.Request) {
-
+	period := r.URL.Query().Get("period")
+	if period == "" {
+		common.HttpResult(w, common.ErrParam.AppendMsg("period is required"))
+		return
+	}
+	queryTimeStr := r.URL.Query().Get("query_time")
+	if queryTimeStr == "" {
+		queryTimeStr = time.Now().Format("2006-01-02")
+	}
+	queryTime, err := time.Parse("2006-01-02", queryTimeStr)
+	if err != nil {
+		common.HttpResult(w, common.ErrParam.AppendMsg("query_time is invalid"))
+		return
+	}
+	data, err := service.GetParkStandardCoalRange(period, queryTime, 0)
+	if err != nil {
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
+	}
+	common.HttpResult(w, common.OK.WithData(data))
 }
 
 // @Summary 园区用电量
@@ -118,7 +211,26 @@ func ParkStandardCoalEmissionHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} common.Response ""
 // @Router /dashboard/park-power-consumption [get]
 func ParkPowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
-
+	period := r.URL.Query().Get("period")
+	if period == "" {
+		common.HttpResult(w, common.ErrParam.AppendMsg("period is required"))
+		return
+	}	
+	queryTimeStr := r.URL.Query().Get("query_time")
+	if queryTimeStr == "" {
+		queryTimeStr = time.Now().Format("2006-01-02")
+	}
+	queryTime, err := time.Parse("2006-01-02", queryTimeStr)
+	if err != nil {
+		common.HttpResult(w, common.ErrParam.AppendMsg("query_time is invalid"))
+		return
+	}
+	data, err := service.GetParkPowerConsumptionRange(period, queryTime, 0)
+	if err != nil {
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
+	}
+	common.HttpResult(w, common.OK.WithData(data))
 }
 
 // @Summary 园区用水量
@@ -131,5 +243,24 @@ func ParkPowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} common.Response ""
 // @Router /dashboard/park-water-consumption [get]
 func ParkWaterConsumptionHandler(w http.ResponseWriter, r *http.Request) {
-
+	period := r.URL.Query().Get("period")
+	if period == "" {
+		common.HttpResult(w, common.ErrParam.AppendMsg("period is required"))
+		return
+	}
+	queryTimeStr := r.URL.Query().Get("query_time")
+	if queryTimeStr == "" {
+		queryTimeStr = time.Now().Format("2006-01-02")
+	}
+	queryTime, err := time.Parse("2006-01-02", queryTimeStr)
+	if err != nil {
+		common.HttpResult(w, common.ErrParam.AppendMsg("query_time is invalid"))
+		return
+	}
+	data, err := service.GetParkWaterConsumption(period, queryTime)
+	if err != nil {
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
+	}
+	common.HttpResult(w, common.OK.WithData(data))
 }

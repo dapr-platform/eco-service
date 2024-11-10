@@ -17,7 +17,7 @@ DB Table Details
 -------------------------------------
 
 
-Table: f_eco_park_1m
+Table: f_eco_park_1h
 [ 0] time                                           TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: []
 [ 1] park_id                                        VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 2] type                                           INT4                 null: true   primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
@@ -26,13 +26,13 @@ Table: f_eco_park_1m
 
 JSON Sample
 -------------------------------------
-{    "time": 74,    "park_id": "fKHSSHgKDMAuFAwWScchEtLYN",    "type": 81,    "power_consumption": 0.397844251463757}
+{    "time": 86,    "park_id": "hPlCWkQjpnMPNMQvVroivAIBo",    "type": 64,    "power_consumption": 0.6471643189297258}
 
 
 Comments
 -------------------------------------
-[ 0] Warning table: f_eco_park_1m does not have a primary key defined, setting col position 1 time as primary key
-Warning table: f_eco_park_1m primary key column time is nullable column, setting it as NOT NULL
+[ 0] Warning table: f_eco_park_1h does not have a primary key defined, setting col position 1 time as primary key
+Warning table: f_eco_park_1h primary key column time is nullable column, setting it as NOT NULL
 
 
 
@@ -40,17 +40,17 @@ Warning table: f_eco_park_1m primary key column time is nullable column, setting
 */
 
 var (
-	Eco_park_1m_FIELD_NAME_time = "time"
+	Eco_park_1h_FIELD_NAME_time = "time"
 
-	Eco_park_1m_FIELD_NAME_park_id = "park_id"
+	Eco_park_1h_FIELD_NAME_park_id = "park_id"
 
-	Eco_park_1m_FIELD_NAME_type = "type"
+	Eco_park_1h_FIELD_NAME_type = "type"
 
-	Eco_park_1m_FIELD_NAME_power_consumption = "power_consumption"
+	Eco_park_1h_FIELD_NAME_power_consumption = "power_consumption"
 )
 
-// Eco_park_1m struct is a row record of the f_eco_park_1m table in the  database
-type Eco_park_1m struct {
+// Eco_park_1h struct is a row record of the f_eco_park_1h table in the  database
+type Eco_park_1h struct {
 	Time             common.LocalTime `json:"time"`              //time
 	ParkID           string           `json:"park_id"`           //park_id
 	Type             int32            `json:"type"`              //type
@@ -58,16 +58,16 @@ type Eco_park_1m struct {
 
 }
 
-var Eco_park_1mTableInfo = &TableInfo{
-	Name: "f_eco_park_1m",
+var Eco_park_1hTableInfo = &TableInfo{
+	Name: "f_eco_park_1h",
 	Columns: []*ColumnInfo{
 
 		&ColumnInfo{
 			Index:   0,
 			Name:    "time",
 			Comment: `time`,
-			Notes: `Warning table: f_eco_park_1m does not have a primary key defined, setting col position 1 time as primary key
-Warning table: f_eco_park_1m primary key column time is nullable column, setting it as NOT NULL
+			Notes: `Warning table: f_eco_park_1h does not have a primary key defined, setting col position 1 time as primary key
+Warning table: f_eco_park_1h primary key column time is nullable column, setting it as NOT NULL
 `,
 			Nullable:           false,
 			DatabaseTypeName:   "TIMESTAMP",
@@ -151,25 +151,25 @@ Warning table: f_eco_park_1m primary key column time is nullable column, setting
 }
 
 // TableName sets the insert table name for this struct type
-func (e *Eco_park_1m) TableName() string {
-	return "f_eco_park_1m"
+func (e *Eco_park_1h) TableName() string {
+	return "f_eco_park_1h"
 }
 
 // BeforeSave invoked before saving, return an error if field is not populated.
-func (e *Eco_park_1m) BeforeSave() error {
+func (e *Eco_park_1h) BeforeSave() error {
 	return nil
 }
 
 // Prepare invoked before saving, can be used to populate fields etc.
-func (e *Eco_park_1m) Prepare() {
+func (e *Eco_park_1h) Prepare() {
 }
 
 // Validate invoked before performing action, return an error if field is not populated.
-func (e *Eco_park_1m) Validate(action Action) error {
+func (e *Eco_park_1h) Validate(action Action) error {
 	return nil
 }
 
 // TableInfo return table meta data
-func (e *Eco_park_1m) TableInfo() *TableInfo {
-	return Eco_park_1mTableInfo
+func (e *Eco_park_1h) TableInfo() *TableInfo {
+	return Eco_park_1hTableInfo
 }

@@ -26,7 +26,7 @@ Table: f_eco_park_1y
 
 JSON Sample
 -------------------------------------
-{    "time": 7,    "park_id": "uRCEQHsAEJYNTjSRqtOgSUGBJ",    "type": 68,    "power_consumption": 0.15602054515964847}
+{    "time": 94,    "park_id": "OTDpNcBPsSCjoQvyycJCDTFPd",    "type": 68,    "power_consumption": 0.18290353985771565}
 
 
 Comments

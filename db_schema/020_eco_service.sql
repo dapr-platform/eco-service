@@ -26,6 +26,7 @@ CREATE TABLE o_eco_building (
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     building_name VARCHAR(128) NOT NULL,
     park_id VARCHAR(32) NOT NULL,
+    index INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (park_id) REFERENCES o_eco_park(id)
 );
 ALTER TABLE o_eco_building ADD CONSTRAINT uk_eco_building_name UNIQUE(building_name);
@@ -37,6 +38,7 @@ COMMENT ON COLUMN o_eco_building.created_time IS '创建时间';
 COMMENT ON COLUMN o_eco_building.updated_time IS '更新时间';
 COMMENT ON COLUMN o_eco_building.created_by IS '创建人';
 COMMENT ON COLUMN o_eco_building.updated_by IS '更新人';
+COMMENT ON COLUMN o_eco_building.index IS '排序索引';
 
 CREATE TABLE o_eco_floor (
     id VARCHAR(32) PRIMARY KEY,
@@ -47,6 +49,7 @@ CREATE TABLE o_eco_floor (
     floor_name VARCHAR(128) NOT NULL,
     building_id VARCHAR(32) NOT NULL,
     park_id VARCHAR(32) NOT NULL,
+    index INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (building_id) REFERENCES o_eco_building(id),
     FOREIGN KEY (park_id) REFERENCES o_eco_park(id)
 );
@@ -60,6 +63,7 @@ COMMENT ON COLUMN o_eco_floor.created_time IS '创建时间';
 COMMENT ON COLUMN o_eco_floor.updated_time IS '更新时间';
 COMMENT ON COLUMN o_eco_floor.created_by IS '创建人';
 COMMENT ON COLUMN o_eco_floor.updated_by IS '更新人';
+COMMENT ON COLUMN o_eco_floor.index IS '排序索引';
 
 CREATE TABLE o_eco_gateway (
     id VARCHAR(32) PRIMARY KEY,

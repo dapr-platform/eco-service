@@ -28,7 +28,7 @@ Table: f_eco_floor_1d
 
 JSON Sample
 -------------------------------------
-{    "time": 85,    "floor_id": "QAAdywPfpphwmSgHKfaHXdtme",    "building_id": "UWXahEryOlxrYmWGPWUKoaUZg",    "park_id": "cleQnUQTNaOWlaytFSfWKKyYK",    "type": 10,    "power_consumption": 0.7899730099971818}
+{    "time": 90,    "floor_id": "sxtjtiLkpfIqIOPSypAikePaG",    "building_id": "FoquEeqeqoSLnMUyirfMLbjSc",    "park_id": "MkmciyDQXqcpgPjMhAKjDbCJW",    "type": 4,    "power_consumption": 0.019784047967563837}
 
 
 Comments
