@@ -44,7 +44,7 @@ func init() {
 				common.Logger.Errorf("Failed to collect gateway hourly stats: %v", err)
 			}
 
-			if err := refreshContinuousAggregate(time.Now()); err != nil {
+			if err := refreshContinuousAggregate(time.Now().Add(-time.Hour * 4)); err != nil {
 				common.Logger.Errorf("Failed to refresh continuous aggregates: %v", err)
 			}
 		}
@@ -125,7 +125,7 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 			if end > len(projectGateways) {
 				end = len(projectGateways)
 			}
-			
+
 			gatewayBatch := projectGateways[i:end]
 			macAddrs := make([]string, len(gatewayBatch))
 			for j, gateway := range gatewayBatch {
@@ -169,7 +169,7 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 						if hourData, ok := gatewayData[hourStr].([]interface{}); ok {
 							stats := processHourStats(hourData)
 							hourTime := time.Date(collectTime.Year(), collectTime.Month(), collectTime.Day(), hour, 0, 0, 0, collectTime.Location())
-							
+
 							stat := model.Eco_gateway_1h{
 								ID:               gateway.ID + "_" + hourTime.Format("2006010215"),
 								Time:             common.LocalTime(hourTime),
@@ -227,7 +227,7 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 			if end > len(projectGateways) {
 				end = len(projectGateways)
 			}
-			
+
 			gatewayBatch := projectGateways[i:end]
 			macAddrs := make([]string, len(gatewayBatch))
 			for j, gateway := range gatewayBatch {
@@ -343,7 +343,7 @@ func saveGatewayHourlyStats(stats []model.Eco_gateway_1h) error {
 	if err != nil {
 		return errors.Wrap(err, "Failed to batch upsert gateway hourly stats")
 	}
-	
+
 	return nil
 }
 
@@ -352,17 +352,25 @@ func refreshContinuousAggregate(collectTime time.Time) error {
 		startTime := collectTime
 		endTime := startTime
 
+		// 根据刷新类型设置不同的时间范围
 		switch refreshType {
-		case "day":
+		case "day": // 按天刷新
+			// 设置开始时间为当天0点
 			startTime = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), 0, 0, 0, 0, startTime.Location())
+			// 结束时间为第二天0点
 			endTime = startTime.AddDate(0, 0, 1)
-		case "month":
+		case "month": // 按月刷新
+			// 设置开始时间为当月1号0点
 			startTime = time.Date(startTime.Year(), startTime.Month(), 1, 0, 0, 0, 0, startTime.Location())
-			endTime = startTime.AddDate(0, 1, 0)
-		case "year":
+			// 结束时间为后两个月的1号0点,这样可以确保当月数据完整性
+			endTime = startTime.AddDate(0, 2, 0)
+		case "year": // 按年刷新
+			// 设置开始时间为当年1月1日0点
 			startTime = time.Date(startTime.Year(), 1, 1, 0, 0, 0, 0, startTime.Location())
-			endTime = startTime.AddDate(1, 0, 0)
+			// 结束时间为后两年的1月1日0点,这样可以确保当年数据完整性
+			endTime = startTime.AddDate(2, 0, 0)
 		default:
+			// 如果刷新类型不在预期内,返回错误
 			return fmt.Errorf("Invalid refresh type: %s", refreshType)
 		}
 

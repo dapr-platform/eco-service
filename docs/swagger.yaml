@@ -18,6 +18,19 @@ definitions:
       status:
         type: integer
     type: object
+  entity.LabelData:
+    properties:
+      hb:
+        type: number
+      id:
+        type: string
+      label:
+        type: string
+      tb:
+        type: number
+      value:
+        type: number
+    type: object
   model.Ecbuilding:
     properties:
       building_name:
@@ -31,6 +44,36 @@ definitions:
         type: string
       id:
         description: 主键ID
+        type: string
+      park_id:
+        description: 园区ID
+        type: string
+      updated_by:
+        description: 更新人
+        type: string
+      updated_time:
+        description: 更新时间
+        type: string
+    type: object
+  model.Ecfloor:
+    properties:
+      building_id:
+        description: 楼栋ID
+        type: string
+      created_by:
+        description: 创建人
+        type: string
+      created_time:
+        description: 创建时间
+        type: string
+      floor_name:
+        description: 楼层名称
+        type: string
+      id:
+        description: 主键ID
+        type: string
+      park_id:
+        description: 园区ID
         type: string
       updated_by:
         description: 更新人
@@ -70,6 +113,9 @@ definitions:
         type: string
       model_name:
         description: 型号名称
+        type: string
+      park_id:
+        description: 园区ID
         type: string
       project_code:
         description: 项目编码
@@ -156,6 +202,178 @@ info:
   title: eco-service API
   version: "1.0"
 paths:
+  /dashboard/building-power-consumption:
+    get:
+      description: 建筑楼层用电量，根据粒度获取所有建筑的用电量
+      parameters:
+      - description: period
+        in: query
+        name: period
+        required: true
+        type: string
+      - description: query_time,格式2024-01-01,不传则默认当天
+        in: query
+        name: query_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entity.LabelData'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 建筑楼层用电量
+      tags:
+      - Dashboard
+  /dashboard/park-carbon-emission:
+    get:
+      description: 园区碳排放，根据粒度获取园区历史的碳排放,不同粒度返回不同数量的数据。日粒度，返回24小时数据。月粒度，返回31天数据。年粒度，返回12个月数据。包括同比环比
+      parameters:
+      - description: period
+        in: query
+        name: period
+        required: true
+        type: string
+      - description: query_time,格式2024-01-01,不传则默认当天
+        in: query
+        name: query_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entity.LabelData'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 园区碳排放
+      tags:
+      - Dashboard
+  /dashboard/park-power-consumption:
+    get:
+      description: 园区用电量，根据粒度获取园区历史的用电量,不同粒度返回不同数量的数据。日粒度，返回24小时数据。月粒度，返回31天数据。年粒度，返回12个月数据。包括同比环比
+      parameters:
+      - description: period
+        in: query
+        name: period
+        required: true
+        type: string
+      - description: query_time,格式2024-01-01,不传则默认当天
+        in: query
+        name: query_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 园区用电量
+      tags:
+      - Dashboard
+  /dashboard/park-standard-coal-emission:
+    get:
+      description: 园区标准煤排放，根据粒度获取园区历史的标准煤排放,不同粒度返回不同数量的数据。日粒度，返回24小时数据。月粒度，返回31天数据。年粒度，返回12个月数据。包括同比环比
+      parameters:
+      - description: period
+        in: query
+        name: period
+        required: true
+        type: string
+      - description: query_time,格式2024-01-01,不传则默认当天
+        in: query
+        name: query_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entity.LabelData'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 园区标准煤排放
+      tags:
+      - Dashboard
+  /dashboard/park-water-consumption:
+    get:
+      description: 园区用水量，根据粒度获取园区当前的用水量,不同粒度返回不同的数据。
+      parameters:
+      - description: period
+        in: query
+        name: period
+        required: true
+        type: string
+      - description: query_time,格式2024-01-01,不传则默认当天
+        in: query
+        name: query_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 园区用水量
+      tags:
+      - Dashboard
   /ecbuilding:
     get:
       description: query objects
@@ -191,6 +409,10 @@ paths:
       - description: building_name
         in: query
         name: building_name
+        type: string
+      - description: park_id
+        in: query
+        name: park_id
         type: string
       produces:
       - application/json
@@ -407,6 +629,10 @@ paths:
         in: query
         name: building_name
         type: string
+      - description: park_id
+        in: query
+        name: park_id
+        type: string
       produces:
       - application/json
       responses:
@@ -433,6 +659,299 @@ paths:
       summary: page query
       tags:
       - Ecbuilding
+  /ecfloor:
+    get:
+      description: query objects
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        type: string
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: id
+        in: query
+        name: id
+        type: string
+      - description: created_by
+        in: query
+        name: created_by
+        type: string
+      - description: created_time
+        in: query
+        name: created_time
+        type: string
+      - description: updated_by
+        in: query
+        name: updated_by
+        type: string
+      - description: updated_time
+        in: query
+        name: updated_time
+        type: string
+      - description: floor_name
+        in: query
+        name: floor_name
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: park_id
+        in: query
+        name: park_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Ecfloor'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: query objects
+      tags:
+      - Ecfloor
+    post:
+      consumes:
+      - application/json
+      description: save
+      parameters:
+      - description: object
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/model.Ecfloor'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Ecfloor'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: save
+      tags:
+      - Ecfloor
+  /ecfloor/{id}:
+    delete:
+      description: delete
+      parameters:
+      - description: 实例id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: object
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Ecfloor'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: delete
+      tags:
+      - Ecfloor
+  /ecfloor/batch-delete:
+    post:
+      consumes:
+      - application/json
+      description: batch delete
+      parameters:
+      - description: id array
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch delete
+      tags:
+      - Ecfloor
+  /ecfloor/batch-upsert:
+    post:
+      consumes:
+      - application/json
+      description: batch update
+      parameters:
+      - description: objects array
+        in: body
+        name: entities
+        required: true
+        schema:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: batch update
+      tags:
+      - Ecfloor
+  /ecfloor/groupby:
+    get:
+      description: GroupBy, for example,  _select=level, then return  {level_val1:sum1,level_val2:sum2},
+        _where can input status=0
+      parameters:
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
+      - description: _where
+        in: query
+        name: _where
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: GroupBy
+      tags:
+      - Ecfloor
+  /ecfloor/page:
+    get:
+      description: page query, _page(from 1 begin), _page_size, _order, and others
+        fields, status=1, name=$like.%CAM%
+      parameters:
+      - description: current page
+        in: query
+        name: _page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: _page_size
+        required: true
+        type: integer
+      - description: order
+        in: query
+        name: _order
+        type: string
+      - description: id
+        in: query
+        name: id
+        type: string
+      - description: created_by
+        in: query
+        name: created_by
+        type: string
+      - description: created_time
+        in: query
+        name: created_time
+        type: string
+      - description: updated_by
+        in: query
+        name: updated_by
+        type: string
+      - description: updated_time
+        in: query
+        name: updated_time
+        type: string
+      - description: floor_name
+        in: query
+        name: floor_name
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
+        type: string
+      - description: park_id
+        in: query
+        name: park_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/common.Page'
+                  - properties:
+                      items:
+                        items:
+                          $ref: '#/definitions/model.Ecfloor'
+                        type: array
+                    type: object
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: page query
+      tags:
+      - Ecfloor
   /ecgateway:
     get:
       description: query objects
@@ -496,6 +1015,10 @@ paths:
       - description: building_id
         in: query
         name: building_id
+        type: string
+      - description: park_id
+        in: query
+        name: park_id
         type: string
       - description: type
         in: query
@@ -743,6 +1266,10 @@ paths:
       - description: building_id
         in: query
         name: building_id
+        type: string
+      - description: park_id
+        in: query
+        name: park_id
         type: string
       - description: type
         in: query

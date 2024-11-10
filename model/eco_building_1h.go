@@ -17,7 +17,7 @@ DB Table Details
 -------------------------------------
 
 
-Table: f_eco_building_1d
+Table: f_eco_building_1h
 [ 0] time                                           TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: []
 [ 1] building_id                                    VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 2] park_id                                        VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
@@ -27,13 +27,13 @@ Table: f_eco_building_1d
 
 JSON Sample
 -------------------------------------
-{    "time": 48,    "building_id": "HkvZyFELngHCbnXSvtCyEpwEU",    "park_id": "NoiCqxdrMLFniAgDQMxhYTvLW",    "type": 67,    "power_consumption": 0.17940062621831634}
+{    "time": 18,    "building_id": "DPReXmQYGpIOmXjgjfDJuqMEe",    "park_id": "QOLfldCBotODBUsocvbwUWywV",    "type": 84,    "power_consumption": 0.01580893459154034}
 
 
 Comments
 -------------------------------------
-[ 0] Warning table: f_eco_building_1d does not have a primary key defined, setting col position 1 time as primary key
-Warning table: f_eco_building_1d primary key column time is nullable column, setting it as NOT NULL
+[ 0] Warning table: f_eco_building_1h does not have a primary key defined, setting col position 1 time as primary key
+Warning table: f_eco_building_1h primary key column time is nullable column, setting it as NOT NULL
 
 
 
@@ -41,19 +41,19 @@ Warning table: f_eco_building_1d primary key column time is nullable column, set
 */
 
 var (
-	Eco_building_1d_FIELD_NAME_time = "time"
+	Eco_building_1h_FIELD_NAME_time = "time"
 
-	Eco_building_1d_FIELD_NAME_building_id = "building_id"
+	Eco_building_1h_FIELD_NAME_building_id = "building_id"
 
-	Eco_building_1d_FIELD_NAME_park_id = "park_id"
+	Eco_building_1h_FIELD_NAME_park_id = "park_id"
 
-	Eco_building_1d_FIELD_NAME_type = "type"
+	Eco_building_1h_FIELD_NAME_type = "type"
 
-	Eco_building_1d_FIELD_NAME_power_consumption = "power_consumption"
+	Eco_building_1h_FIELD_NAME_power_consumption = "power_consumption"
 )
 
-// Eco_building_1d struct is a row record of the f_eco_building_1d table in the  database
-type Eco_building_1d struct {
+// Eco_building_1h struct is a row record of the f_eco_building_1h table in the  database
+type Eco_building_1h struct {
 	Time             common.LocalTime `json:"time"`              //time
 	BuildingID       string           `json:"building_id"`       //building_id
 	ParkID           string           `json:"park_id"`           //park_id
@@ -62,16 +62,16 @@ type Eco_building_1d struct {
 
 }
 
-var Eco_building_1dTableInfo = &TableInfo{
-	Name: "f_eco_building_1d",
+var Eco_building_1hTableInfo = &TableInfo{
+	Name: "f_eco_building_1h",
 	Columns: []*ColumnInfo{
 
 		&ColumnInfo{
 			Index:   0,
 			Name:    "time",
 			Comment: `time`,
-			Notes: `Warning table: f_eco_building_1d does not have a primary key defined, setting col position 1 time as primary key
-Warning table: f_eco_building_1d primary key column time is nullable column, setting it as NOT NULL
+			Notes: `Warning table: f_eco_building_1h does not have a primary key defined, setting col position 1 time as primary key
+Warning table: f_eco_building_1h primary key column time is nullable column, setting it as NOT NULL
 `,
 			Nullable:           false,
 			DatabaseTypeName:   "TIMESTAMP",
@@ -176,25 +176,25 @@ Warning table: f_eco_building_1d primary key column time is nullable column, set
 }
 
 // TableName sets the insert table name for this struct type
-func (e *Eco_building_1d) TableName() string {
-	return "f_eco_building_1d"
+func (e *Eco_building_1h) TableName() string {
+	return "f_eco_building_1h"
 }
 
 // BeforeSave invoked before saving, return an error if field is not populated.
-func (e *Eco_building_1d) BeforeSave() error {
+func (e *Eco_building_1h) BeforeSave() error {
 	return nil
 }
 
 // Prepare invoked before saving, can be used to populate fields etc.
-func (e *Eco_building_1d) Prepare() {
+func (e *Eco_building_1h) Prepare() {
 }
 
 // Validate invoked before performing action, return an error if field is not populated.
-func (e *Eco_building_1d) Validate(action Action) error {
+func (e *Eco_building_1h) Validate(action Action) error {
 	return nil
 }
 
 // TableInfo return table meta data
-func (e *Eco_building_1d) TableInfo() *TableInfo {
-	return Eco_building_1dTableInfo
+func (e *Eco_building_1h) TableInfo() *TableInfo {
+	return Eco_building_1hTableInfo
 }

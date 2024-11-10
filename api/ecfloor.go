@@ -76,6 +76,7 @@ func batchUpsertEcfloorHandler(w http.ResponseWriter, r *http.Request) {
 // @Param updated_time query string false "updated_time"
 // @Param floor_name query string false "floor_name"
 // @Param building_id query string false "building_id"
+// @Param park_id query string false "park_id"
 // @Produce  json
 // @Success 200 {object} common.Response{data=common.Page{items=[]model.Ecfloor}} "objects array"
 // @Failure 500 {object} common.Response ""
@@ -104,6 +105,7 @@ func EcfloorPageListHandler(w http.ResponseWriter, r *http.Request) {
 // @Param updated_time query string false "updated_time"
 // @Param floor_name query string false "floor_name"
 // @Param building_id query string false "building_id"
+// @Param park_id query string false "park_id"
 // @Produce  json
 // @Success 200 {object} common.Response{data=[]model.Ecfloor} "objects array"
 // @Failure 500 {object} common.Response ""

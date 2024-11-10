@@ -31,12 +31,13 @@ Table: o_eco_gateway
 [10] location                                       VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
 [11] floor_id                                       VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [12] building_id                                    VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[13] type                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[13] park_id                                        VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
+[14] type                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "id": "aTFrVdxtKSTihtVZaMfIqocjV",    "created_by": "NsNGgaPxFKGlPGFEonsuAivdT",    "created_time": 96,    "updated_by": "aLrmmMZARFPZsttaPPndbwnRu",    "updated_time": 19,    "model_name": "KEYgPTPkUNZrrAbsvohgaitGT",    "dev_name": "wlGDLSKWcpmkvHKapStOXGCOV",    "mac_addr": "pheWdXMqrjlScjIfPLYmiLGtP",    "cm_code": "onAWHekOnkWmbnnpyFQiRNPNr",    "project_code": "JBjTRZFxuqvjpVqHgGDDmegYZ",    "location": "tZHcNDmOEvuxIcOjhWkMxeNdN",    "floor_id": "KEYyFSsYPGYGeCUTjvweIDuja",    "building_id": "rmmMkBxdqSgiFFyqwJntHdlgc",    "type": 46}
+{    "id": "vJfqvtSskLTvZQnrYXrHppJMK",    "created_by": "hsiFVMQShajacRskgffpHoBah",    "created_time": 1,    "updated_by": "GteGgNOhxVkYigHSUGIcbYkwL",    "updated_time": 60,    "model_name": "ikBfJvPCbYysfPvRrGygOjIWF",    "dev_name": "gaXTXVRjRUOjQuGkNkGWIwmMs",    "mac_addr": "DaYUQPckQBKrLIVPjtkykgyVD",    "cm_code": "XjjcSwlhUxjyJonOYASQNqerV",    "project_code": "LGSunNlcRnSnyTHVVeWDHdNgG",    "location": "LfHTeGEOyFXFWGEBfZOtgZoHR",    "floor_id": "LrUeZqHhWUiPSPfgbcgYSrLei",    "building_id": "ypOurYvxPGCLGujLGMdKgdulH",    "park_id": "HHNZZcNkhnebhlbhVjIQlRCjH",    "type": 41}
 
 
 
@@ -69,6 +70,8 @@ var (
 
 	Ecgateway_FIELD_NAME_building_id = "building_id"
 
+	Ecgateway_FIELD_NAME_park_id = "park_id"
+
 	Ecgateway_FIELD_NAME_type = "type"
 )
 
@@ -87,6 +90,7 @@ type Ecgateway struct {
 	Location    string           `json:"location"`     //组织名称
 	FloorID     string           `json:"floor_id"`     //楼层ID
 	BuildingID  string           `json:"building_id"`  //楼栋ID
+	ParkID      string           `json:"park_id"`      //园区ID
 	Type        int32            `json:"type"`         //网关类型(1:AL,2:AP)
 
 }
@@ -370,6 +374,27 @@ var EcgatewayTableInfo = &TableInfo{
 
 		&ColumnInfo{
 			Index:              13,
+			Name:               "park_id",
+			Comment:            `园区ID`,
+			Notes:              ``,
+			Nullable:           false,
+			DatabaseTypeName:   "VARCHAR",
+			DatabaseTypePretty: "VARCHAR(32)",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "VARCHAR",
+			ColumnLength:       32,
+			GoFieldName:        "ParkID",
+			GoFieldType:        "string",
+			JSONFieldName:      "park_id",
+			ProtobufFieldName:  "park_id",
+			ProtobufType:       "string",
+			ProtobufPos:        14,
+		},
+
+		&ColumnInfo{
+			Index:              14,
 			Name:               "type",
 			Comment:            `网关类型(1:AL,2:AP)`,
 			Notes:              ``,
@@ -386,7 +411,7 @@ var EcgatewayTableInfo = &TableInfo{
 			JSONFieldName:      "type",
 			ProtobufFieldName:  "type",
 			ProtobufType:       "int32",
-			ProtobufPos:        14,
+			ProtobufPos:        15,
 		},
 	},
 }

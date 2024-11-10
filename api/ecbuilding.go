@@ -75,6 +75,7 @@ func batchUpsertEcbuildingHandler(w http.ResponseWriter, r *http.Request) {
 // @Param updated_by query string false "updated_by"
 // @Param updated_time query string false "updated_time"
 // @Param building_name query string false "building_name"
+// @Param park_id query string false "park_id"
 // @Produce  json
 // @Success 200 {object} common.Response{data=common.Page{items=[]model.Ecbuilding}} "objects array"
 // @Failure 500 {object} common.Response ""
@@ -102,6 +103,7 @@ func EcbuildingPageListHandler(w http.ResponseWriter, r *http.Request) {
 // @Param updated_by query string false "updated_by"
 // @Param updated_time query string false "updated_time"
 // @Param building_name query string false "building_name"
+// @Param park_id query string false "park_id"
 // @Produce  json
 // @Success 200 {object} common.Response{data=[]model.Ecbuilding} "objects array"
 // @Failure 500 {object} common.Response ""

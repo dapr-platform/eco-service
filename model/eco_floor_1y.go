@@ -21,13 +21,14 @@ Table: f_eco_floor_1y
 [ 0] time                                           TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: []
 [ 1] floor_id                                       VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 2] building_id                                    VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[ 3] type                                           INT4                 null: true   primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
-[ 4] power_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
+[ 3] park_id                                        VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
+[ 4] type                                           INT4                 null: true   primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[ 5] power_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "time": 65,    "floor_id": "NvmtIoYthGPCvJIZPxdTKpBbY",    "building_id": "MtLcKNPVAxqgQSdXISkWhhKac",    "type": 32,    "power_consumption": 0.881455733433569}
+{    "time": 1,    "floor_id": "HjIxTgfERkCfRZxIOuRCDvKwR",    "building_id": "msIsVBuLhvlGvTuWpKXUjgAbB",    "park_id": "DyqlUPADjYJdMrUKKZHFgpAtv",    "type": 58,    "power_consumption": 0.4272401633813537}
 
 
 Comments
@@ -47,6 +48,8 @@ var (
 
 	Eco_floor_1y_FIELD_NAME_building_id = "building_id"
 
+	Eco_floor_1y_FIELD_NAME_park_id = "park_id"
+
 	Eco_floor_1y_FIELD_NAME_type = "type"
 
 	Eco_floor_1y_FIELD_NAME_power_consumption = "power_consumption"
@@ -57,6 +60,7 @@ type Eco_floor_1y struct {
 	Time             common.LocalTime `json:"time"`              //time
 	FloorID          string           `json:"floor_id"`          //floor_id
 	BuildingID       string           `json:"building_id"`       //building_id
+	ParkID           string           `json:"park_id"`           //park_id
 	Type             int32            `json:"type"`              //type
 	PowerConsumption float64          `json:"power_consumption"` //power_consumption
 
@@ -133,6 +137,27 @@ Warning table: f_eco_floor_1y primary key column time is nullable column, settin
 
 		&ColumnInfo{
 			Index:              3,
+			Name:               "park_id",
+			Comment:            `park_id`,
+			Notes:              ``,
+			Nullable:           true,
+			DatabaseTypeName:   "VARCHAR",
+			DatabaseTypePretty: "VARCHAR(32)",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "VARCHAR",
+			ColumnLength:       32,
+			GoFieldName:        "ParkID",
+			GoFieldType:        "string",
+			JSONFieldName:      "park_id",
+			ProtobufFieldName:  "park_id",
+			ProtobufType:       "string",
+			ProtobufPos:        4,
+		},
+
+		&ColumnInfo{
+			Index:              4,
 			Name:               "type",
 			Comment:            `type`,
 			Notes:              ``,
@@ -149,11 +174,11 @@ Warning table: f_eco_floor_1y primary key column time is nullable column, settin
 			JSONFieldName:      "type",
 			ProtobufFieldName:  "type",
 			ProtobufType:       "int32",
-			ProtobufPos:        4,
+			ProtobufPos:        5,
 		},
 
 		&ColumnInfo{
-			Index:              4,
+			Index:              5,
 			Name:               "power_consumption",
 			Comment:            `power_consumption`,
 			Notes:              ``,
@@ -170,7 +195,7 @@ Warning table: f_eco_floor_1y primary key column time is nullable column, settin
 			JSONFieldName:      "power_consumption",
 			ProtobufFieldName:  "power_consumption",
 			ProtobufType:       "float",
-			ProtobufPos:        5,
+			ProtobufPos:        6,
 		},
 	},
 }

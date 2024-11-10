@@ -23,13 +23,14 @@ Table: f_eco_gateway_1h
 [ 2] gateway_id                                     VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 3] floor_id                                       VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 4] building_id                                    VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[ 5] type                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
-[ 6] power_consumption                              NUMERIC              null: false  primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
+[ 5] park_id                                        VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
+[ 6] type                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[ 7] power_consumption                              NUMERIC              null: false  primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "id": "KDvGpSlRLkRxtklWgPxCTrFoo",    "time": 62,    "gateway_id": "abyuXrToAhFgfBAgUQcXNPKsm",    "floor_id": "VpeIsESEAVugGdXtCFckSpMjI",    "building_id": "pjBYsbNhcxYsLwrjDgLYetrKb",    "type": 33,    "power_consumption": 0.6444172584273061}
+{    "id": "CJHGUTyhgYBcGpHUsyUvEtwTo",    "time": 48,    "gateway_id": "jaHHFWJmDaTpqkBELbDFPnnkZ",    "floor_id": "NZmtqUIiKljOJprUmuRunGhfr",    "building_id": "nutmojVxIFSDDeqgUGOmspeZc",    "park_id": "lKmnvrRKFXatYhsTUsFfIsMOR",    "type": 83,    "power_consumption": 0.11289523255096032}
 
 
 
@@ -46,6 +47,8 @@ var (
 
 	Eco_gateway_1h_FIELD_NAME_building_id = "building_id"
 
+	Eco_gateway_1h_FIELD_NAME_park_id = "park_id"
+
 	Eco_gateway_1h_FIELD_NAME_type = "type"
 
 	Eco_gateway_1h_FIELD_NAME_power_consumption = "power_consumption"
@@ -58,6 +61,7 @@ type Eco_gateway_1h struct {
 	GatewayID        string           `json:"gateway_id"`        //网关ID
 	FloorID          string           `json:"floor_id"`          //楼层ID
 	BuildingID       string           `json:"building_id"`       //楼栋ID
+	ParkID           string           `json:"park_id"`           //园区ID
 	Type             int32            `json:"type"`              //网关类型(1:AL,2:AP)
 	PowerConsumption float64          `json:"power_consumption"` //用电量(kWh)
 
@@ -174,6 +178,27 @@ var Eco_gateway_1hTableInfo = &TableInfo{
 
 		&ColumnInfo{
 			Index:              5,
+			Name:               "park_id",
+			Comment:            `园区ID`,
+			Notes:              ``,
+			Nullable:           false,
+			DatabaseTypeName:   "VARCHAR",
+			DatabaseTypePretty: "VARCHAR(32)",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "VARCHAR",
+			ColumnLength:       32,
+			GoFieldName:        "ParkID",
+			GoFieldType:        "string",
+			JSONFieldName:      "park_id",
+			ProtobufFieldName:  "park_id",
+			ProtobufType:       "string",
+			ProtobufPos:        6,
+		},
+
+		&ColumnInfo{
+			Index:              6,
 			Name:               "type",
 			Comment:            `网关类型(1:AL,2:AP)`,
 			Notes:              ``,
@@ -190,11 +215,11 @@ var Eco_gateway_1hTableInfo = &TableInfo{
 			JSONFieldName:      "type",
 			ProtobufFieldName:  "type",
 			ProtobufType:       "int32",
-			ProtobufPos:        6,
+			ProtobufPos:        7,
 		},
 
 		&ColumnInfo{
-			Index:              6,
+			Index:              7,
 			Name:               "power_consumption",
 			Comment:            `用电量(kWh)`,
 			Notes:              ``,
@@ -211,7 +236,7 @@ var Eco_gateway_1hTableInfo = &TableInfo{
 			JSONFieldName:      "power_consumption",
 			ProtobufFieldName:  "power_consumption",
 			ProtobufType:       "float",
-			ProtobufPos:        7,
+			ProtobufPos:        8,
 		},
 	},
 }

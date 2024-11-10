@@ -20,13 +20,14 @@ DB Table Details
 Table: f_eco_building_1y
 [ 0] time                                           TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: []
 [ 1] building_id                                    VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[ 2] type                                           INT4                 null: true   primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
-[ 3] power_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
+[ 2] park_id                                        VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
+[ 3] type                                           INT4                 null: true   primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[ 4] power_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "time": 65,    "building_id": "aCkZyBBCHJnTQFbmuOjFsXDjm",    "type": 1,    "power_consumption": 0.10132532425991478}
+{    "time": 24,    "building_id": "BvbRmHmETflflybVwjQklgGFk",    "park_id": "xrCVSDUfYMWJZoSuYOmTEtxJC",    "type": 17,    "power_consumption": 0.015322607021481159}
 
 
 Comments
@@ -44,6 +45,8 @@ var (
 
 	Eco_building_1y_FIELD_NAME_building_id = "building_id"
 
+	Eco_building_1y_FIELD_NAME_park_id = "park_id"
+
 	Eco_building_1y_FIELD_NAME_type = "type"
 
 	Eco_building_1y_FIELD_NAME_power_consumption = "power_consumption"
@@ -53,6 +56,7 @@ var (
 type Eco_building_1y struct {
 	Time             common.LocalTime `json:"time"`              //time
 	BuildingID       string           `json:"building_id"`       //building_id
+	ParkID           string           `json:"park_id"`           //park_id
 	Type             int32            `json:"type"`              //type
 	PowerConsumption float64          `json:"power_consumption"` //power_consumption
 
@@ -108,6 +112,27 @@ Warning table: f_eco_building_1y primary key column time is nullable column, set
 
 		&ColumnInfo{
 			Index:              2,
+			Name:               "park_id",
+			Comment:            `park_id`,
+			Notes:              ``,
+			Nullable:           true,
+			DatabaseTypeName:   "VARCHAR",
+			DatabaseTypePretty: "VARCHAR(32)",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "VARCHAR",
+			ColumnLength:       32,
+			GoFieldName:        "ParkID",
+			GoFieldType:        "string",
+			JSONFieldName:      "park_id",
+			ProtobufFieldName:  "park_id",
+			ProtobufType:       "string",
+			ProtobufPos:        3,
+		},
+
+		&ColumnInfo{
+			Index:              3,
 			Name:               "type",
 			Comment:            `type`,
 			Notes:              ``,
@@ -124,11 +149,11 @@ Warning table: f_eco_building_1y primary key column time is nullable column, set
 			JSONFieldName:      "type",
 			ProtobufFieldName:  "type",
 			ProtobufType:       "int32",
-			ProtobufPos:        3,
+			ProtobufPos:        4,
 		},
 
 		&ColumnInfo{
-			Index:              3,
+			Index:              4,
 			Name:               "power_consumption",
 			Comment:            `power_consumption`,
 			Notes:              ``,
@@ -145,7 +170,7 @@ Warning table: f_eco_building_1y primary key column time is nullable column, set
 			JSONFieldName:      "power_consumption",
 			ProtobufFieldName:  "power_consumption",
 			ProtobufType:       "float",
-			ProtobufPos:        4,
+			ProtobufPos:        5,
 		},
 	},
 }

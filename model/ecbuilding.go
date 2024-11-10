@@ -24,11 +24,12 @@ Table: o_eco_building
 [ 3] updated_by                                     VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 4] updated_time                                   TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: [CURRENT_TIMESTAMP]
 [ 5] building_name                                  VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
+[ 6] park_id                                        VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "id": "chUfabukReejAIDDSpcTpcjnY",    "created_by": "rPwMKtebODxcPymjHHZcLTEmb",    "created_time": 3,    "updated_by": "tfOvDRkxRpYegYMVWnMfXZeXO",    "updated_time": 49,    "building_name": "tMrFbgFLacUrqpYstmaGicVbR"}
+{    "id": "jcdUPINNjHRuBNQZRjFayRpnu",    "created_by": "IaAXcZCKGBgUfkcnOKusdcYbL",    "created_time": 73,    "updated_by": "OXEoZSZNTaQNqyLTcpPIoBlsr",    "updated_time": 13,    "building_name": "FxnUhYlGwKtppOoeOJkQJuelM",    "park_id": "SFSaUikmpNvoIlHvghuYYcWon"}
 
 
 
@@ -46,6 +47,8 @@ var (
 	Ecbuilding_FIELD_NAME_updated_time = "updated_time"
 
 	Ecbuilding_FIELD_NAME_building_name = "building_name"
+
+	Ecbuilding_FIELD_NAME_park_id = "park_id"
 )
 
 // Ecbuilding struct is a row record of the o_eco_building table in the  database
@@ -56,6 +59,7 @@ type Ecbuilding struct {
 	UpdatedBy    string           `json:"updated_by"`    //更新人
 	UpdatedTime  common.LocalTime `json:"updated_time"`  //更新时间
 	BuildingName string           `json:"building_name"` //楼栋名称
+	ParkID       string           `json:"park_id"`       //园区ID
 
 }
 
@@ -187,6 +191,27 @@ var EcbuildingTableInfo = &TableInfo{
 			ProtobufFieldName:  "building_name",
 			ProtobufType:       "string",
 			ProtobufPos:        6,
+		},
+
+		&ColumnInfo{
+			Index:              6,
+			Name:               "park_id",
+			Comment:            `园区ID`,
+			Notes:              ``,
+			Nullable:           false,
+			DatabaseTypeName:   "VARCHAR",
+			DatabaseTypePretty: "VARCHAR(32)",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "VARCHAR",
+			ColumnLength:       32,
+			GoFieldName:        "ParkID",
+			GoFieldType:        "string",
+			JSONFieldName:      "park_id",
+			ProtobufFieldName:  "park_id",
+			ProtobufType:       "string",
+			ProtobufPos:        7,
 		},
 	},
 }
