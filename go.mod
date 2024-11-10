@@ -12,6 +12,7 @@ require (
 	github.com/prometheus/client_golang v1.19.1
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.3
+	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
 )
 
 require (
