@@ -278,6 +278,7 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 							GatewayID:        gateway.ID,
 							FloorID:          gateway.FloorID,
 							BuildingID:       gateway.BuildingID,
+							ParkID:           gateway.ParkID,
 							Type:             gateway.Type,
 							PowerConsumption: getTotalElectricity(stats),
 						}}
