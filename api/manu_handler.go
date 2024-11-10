@@ -23,6 +23,11 @@ func InitManuCollectRoute(r chi.Router) {
 func ManuCollectHandler(w http.ResponseWriter, r *http.Request) {
 	start := r.URL.Query().Get("start")
 	end := r.URL.Query().Get("end")
-	go service.ManuCollectGatewayHourlyStatsByDay(start, end)
+	go func() {
+		err := service.ManuCollectGatewayHourlyStatsByDay(start, end)
+		if err != nil {
+			common.Logger.Error("手动收集数据失败," + err.Error())
+		}
+	}()
 	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }

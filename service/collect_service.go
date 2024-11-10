@@ -23,6 +23,10 @@ var needRefreshContinuousAggregateMap = map[string]string{
 	"f_eco_building_1d": "day",
 	"f_eco_building_1m": "month",
 	"f_eco_building_1y": "year",
+	"f_eco_park_1h":     "hour",
+	"f_eco_park_1d":     "day",
+	"f_eco_park_1m":     "month",
+	"f_eco_park_1y":     "year",
 }
 
 func init() {
@@ -34,11 +38,15 @@ func init() {
 			next := time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, 5, 0, 0, now.Location())
 			time.Sleep(next.Sub(now))
 
+			common.Logger.Info("Starting scheduled data collection...")
+
 			gateways, err := GetAllEcgateways()
 			if err != nil {
 				common.Logger.Errorf("Failed to get gateways: %v", err)
 				continue
 			}
+
+			common.Logger.Infof("Found %d gateways to collect data from", len(gateways))
 
 			if err := collectGatewaysHours(time.Now(), 4, gateways); err != nil {
 				common.Logger.Errorf("Failed to collect gateway hourly stats: %v", err)
@@ -47,12 +55,16 @@ func init() {
 			if err := refreshContinuousAggregate(time.Now().Add(-time.Hour * 4)); err != nil {
 				common.Logger.Errorf("Failed to refresh continuous aggregates: %v", err)
 			}
+
+			common.Logger.Info("Scheduled data collection completed")
 		}
 	}()
 }
 
 // 手动收集指定日期的数据，开始时间结束时间格式为 2024-01-01
 func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
+	common.Logger.Infof("Starting manual data collection from %s to %s", start, end)
+
 	if start == "" || end == "" {
 		return errors.New("Start and end dates are required")
 	}
@@ -78,12 +90,16 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 		return errors.Wrap(err, "Failed to get gateways")
 	}
 
+	common.Logger.Infof("Found %d gateways to collect data from", len(gateways))
+
 	if len(gateways) == 0 {
 		return errors.New("No gateways found")
 	}
 
 	// Iterate through each day
 	for currentDate := startTime; !currentDate.After(endTime); currentDate = currentDate.AddDate(0, 0, 1) {
+		common.Logger.Infof("Collecting data for date: %s", currentDate.Format("2006-01-02"))
+
 		if err := collectGatewaysFullDay(currentDate, gateways); err != nil {
 			common.Logger.Errorf("Failed to collect stats for %s: %v",
 				currentDate.Format("2006-01-02"), err)
@@ -93,6 +109,8 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 		if err := refreshContinuousAggregate(currentDate); err != nil {
 			return err
 		}
+
+		common.Logger.Infof("Successfully collected and processed data for %s", currentDate.Format("2006-01-02"))
 	}
 
 	return nil
@@ -117,8 +135,12 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 		projectGateways[projectCode] = append(projectGateways[projectCode], gateway)
 	}
 
+	common.Logger.Infof("Grouped gateways into %d projects", len(projectGateways))
+
 	// For each project, collect full day stats
 	for projectCode, projectGateways := range projectGateways {
+		common.Logger.Infof("Processing project %s with %d gateways", projectCode, len(projectGateways))
+
 		// Process gateways in batches of 20
 		for i := 0; i < len(projectGateways); i += 20 {
 			end := i + 20
@@ -140,8 +162,12 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 				"day":         collectTime.Format("02"),
 			}
 
+			common.Logger.Infof("Requesting data for batch of %d gateways, date: %s", len(gatewayBatch),
+				collectTime.Format("2006-01-02"))
+
 			respBytes, err := client.GetBoxesHourStats(reqBody)
 			if err != nil {
+				common.Logger.Errorf("API request failed: %v", err)
 				return errors.Wrap(err, "Failed to get box hour stats")
 			}
 
@@ -152,12 +178,16 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 			}
 
 			if err := json.Unmarshal(respBytes, &resp); err != nil {
+				common.Logger.Errorf("Failed to parse API response: %v", err)
 				return errors.Wrap(err, "Failed to unmarshal response")
 			}
 
 			if resp.Code != "0" {
+				common.Logger.Errorf("API returned error code: %s, message: %s", resp.Code, resp.Message)
 				return fmt.Errorf("API error: %s", resp.Message)
 			}
+
+			common.Logger.Infof("Received data for %d gateways", len(resp.Data))
 
 			// Process response for each gateway and hour
 			for _, gateway := range gatewayBatch {
@@ -183,9 +213,12 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 							hourlyStats = append(hourlyStats, stat)
 						}
 					}
+				} else {
+					common.Logger.Warnf("No data found for gateway %s (%s)", gateway.ID, gateway.MacAddr)
 				}
 
 				if len(hourlyStats) > 0 {
+					common.Logger.Infof("Saving %d hourly stats for gateway %s", len(hourlyStats), gateway.ID)
 					if err := saveGatewayHourlyStats(hourlyStats); err != nil {
 						return errors.Wrap(err, "Failed to save gateway hourly stats")
 					}
@@ -201,6 +234,8 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 	if hoursAgo <= 0 {
 		return errors.New("hoursAgo must be greater than 0")
 	}
+
+	common.Logger.Infof("Starting collection for last %d hours from %s", hoursAgo, collectTime.Format("2006-01-02 15:04:05"))
 
 	// Group gateways by project code
 	projectGateways := make(map[string][]model.Ecgateway)
@@ -220,8 +255,12 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 		projectGateways[projectCode] = append(projectGateways[projectCode], gateway)
 	}
 
+	common.Logger.Infof("Grouped gateways into %d projects", len(projectGateways))
+
 	// For each project, collect stats for specified hours
 	for projectCode, projectGateways := range projectGateways {
+		common.Logger.Infof("Processing project %s with %d gateways", projectCode, len(projectGateways))
+
 		// Process gateways in batches of 20
 		for i := 0; i < len(projectGateways); i += 20 {
 			end := i + 20
@@ -249,8 +288,12 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 					"hour":        hourTime.Format("15"),
 				}
 
+				common.Logger.Infof("Requesting data for batch of %d gateways, hour: %s",
+					len(gatewayBatch), hourTime.Format("2006-01-02 15:04:05"))
+
 				respBytes, err := client.GetBoxesHourStats(reqBody)
 				if err != nil {
+					common.Logger.Errorf("API request failed: %v", err)
 					return errors.Wrap(err, "Failed to get box hour stats")
 				}
 
@@ -261,12 +304,16 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 				}
 
 				if err := json.Unmarshal(respBytes, &resp); err != nil {
+					common.Logger.Errorf("Failed to parse API response: %v", err)
 					return errors.Wrap(err, "Failed to unmarshal response")
 				}
 
 				if resp.Code != "0" {
+					common.Logger.Errorf("API returned error code: %s, message: %s", resp.Code, resp.Message)
 					return fmt.Errorf("API error: %s", resp.Message)
 				}
+
+				common.Logger.Infof("Received data for %d gateways", len(resp.Data))
 
 				// Process response for each gateway
 				for _, gateway := range gatewayBatch {
@@ -283,9 +330,14 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 							PowerConsumption: getTotalElectricity(stats),
 						}}
 
+						common.Logger.Infof("Saving hourly stats for gateway %s, hour: %s",
+							gateway.ID, hourTime.Format("2006-01-02 15:04:05"))
+
 						if err := saveGatewayHourlyStats(hourlyStats); err != nil {
 							return errors.Wrap(err, "Failed to save gateway hourly stats")
 						}
+					} else {
+						common.Logger.Warnf("No data found for gateway %s (%s)", gateway.ID, gateway.MacAddr)
 					}
 				}
 			}
@@ -309,6 +361,7 @@ func processHourStats(data []interface{}) []struct {
 			addr, ok1 := statMap["addr"].(float64)
 			electricity, ok2 := statMap["electricity"].(float64)
 			if !ok1 || !ok2 {
+				common.Logger.Warnf("Invalid stat data format: %+v", statMap)
 				continue
 			}
 			stats = append(stats, struct {
@@ -350,12 +403,19 @@ func saveGatewayHourlyStats(stats []model.Eco_gateway_1h) error {
 }
 
 func refreshContinuousAggregate(collectTime time.Time) error {
+	common.Logger.Infof("Starting continuous aggregate refresh for time: %s", collectTime.Format("2006-01-02 15:04:05"))
+
 	for tableName, refreshType := range needRefreshContinuousAggregateMap {
 		startTime := collectTime
 		endTime := startTime
 
 		// 根据刷新类型设置不同的时间范围
 		switch refreshType {
+		case "hour": // 按小时刷新
+			startTime = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), 0, 0, 0, 0, startTime.Location())
+			// 结束时间为第二天0点
+			endTime = startTime.AddDate(0, 0, 1)
+
 		case "day": // 按天刷新
 			// 设置开始时间为当天0点
 			startTime = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), 0, 0, 0, 0, startTime.Location())
@@ -375,6 +435,9 @@ func refreshContinuousAggregate(collectTime time.Time) error {
 			// 如果刷新类型不在预期内,返回错误
 			return fmt.Errorf("Invalid refresh type: %s", refreshType)
 		}
+
+		common.Logger.Infof("Refreshing continuous aggregate for table %s from %s to %s",
+			tableName, startTime.Format("2006-01-02"), endTime.Format("2006-01-02"))
 
 		if err := common.DbRefreshContinuousAggregate(context.Background(), common.GetDaprClient(),
 			tableName, startTime.Format("2006-01-02"), endTime.Format("2006-01-02")); err != nil {
