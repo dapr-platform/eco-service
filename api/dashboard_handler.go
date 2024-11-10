@@ -1,6 +1,7 @@
 package api
 
 import (
+	"eco-service/entity"
 	"eco-service/service"
 	"net/http"
 	"strconv"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/dapr-platform/common"
 	"github.com/go-chi/chi/v5"
+	"golang.org/x/exp/rand"
 )
 
 //前端dashboard接口
@@ -47,7 +49,7 @@ func BuildingPowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 		common.HttpResult(w, common.ErrParam.AppendMsg("query_time is invalid"))
 		return
 	}
-	data, err := service.GetBuildingsPowerConsumption(period, queryTime,0)
+	data, err := service.GetBuildingsPowerConsumption(period, queryTime, 0)
 	if err != nil {
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
 		return
@@ -129,7 +131,7 @@ func BuildingFloorPowerConsumptionHandler(w http.ResponseWriter, r *http.Request
 		common.HttpResult(w, common.ErrParam.AppendMsg("query_time is invalid"))
 		return
 	}
-	data, err := service.GetBuildingFloorsPowerConsumption	(period, buildingId, queryTime, 0)
+	data, err := service.GetBuildingFloorsPowerConsumption(period, buildingId, queryTime, 0)
 	if err != nil {
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
 		return
@@ -215,7 +217,7 @@ func ParkPowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 	if period == "" {
 		common.HttpResult(w, common.ErrParam.AppendMsg("period is required"))
 		return
-	}	
+	}
 	queryTimeStr := r.URL.Query().Get("query_time")
 	if queryTimeStr == "" {
 		queryTimeStr = time.Now().Format("2006-01-02")
@@ -257,10 +259,18 @@ func ParkWaterConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 		common.HttpResult(w, common.ErrParam.AppendMsg("query_time is invalid"))
 		return
 	}
-	data, err := service.GetParkWaterConsumption(period, queryTime)
-	if err != nil {
-		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
-		return
+	_ = queryTime
+	label := ""
+	switch period {
+	case service.PERIOD_DAY:
+		label = queryTime.Format("2006-01-02")
+	case service.PERIOD_MONTH:
+		label = queryTime.Format("2006-01")
+	case service.PERIOD_YEAR:
+		label = queryTime.Format("2006")
 	}
-	common.HttpResult(w, common.OK.WithData(data))
+	demoData := []entity.LabelData{
+		{Label: label, Value: rand.Intn(1000)},
+	}
+	common.HttpResult(w, common.OK.WithData(demoData))
 }
