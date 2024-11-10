@@ -270,7 +270,7 @@ func ParkWaterConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 		label = queryTime.Format("2006")
 	}
 	demoData := []entity.LabelData{
-		{Label: label, Value: rand.Intn(1000)},
+		{Label: label, Value: float64(rand.Intn(1000))},
 	}
 	common.HttpResult(w, common.OK.WithData(demoData))
 }
