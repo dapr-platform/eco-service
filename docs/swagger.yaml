@@ -204,11 +204,16 @@ info:
 paths:
   /dashboard/building-power-consumption:
     get:
-      description: 建筑楼层用电量，根据粒度获取所有建筑的用电量
+      description: 建筑楼层用电量，根据粒度获取建筑所有楼层的用电量
       parameters:
       - description: period
         in: query
         name: period
+        required: true
+        type: string
+      - description: building_id
+        in: query
+        name: building_id
         required: true
         type: string
       - description: query_time,格式2024-01-01,不传则默认当天

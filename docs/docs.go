@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/dashboard/building-power-consumption": {
             "get": {
-                "description": "建筑楼层用电量，根据粒度获取所有建筑的用电量",
+                "description": "建筑楼层用电量，根据粒度获取建筑所有楼层的用电量",
                 "produces": [
                     "application/json"
                 ],
@@ -30,6 +30,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "period",
                         "name": "period",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "building_id",
+                        "name": "building_id",
                         "in": "query",
                         "required": true
                     },
