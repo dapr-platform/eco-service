@@ -15,13 +15,13 @@ import (
 //前端dashboard接口
 
 func InitDashboardRoute(r chi.Router) {
-	r.Get(common.BASE_CONTEXT+"/building-power-consumption", BuildingPowerConsumptionHandler)
-	r.Get(common.BASE_CONTEXT+"/building-type-power-consumption", BuildingTypePowerConsumptionHandler)
-	r.Get(common.BASE_CONTEXT+"/building-floor-power-consumption", BuildingFloorPowerConsumptionHandler)
-	r.Get(common.BASE_CONTEXT+"/park-carbon-emission", ParkCarbonEmissionHandler)
-	r.Get(common.BASE_CONTEXT+"/park-standard-coal-emission", ParkStandardCoalEmissionHandler)
-	r.Get(common.BASE_CONTEXT+"/park-power-consumption", ParkPowerConsumptionHandler)
-	r.Get(common.BASE_CONTEXT+"/park-water-consumption", ParkWaterConsumptionHandler)
+	r.Get(common.BASE_CONTEXT+"/dashboard/building-power-consumption", BuildingPowerConsumptionHandler)
+	r.Get(common.BASE_CONTEXT+"/dashboard/building-type-power-consumption", BuildingTypePowerConsumptionHandler)
+	r.Get(common.BASE_CONTEXT+"/dashboard/building-floor-power-consumption", BuildingFloorPowerConsumptionHandler)
+	r.Get(common.BASE_CONTEXT+"/dashboard/park-carbon-emission", ParkCarbonEmissionHandler)
+	r.Get(common.BASE_CONTEXT+"/dashboard/park-standard-coal-emission", ParkStandardCoalEmissionHandler)
+	r.Get(common.BASE_CONTEXT+"/dashboard/park-power-consumption", ParkPowerConsumptionHandler)
+	r.Get(common.BASE_CONTEXT+"/dashboard/park-water-consumption", ParkWaterConsumptionHandler)
 }
 
 // @Summary 建筑用电量
