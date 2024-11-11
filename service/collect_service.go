@@ -11,9 +11,10 @@ import (
 
 	"github.com/dapr-platform/common"
 	"github.com/pkg/errors"
+	"golang.org/x/exp/rand"
 )
 
-var needRefreshContinuousAggregateMap = map[string]string{
+var gatewayNeedRefreshContinuousAggregateMap = map[string]string{
 	"f_eco_gateway_1d":  "day",
 	"f_eco_gateway_1m":  "month",
 	"f_eco_gateway_1y":  "year",
@@ -27,6 +28,10 @@ var needRefreshContinuousAggregateMap = map[string]string{
 	"f_eco_park_1d":     "day",
 	"f_eco_park_1m":     "month",
 	"f_eco_park_1y":     "year",
+}
+var waterNeedRefreshContinuousAggregateMap = map[string]string{
+	"f_eco_park_water_1m": "month",
+	"f_eco_park_water_1y": "year",
 }
 
 func init() {
@@ -52,13 +57,57 @@ func init() {
 				common.Logger.Errorf("Failed to collect gateway hourly stats: %v", err)
 			}
 
-			if err := refreshContinuousAggregate(time.Now().Add(-time.Hour * 4)); err != nil {
+			if err := refreshContinuousAggregate(time.Now().Add(-time.Hour*4), gatewayNeedRefreshContinuousAggregateMap); err != nil {
 				common.Logger.Errorf("Failed to refresh continuous aggregates: %v", err)
 			}
 
 			common.Logger.Info("Scheduled data collection completed")
 		}
 	}()
+	go func() {
+		for {
+			demoWaterDataGen()
+			time.Sleep(time.Hour * 24)
+		}
+	}()
+}
+
+func demoWaterDataGen() {
+	// 获取当前时间
+	now := time.Now()
+	// 生成昨天的日期，因为是按天统计
+	yesterday := now.AddDate(0, 0, -1)
+	// 生成随机数，基准值100，上下浮动20
+	rand.Seed(uint64(time.Now().UnixNano()))
+	waterConsumption := 100.0 + (rand.Float64()-0.5)*40
+	park, err := common.DbGetOne[model.Ecpark](context.Background(), common.GetDaprClient(), model.EcparkTableInfo.Name, "")
+	if err != nil {
+		common.Logger.Errorf("Failed to get park: %v", err)
+		return
+	}
+	// 构造数据
+	waterData := model.Eco_park_water_1d{
+		ID:               park.ID + "_" + yesterday.Format("20060102"),
+		Time:             common.LocalTime(yesterday),
+		ParkID:           park.ID,
+		WaterConsumption: waterConsumption,
+	}
+
+	// 插入数据
+	err = common.DbBatchUpsert(context.Background(), common.GetDaprClient(), []model.Eco_park_water_1d{waterData}, model.Eco_park_water_1dTableInfo.Name, model.Eco_park_water_1d_FIELD_NAME_id)
+	if err != nil {
+		common.Logger.Errorf("Failed to insert water consumption data: %v", err)
+		return
+	}
+
+	// 刷新连续聚合表
+	err = refreshContinuousAggregate(yesterday, waterNeedRefreshContinuousAggregateMap)
+	if err != nil {
+		common.Logger.Errorf("Failed to refresh water continuous aggregates: %v", err)
+		return
+	}
+
+	common.Logger.Infof("Generated water consumption data for %s: %.2f", yesterday.Format("2006-01-02"), waterConsumption)
 }
 
 // 手动收集指定日期的数据，开始时间结束时间格式为 2024-01-01
@@ -106,7 +155,7 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 			return err
 		}
 
-		if err := refreshContinuousAggregate(currentDate); err != nil {
+		if err := refreshContinuousAggregate(currentDate, gatewayNeedRefreshContinuousAggregateMap); err != nil {
 			return err
 		}
 
@@ -402,10 +451,10 @@ func saveGatewayHourlyStats(stats []model.Eco_gateway_1h) error {
 	return nil
 }
 
-func refreshContinuousAggregate(collectTime time.Time) error {
+func refreshContinuousAggregate(collectTime time.Time, refreshDefineMap map[string]string) error {
 	common.Logger.Infof("Starting continuous aggregate refresh for time: %s", collectTime.Format("2006-01-02 15:04:05"))
 
-	for tableName, refreshType := range needRefreshContinuousAggregateMap {
+	for tableName, refreshType := range refreshDefineMap {
 		startTime := collectTime
 		endTime := startTime
 

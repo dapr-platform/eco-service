@@ -259,18 +259,10 @@ func ParkWaterConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 		common.HttpResult(w, common.ErrParam.AppendMsg("query_time is invalid"))
 		return
 	}
-	_ = queryTime
-	label := ""
-	switch period {
-	case service.PERIOD_DAY:
-		label = queryTime.Format("2006-01-02")
-	case service.PERIOD_MONTH:
-		label = queryTime.Format("2006-01")
-	case service.PERIOD_YEAR:
-		label = queryTime.Format("2006")
+	data, err := service.GetParkWaterConsumption(period, queryTime)
+	if err != nil {
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
 	}
-	demoData := []entity.LabelData{
-		{Label: label, Value: float64(rand.Intn(1000))},
-	}
-	common.HttpResult(w, common.OK.WithData(demoData))
+	common.HttpResult(w, common.OK.WithData(data))
 }

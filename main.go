@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 
+	_ "eco-service/service"
+
 	"github.com/dapr-platform/common"
 	daprd "github.com/dapr/go-sdk/service/http"
 	"github.com/go-chi/chi/v5"

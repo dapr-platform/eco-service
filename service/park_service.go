@@ -21,13 +21,15 @@ type ParkDataGetter func(time.Time) ([]entity.LabelData, error)
 
 func GetParkWaterConsumption(period string, queryTime time.Time) ([]entity.LabelData, error) {
 	fmt.Printf("GetParkWaterConsumption: period=%s, queryTime=%v\n", period, queryTime)
-	switch period {
-	case PERIOD_DAY:
-		return getParkDataDay(queryTime, 0)
-	case PERIOD_MONTH:
-		return getParkDataMonth(queryTime, 0)
-	case PERIOD_YEAR:
-		return getParkDataYear(queryTime, 0)
+	getters := map[string]ParkDataGetter{
+		PERIOD_HOUR:  func(t time.Time) ([]entity.LabelData, error) { return getParkWaterDataHour(t) },
+		PERIOD_DAY:   func(t time.Time) ([]entity.LabelData, error) { return getParkWaterDataDay(t) },
+		PERIOD_MONTH: func(t time.Time) ([]entity.LabelData, error) { return getParkWaterDataMonth(t) },
+		PERIOD_YEAR:  func(t time.Time) ([]entity.LabelData, error) { return getParkWaterDataYear(t) },
+	}
+
+	if getter, ok := getters[period]; ok {
+		return getter(queryTime)
 	}
 
 	return nil, fmt.Errorf("unsupported period: %s", period)
@@ -208,6 +210,93 @@ func getParkDataWithTimeOffset(period string, queryTime time.Time, years, months
 			Id:    parkID,
 			Label: parkID,
 			Value: powerConsumption,
+		})
+	}
+
+	return result, nil
+}
+
+
+func getParkWaterDataWithTimeOffset(period string, queryTime time.Time, years, months, days, hours int) ([]entity.LabelData, error) {
+	var data interface{}
+	var err error
+	var tableName string
+
+	offsetTime := queryTime.AddDate(years, months, days).Add(time.Duration(hours) * time.Hour)
+
+	switch period {
+	case PERIOD_HOUR:
+		tableName = model.Eco_park_water_1dTableInfo.Name
+		fmt.Printf("Querying %s: time=%s\n", tableName, offsetTime.Format("2006-01-02 15"))
+		data, err = common.DbQuery[model.Eco_park_water_1d](
+			context.Background(),
+			common.GetDaprClient(),
+			tableName,
+			fmt.Sprintf("time=%s", offsetTime.Format("2006-01-02 15")),
+		)
+	case PERIOD_DAY:
+		tableName = model.Eco_park_water_1dTableInfo.Name
+		fmt.Printf("Querying %s: time=%s\n", tableName, offsetTime.Format("2006-01-02"))
+		data, err = common.DbQuery[model.Eco_park_water_1d](
+			context.Background(),
+			common.GetDaprClient(),
+			tableName,
+			fmt.Sprintf("time=%s", offsetTime.Format("2006-01-02")),
+		)
+	case PERIOD_MONTH:
+		tableName = model.Eco_park_water_1mTableInfo.Name
+		fmt.Printf("Querying %s: time=%s\n", tableName, offsetTime.Format("2006-01"))
+		data, err = common.DbQuery[model.Eco_park_water_1m](
+			context.Background(),
+			common.GetDaprClient(),
+			tableName,
+			fmt.Sprintf("time=%s", offsetTime.Format("2006-01")),
+		)
+	case PERIOD_YEAR:
+		tableName = model.Eco_park_water_1yTableInfo.Name
+		fmt.Printf("Querying %s: time=%s\n", tableName, offsetTime.Format("2006"))
+		data, err = common.DbQuery[model.Eco_park_water_1y](
+			context.Background(),
+			common.GetDaprClient(),
+			tableName,
+			fmt.Sprintf("time=%s", offsetTime.Format("2006")),
+		)
+	default:
+		return nil, fmt.Errorf("unsupported period: %s", period)
+	}
+
+	if err != nil {
+		fmt.Printf("Query error: %v\n", err)
+		return nil, err
+	}
+
+	result := make([]entity.LabelData, 0)
+	parkWaterMap := make(map[string]float64)
+
+	switch period {
+	case PERIOD_HOUR:
+		for _, v := range data.([]model.Eco_park_water_1d) {
+			parkWaterMap[v.ParkID] = v.WaterConsumption
+		}
+	case PERIOD_DAY:
+		for _, v := range data.([]model.Eco_park_water_1d) {
+			parkWaterMap[v.ParkID] = v.WaterConsumption
+		}
+	case PERIOD_MONTH:
+		for _, v := range data.([]model.Eco_park_water_1m) {
+			parkWaterMap[v.ParkID] = v.WaterConsumption
+		}
+	case PERIOD_YEAR:
+		for _, v := range data.([]model.Eco_park_water_1y) {
+			parkWaterMap[v.ParkID] = v.WaterConsumption
+		}
+	}
+
+	for parkID, waterConsumption := range parkWaterMap {
+		result = append(result, entity.LabelData{
+			Id:    parkID,
+			Label: parkID,
+			Value: waterConsumption,
 		})
 	}
 
