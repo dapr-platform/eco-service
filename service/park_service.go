@@ -30,35 +30,31 @@ func GetParkWaterConsumption(period string, queryTime time.Time) ([]entity.Label
 	return getPeriodData(period, queryTime, getParkWaterDataWithTimeOffset)
 }
 
-func GetParkWaterConsumptionRange(period string, queryTime time.Time) ([]entity.LabelData, error) {
-	fmt.Printf("GetParkWaterConsumptionRange: period=%s, queryTime=%v\n", period, queryTime)
+func GetParkWaterConsumptionSubRange(period string, queryTime time.Time) ([]entity.LabelData, error) {
+	fmt.Printf("GetParkWaterConsumptionSubRange: period=%s, queryTime=%v\n", period, queryTime)
 	var startTime, endTime time.Time
 	gatewayType := 0
 	switch period {
-	case PERIOD_HOUR:
-		startTime = time.Date(queryTime.Year(), queryTime.Month(), queryTime.Day(), queryTime.Hour(), 0, 0, 0, queryTime.Location())
-		endTime = startTime.Add(1 * time.Hour)
-		return getRangeData(period, startTime, endTime, gatewayType, getParkWaterDataWithTimeRange)
 	case PERIOD_DAY:
-		startTime = time.Date(queryTime.Year(), queryTime.Month(), queryTime.Day(), 0, 0, 0, 0, queryTime.Location())
-		endTime = startTime.Add(24 * time.Hour)
-		return getRangeData(period, startTime, endTime, gatewayType, getParkWaterDataWithTimeRange)
+		endTime = time.Date(queryTime.Year(), queryTime.Month(), queryTime.Day(), 0, 0, 0, 0, queryTime.Location())
+		startTime = endTime.AddDate(0, 0, -1)
+		return getRangeData(PERIOD_HOUR, startTime, endTime, gatewayType, getParkWaterDataWithTimeRange)
 	case PERIOD_MONTH:
-		startTime = time.Date(queryTime.Year(), queryTime.Month(), 1, 0, 0, 0, 0, queryTime.Location())
-		endTime = startTime.AddDate(0, 1, 0)
-		return getRangeData(period, startTime, endTime, gatewayType, getParkWaterDataWithTimeRange)
+		endTime = time.Date(queryTime.Year(), queryTime.Month(), 1, 0, 0, 0, 0, queryTime.Location())
+		startTime = endTime.AddDate(0, -1, 0)
+		return getRangeData(PERIOD_DAY, startTime, endTime, gatewayType, getParkWaterDataWithTimeRange)
 	case PERIOD_YEAR:
-		startTime = time.Date(queryTime.Year(), 1, 1, 0, 0, 0, 0, queryTime.Location())
-		endTime = startTime.AddDate(1, 0, 0)
-		return getRangeData(period, startTime, endTime, gatewayType, getParkWaterDataWithTimeRange)
+		endTime = time.Date(queryTime.Year(), 1, 1, 0, 0, 0, 0, queryTime.Location())
+		startTime = endTime.AddDate(-1, 0, 0)
+		return getRangeData(PERIOD_MONTH, startTime, endTime, gatewayType, getParkWaterDataWithTimeRange)
 	default:
 		return nil, fmt.Errorf("unsupported period: %s", period)
 	}
 }
 
-func GetParkCarbonEmissionRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
-	fmt.Printf("GetParkCarbonEmissionRange: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
-	result, err := GetParkPowerConsumptionRange(period, queryTime, gatewayType)
+func GetParkCarbonEmissionSubRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("GetParkCarbonEmissionSubRange: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
+	result, err := GetParkPowerConsumptionSubRange(period, queryTime, gatewayType)
 	if err != nil {
 		return nil, err
 	}
@@ -69,9 +65,9 @@ func GetParkCarbonEmissionRange(period string, queryTime time.Time, gatewayType 
 	return result, nil
 }
 
-func GetParkStandardCoalRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
-	fmt.Printf("GetParkStandardCoalRange: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
-	result, err := GetParkPowerConsumptionRange(period, queryTime, gatewayType)
+func GetParkStandardCoalSubRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("GetParkStandardCoalSubRange: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
+	result, err := GetParkPowerConsumptionSubRange(period, queryTime, gatewayType)
 	if err != nil {
 		return nil, err
 	}
@@ -82,23 +78,23 @@ func GetParkStandardCoalRange(period string, queryTime time.Time, gatewayType in
 	return result, nil
 }
 
-func GetParkPowerConsumptionRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
-	fmt.Printf("GetParkPowerConsumptionRange: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
+func GetParkPowerConsumptionSubRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("GetParkPowerConsumptionSubRange: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
 
 	var startTime, endTime time.Time
 	switch period {
 	case PERIOD_DAY:
-		startTime = time.Date(queryTime.Year(), queryTime.Month(), queryTime.Day(), 0, 0, 0, 0, queryTime.Location())
-		endTime = startTime.Add(24 * time.Hour)
-		return getRangeData(period, startTime, endTime, gatewayType, getParkDataWithTimeRange)
+		endTime = time.Date(queryTime.Year(), queryTime.Month(), queryTime.Day(), 0, 0, 0, 0, queryTime.Location())
+		startTime = endTime.AddDate(0, 0, -1)
+		return getRangeData(PERIOD_HOUR, startTime, endTime, gatewayType, getParkDataWithTimeRange)
 	case PERIOD_MONTH:
-		startTime = time.Date(queryTime.Year(), queryTime.Month(), 1, 0, 0, 0, 0, queryTime.Location())
-		endTime = startTime.AddDate(0, 1, 0).Add(-time.Second) // Fix: Use AddDate and subtract 1 second
-		return getRangeData(period, startTime, endTime, gatewayType, getParkDataWithTimeRange)
+		endTime = time.Date(queryTime.Year(), queryTime.Month(), 1, 0, 0, 0, 0, queryTime.Location())
+		startTime = endTime.AddDate(0, -1, 0)
+		return getRangeData(PERIOD_DAY, startTime, endTime, gatewayType, getParkDataWithTimeRange)
 	case PERIOD_YEAR:
-		startTime = time.Date(queryTime.Year(), 1, 1, 0, 0, 0, 0, queryTime.Location())
-		endTime = startTime.AddDate(1, 0, 0).Add(-time.Second) // Fix: Use AddDate and subtract 1 second
-		return getRangeData(period, startTime, endTime, gatewayType, getParkDataWithTimeRange)
+		endTime = time.Date(queryTime.Year(), 1, 1, 0, 0, 0, 0, queryTime.Location())
+		startTime = endTime.AddDate(-1, 0, 0)
+		return getRangeData(PERIOD_MONTH, startTime, endTime, gatewayType, getParkDataWithTimeRange)
 	default:
 		return nil, fmt.Errorf("unsupported period: %s", period)
 	}

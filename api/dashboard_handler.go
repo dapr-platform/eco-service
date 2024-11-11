@@ -171,7 +171,7 @@ func ParkCarbonEmissionHandler(w http.ResponseWriter, r *http.Request) {
 		common.HttpResult(w, common.ErrParam.AppendMsg(err.Error()))
 		return
 	}
-	data, err := service.GetParkCarbonEmissionRange(period, queryTime, 0)
+	data, err := service.GetParkCarbonEmissionSubRange(period, queryTime, 0)
 	if err != nil {
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
 		return
@@ -199,7 +199,7 @@ func ParkStandardCoalEmissionHandler(w http.ResponseWriter, r *http.Request) {
 		common.HttpResult(w, common.ErrParam.AppendMsg(err.Error()))
 		return
 	}
-	data, err := service.GetParkStandardCoalRange(period, queryTime, 0)
+	data, err := service.GetParkStandardCoalSubRange(period, queryTime, 0)
 	if err != nil {
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
 		return
@@ -237,7 +237,7 @@ func ParkPowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 		common.HttpResult(w, common.ErrParam.AppendMsg("type is invalid"))
 		return
 	}
-	data, err := service.GetParkPowerConsumptionRange(period, queryTime, typeInt)
+	data, err := service.GetParkPowerConsumptionSubRange(period, queryTime, typeInt)
 	if err != nil {
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
 		return
@@ -293,7 +293,7 @@ func ParkWaterConsumptionRangeHandler(w http.ResponseWriter, r *http.Request) {
 		common.HttpResult(w, common.ErrParam.AppendMsg(err.Error()))
 		return
 	}
-	data, err := service.GetParkWaterConsumptionRange(period, queryTime)
+	data, err := service.GetParkWaterConsumptionSubRange(period, queryTime)
 	if err != nil {
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
 		return
