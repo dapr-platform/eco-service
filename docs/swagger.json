@@ -8,7 +8,7 @@
     },
     "basePath": "/swagger/eco-service",
     "paths": {
-        "/dashboard/building-power-consumption": {
+        "/dashboard/building-floor-power-consumption": {
             "get": {
                 "description": "建筑楼层用电量，根据粒度获取建筑所有楼层的用电量",
                 "produces": [
@@ -38,6 +38,125 @@
                         "description": "query_time,格式2024-01-01,不传则默认当天",
                         "name": "query_time",
                         "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "objects array",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/entity.LabelData"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard/building-power-consumption": {
+            "get": {
+                "description": "建筑用电量，根据粒度获取所有建筑的用电量",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "建筑用电量",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "period, hour/day/month/year",
+                        "name": "period",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "query_time,格式2024-01-01,不传则默认当天",
+                        "name": "query_time",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "objects array",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/entity.LabelData"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard/building-type-power-consumption": {
+            "get": {
+                "description": "建筑细分用电量，根据粒度,和分类获取所有建筑的用电量。分类为1:照明，2:动力",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "建筑细分用电量",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "period, hour/day/month/year",
+                        "name": "period",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "query_time,格式2024-01-01,不传则默认当天",
+                        "name": "query_time",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "type",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {

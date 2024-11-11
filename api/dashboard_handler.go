@@ -66,7 +66,7 @@ func BuildingPowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Success 200 {object} common.Response{data=[]entity.LabelData} "objects array"
 // @Failure 500 {object} common.Response ""
-// @Router /dashboard/building-power-consumption [get]
+// @Router /dashboard/building-type-power-consumption [get]
 func BuildingTypePowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 	period := r.URL.Query().Get("period")
 	if period == "" {
@@ -110,7 +110,7 @@ func BuildingTypePowerConsumptionHandler(w http.ResponseWriter, r *http.Request)
 // @Produce  json
 // @Success 200 {object} common.Response{data=[]entity.LabelData} "objects array"
 // @Failure 500 {object} common.Response ""
-// @Router /dashboard/building-power-consumption [get]
+// @Router /dashboard/building-floor-power-consumption [get]
 func BuildingFloorPowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 	period := r.URL.Query().Get("period")
 	if period == "" {
