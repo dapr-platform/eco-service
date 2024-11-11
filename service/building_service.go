@@ -77,7 +77,7 @@ func getBuildingDataWithTimeOffset(period string, queryTime time.Time, years, mo
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=%s%s", offsetTime.Format("2006-01-02"), whereClause),
+			fmt.Sprintf("time=%s%s", offsetTime.Format("2006-01-02T00:00:00"), whereClause),
 		)
 	case PERIOD_MONTH:
 		tableName = model.Eco_building_1mTableInfo.Name
@@ -85,7 +85,7 @@ func getBuildingDataWithTimeOffset(period string, queryTime time.Time, years, mo
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=%s%s", offsetTime.Format("2006-01"), whereClause),
+			fmt.Sprintf("time=%s%s", offsetTime.Format("2006-01-01T00:00:00"), whereClause),
 		)
 	case PERIOD_YEAR:
 		tableName = model.Eco_building_1yTableInfo.Name
@@ -93,7 +93,7 @@ func getBuildingDataWithTimeOffset(period string, queryTime time.Time, years, mo
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=%s%s", offsetTime.Format("2006"), whereClause),
+			fmt.Sprintf("time=%s%s", offsetTime.Format("2006-01-01T00:00:00"), whereClause),
 		)
 	default:
 		return nil, fmt.Errorf("unsupported period: %s", period)
@@ -186,7 +186,7 @@ func getBuildingFloorDataWithTimeOffset(buildingID string, period string, queryT
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=%s%s", offsetTime.Format("2006-01-02"), whereClause),
+			fmt.Sprintf("time=%s%s", offsetTime.Format("2006-01-02T00:00:00"), whereClause),
 		)
 	case PERIOD_MONTH:
 		tableName = model.Eco_floor_1mTableInfo.Name
@@ -194,7 +194,7 @@ func getBuildingFloorDataWithTimeOffset(buildingID string, period string, queryT
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=%s%s", offsetTime.Format("2006-01"), whereClause),
+			fmt.Sprintf("time=%s%s", offsetTime.Format("2006-01-01T00:00:00"), whereClause),
 		)
 	case PERIOD_YEAR:
 		tableName = model.Eco_floor_1yTableInfo.Name
@@ -202,7 +202,7 @@ func getBuildingFloorDataWithTimeOffset(buildingID string, period string, queryT
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=%s%s", offsetTime.Format("2006"), whereClause),
+			fmt.Sprintf("time=%s%s", offsetTime.Format("2006-01-01T00:00:00"), whereClause),
 		)
 	default:
 		return nil, fmt.Errorf("unsupported period: %s", period)

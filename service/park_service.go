@@ -219,7 +219,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time$gte.%s&time$lte.%s%s", startTime.Format("2006-01-02T15"), endTime.Format("2006-01-02T15"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-02T15:00:00"), endTime.Format("2006-01-02T15:00:00"), whereClause),
 		)
 	case PERIOD_DAY:
 		tableName = model.Eco_park_1dTableInfo.Name
@@ -227,7 +227,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time$gte.%s&time$lte.%s%s", startTime.Format("2006-01-02"), endTime.Format("2006-01-02"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T23:59:59"), whereClause),
 		)
 	case PERIOD_MONTH:
 		tableName = model.Eco_park_1mTableInfo.Name
@@ -235,7 +235,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time$gte.%s&time$lte.%s%s", startTime.Format("2006-01"), endTime.Format("2006-01"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-31T23:59:59"), whereClause),
 		)
 	case PERIOD_YEAR:
 		tableName = model.Eco_park_1yTableInfo.Name
@@ -243,7 +243,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time$gte.%s&time$lte.%s%s", startTime.Format("2006"), endTime.Format("2006"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-12-31T23:59:59"), whereClause),
 		)
 	default:
 		return nil, fmt.Errorf("unsupported period: %s", period)
