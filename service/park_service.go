@@ -40,16 +40,16 @@ func GetParkWaterConsumptionSubRange(period string, queryTime time.Time) ([]enti
 	gatewayType := 0
 	switch period {
 	case PERIOD_DAY:
-		endTime = time.Date(queryTime.Year(), queryTime.Month(), queryTime.Day(), 0, 0, 0, 0, queryTime.Location())
-		startTime = endTime.AddDate(0, 0, -1)
+		startTime = time.Date(queryTime.Year(), queryTime.Month(), queryTime.Day(), 0, 0, 0, 0, queryTime.Location())
+		endTime = startTime.AddDate(0, 0, 1)
 		return getRangeData(PERIOD_HOUR, startTime, endTime, gatewayType, getParkWaterDataWithTimeRange)
 	case PERIOD_MONTH:
-		endTime = time.Date(queryTime.Year(), queryTime.Month(), 1, 0, 0, 0, 0, queryTime.Location())
-		startTime = endTime.AddDate(0, -1, 0)
+		startTime = time.Date(queryTime.Year(), queryTime.Month(), 1, 0, 0, 0, 0, queryTime.Location())
+		endTime = startTime.AddDate(0, 1, 0)
 		return getRangeData(PERIOD_DAY, startTime, endTime, gatewayType, getParkWaterDataWithTimeRange)
 	case PERIOD_YEAR:
-		endTime = time.Date(queryTime.Year(), 1, 1, 0, 0, 0, 0, queryTime.Location())
-		startTime = endTime.AddDate(-1, 0, 0)
+		startTime = time.Date(queryTime.Year(), 1, 1, 0, 0, 0, 0, queryTime.Location())
+		endTime = startTime.AddDate(1, 0, 0)
 		return getRangeData(PERIOD_MONTH, startTime, endTime, gatewayType, getParkWaterDataWithTimeRange)
 	default:
 		return nil, fmt.Errorf("unsupported period: %s", period)
@@ -93,16 +93,16 @@ func GetParkPowerConsumptionSubRange(period string, queryTime time.Time, gateway
 	var startTime, endTime time.Time
 	switch period {
 	case PERIOD_DAY:
-		endTime = time.Date(queryTime.Year(), queryTime.Month(), queryTime.Day(), 0, 0, 0, 0, queryTime.Location())
-		startTime = endTime.AddDate(0, 0, -1)
+		startTime = time.Date(queryTime.Year(), queryTime.Month(), queryTime.Day(), 0, 0, 0, 0, queryTime.Location())
+		endTime = startTime.AddDate(0, 0, 1)
 		return getRangeData(PERIOD_HOUR, startTime, endTime, gatewayType, getParkDataWithTimeRange)
 	case PERIOD_MONTH:
-		endTime = time.Date(queryTime.Year(), queryTime.Month(), 1, 0, 0, 0, 0, queryTime.Location())
-		startTime = endTime.AddDate(0, -1, 0)
+		startTime = time.Date(queryTime.Year(), queryTime.Month(), 1, 0, 0, 0, 0, queryTime.Location())
+		endTime = startTime.AddDate(0, 1, 0)
 		return getRangeData(PERIOD_DAY, startTime, endTime, gatewayType, getParkDataWithTimeRange)
 	case PERIOD_YEAR:
-		endTime = time.Date(queryTime.Year(), 1, 1, 0, 0, 0, 0, queryTime.Location())
-		startTime = endTime.AddDate(-1, 0, 0)
+		startTime = time.Date(queryTime.Year(), 1, 1, 0, 0, 0, 0, queryTime.Location())
+		endTime = startTime.AddDate(1, 0, 0)
 		return getRangeData(PERIOD_MONTH, startTime, endTime, gatewayType, getParkDataWithTimeRange)
 	default:
 		return nil, fmt.Errorf("unsupported period: %s", period)
@@ -429,7 +429,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T23:59:59"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause),
 		)
 	case PERIOD_MONTH:
 		tableName = model.Eco_park_1mTableInfo.Name
@@ -437,7 +437,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-31T23:59:59"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-01T00:00:00"), whereClause),
 		)
 	case PERIOD_YEAR:
 		tableName = model.Eco_park_1yTableInfo.Name
@@ -445,7 +445,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-12-31T23:59:59"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-01T00:00:00"), whereClause),
 		)
 	default:
 		return nil, fmt.Errorf("unsupported period: %s", period)
