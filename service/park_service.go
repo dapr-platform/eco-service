@@ -16,6 +16,10 @@ const (
 	CARBON_FACTOR = 0.61   // 碳排放系数
 	COAL_FACTOR   = 0.1229 // 标准煤系数
 )
+type keyValue struct {
+	key   string
+	value float64
+}
 
 type ParkDataGetter func(time.Time) ([]entity.LabelData, error)
 
@@ -60,7 +64,9 @@ func GetParkCarbonEmissionSubRange(period string, queryTime time.Time, gatewayTy
 	}
 
 	for i := range result {
-		result[i].Value *= CARBON_FACTOR
+		result[i].Value = float64(int(result[i].Value*CARBON_FACTOR*100)) / 100
+		result[i].HB = float64(int(result[i].HB*CARBON_FACTOR*100)) / 100
+		result[i].TB = float64(int(result[i].TB*CARBON_FACTOR*100)) / 100
 	}
 	return result, nil
 }
@@ -73,7 +79,10 @@ func GetParkStandardCoalSubRange(period string, queryTime time.Time, gatewayType
 	}
 
 	for i := range result {
-		result[i].Value *= COAL_FACTOR
+		result[i].Value = float64(int(result[i].Value*COAL_FACTOR*100)) / 100
+		result[i].HB = float64(int(result[i].HB*COAL_FACTOR*100)) / 100
+		result[i].TB = float64(int(result[i].TB*COAL_FACTOR*100)) / 100
+
 	}
 	return result, nil
 }
@@ -453,19 +462,20 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 
 	switch period {
 	case PERIOD_HOUR:
-		timeFormat = "15:04"
+		timeFormat = "15"
 	case PERIOD_DAY:
-		timeFormat = "01-02"
+		timeFormat = "02"
 	case PERIOD_MONTH:
-		timeFormat = "2006-01"
+		timeFormat = "01"
 	case PERIOD_YEAR:
 		timeFormat = "2006"
 	}
+	calcTimeFormat := "2006-01-02_15:04:05"
 
 	switch period {
 	case PERIOD_HOUR:
 		for _, v := range data.([]model.Eco_park_1h) {
-			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(timeFormat))
+			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
 			if len(gatewayType) > 0 && gatewayType[0] > 0 {
 				parkPowerMap[key] += v.PowerConsumption
 			} else {
@@ -474,7 +484,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		}
 	case PERIOD_DAY:
 		for _, v := range data.([]model.Eco_park_1d) {
-			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(timeFormat))
+			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
 			if len(gatewayType) > 0 && gatewayType[0] > 0 {
 				parkPowerMap[key] += v.PowerConsumption
 			} else {
@@ -483,7 +493,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		}
 	case PERIOD_MONTH:
 		for _, v := range data.([]model.Eco_park_1m) {
-			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(timeFormat))
+			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
 			if len(gatewayType) > 0 && gatewayType[0] > 0 {
 				parkPowerMap[key] += v.PowerConsumption
 			} else {
@@ -492,7 +502,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		}
 	case PERIOD_YEAR:
 		for _, v := range data.([]model.Eco_park_1y) {
-			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(timeFormat))
+			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
 			if len(gatewayType) > 0 && gatewayType[0] > 0 {
 				parkPowerMap[key] += v.PowerConsumption
 			} else {
@@ -501,11 +511,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		}
 	}
 
-	// Convert map to slice and sort by time
-	type keyValue struct {
-		key   string
-		value float64
-	}
+	
 	var sortedData []keyValue
 	for k, v := range parkPowerMap {
 		sortedData = append(sortedData, keyValue{k, v})
@@ -517,18 +523,9 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		time2 := strings.Split(sortedData[j].key, "_")[1]
 		return time1 < time2
 	})
+	result = fillSortedData(sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
 
-	// Convert sorted data to result
-	for _, kv := range sortedData {
-		parts := strings.Split(kv.key, "_")
-		parkID := parts[0]
-		timeStr := parts[1]
-		result = append(result, entity.LabelData{
-			Id:    parkID,
-			Label: timeStr,
-			Value: kv.value,
-		})
-	}
+
 
 	return result, nil
 }
@@ -599,11 +596,11 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	case PERIOD_YEAR:
 		timeFormat = "2006"
 	}
-
+	calcTimeFormat := "2006-01-02_15:04:05"
 	switch period {
 	case PERIOD_HOUR:
 		for _, v := range data.([]model.Eco_park_water_1d) {
-			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(timeFormat))
+			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
 			if len(gatewayType) > 0 && gatewayType[0] > 0 {
 				parkPowerMap[key] += v.WaterConsumption
 			} else {
@@ -612,7 +609,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 		}
 	case PERIOD_DAY:
 		for _, v := range data.([]model.Eco_park_water_1d) {
-			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(timeFormat))
+			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
 			if len(gatewayType) > 0 && gatewayType[0] > 0 {
 				parkPowerMap[key] += v.WaterConsumption
 			} else {
@@ -621,7 +618,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 		}
 	case PERIOD_MONTH:
 		for _, v := range data.([]model.Eco_park_water_1m) {
-			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(timeFormat))
+			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
 			if len(gatewayType) > 0 && gatewayType[0] > 0 {
 				parkPowerMap[key] += v.WaterConsumption
 			} else {
@@ -630,7 +627,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 		}
 	case PERIOD_YEAR:
 		for _, v := range data.([]model.Eco_park_water_1y) {
-			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(timeFormat))
+			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
 			if len(gatewayType) > 0 && gatewayType[0] > 0 {
 				parkPowerMap[key] += v.WaterConsumption
 			} else {
@@ -640,10 +637,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	}
 
 	// Convert map to slice and sort by time
-	type keyValue struct {
-		key   string
-		value float64
-	}
+	
 	var sortedData []keyValue
 	for k, v := range parkPowerMap {
 		sortedData = append(sortedData, keyValue{k, v})
@@ -655,18 +649,56 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 		time2 := strings.Split(sortedData[j].key, "_")[1]
 		return time1 < time2
 	})
+	result = fillSortedData(sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
 
-	// Convert sorted data to result
-	for _, kv := range sortedData {
-		parts := strings.Split(kv.key, "_")
-		parkID := parts[0]
-		timeStr := parts[1]
+	return result, nil
+}
+// fillSortedData fills in missing time points in sorted data with zero values
+func fillSortedData(sortedData []keyValue, period string, startTime time.Time, endTime time.Time, calcTimeFormat string, timeFormat string) []entity.LabelData {
+	var result []entity.LabelData
+
+	// Generate continuous time points
+	var step time.Duration
+	switch period {
+	case PERIOD_HOUR:
+		step = time.Hour
+	case PERIOD_DAY:
+		step = 24 * time.Hour
+	case PERIOD_MONTH:
+		step = 30 * 24 * time.Hour // Approximate
+	case PERIOD_YEAR:
+		step = 365 * 24 * time.Hour // Approximate
+	}
+
+	// Create map for quick lookup of values
+	valueMap := make(map[string]float64)
+	var parkID string
+	if len(sortedData) > 0 {
+		for _, kv := range sortedData {
+			parts := strings.Split(kv.key, "_")
+			if parkID == "" {
+				parkID = parts[0]
+			}
+			timeStr := parts[1]
+			valueMap[timeStr] = kv.value
+		}
+	}
+
+	// If no parkID found, use a default value
+	if parkID == "" {
+		parkID = "default"
+	}
+
+	// Generate continuous time points from startTime to endTime
+	for t := startTime; !t.After(endTime); t = t.Add(step) {
+		timeStr := t.Format(calcTimeFormat)
+		value := valueMap[timeStr] // Will be 0 if not found
 		result = append(result, entity.LabelData{
 			Id:    parkID,
-			Label: timeStr,
-			Value: kv.value,
+			Label: t.Format(timeFormat),
+			Value: value,
 		})
 	}
 
-	return result, nil
+	return result
 }
