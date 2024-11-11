@@ -272,7 +272,18 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 
 	result := make([]entity.LabelData, 0)
 	parkPowerMap := make(map[string]float64)
-	timeFormat := "2006-01-02T15:04:05"
+	var timeFormat string
+
+	switch period {
+	case PERIOD_HOUR:
+		timeFormat = "15:04"
+	case PERIOD_DAY:
+		timeFormat = "01-02"
+	case PERIOD_MONTH:
+		timeFormat = "2006-01"
+	case PERIOD_YEAR:
+		timeFormat = "2006"
+	}
 
 	switch period {
 	case PERIOD_HOUR:
@@ -334,9 +345,10 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 	for _, kv := range sortedData {
 		parts := strings.Split(kv.key, "_")
 		parkID := parts[0]
+		timeStr := parts[1]
 		result = append(result, entity.LabelData{
 			Id:    parkID,
-			Label: parkID,
+			Label: timeStr,
 			Value: kv.value,
 		})
 	}
