@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"crypto/md5"
 	"eco-service/client"
 	"eco-service/model"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -124,7 +126,7 @@ func demoWaterDataGenHourly(startTime time.Time) {
 
 	// 构造数据
 	waterData := model.Eco_park_water_1h{
-		ID:               park.ID + "_" + lastHour.Format("2006010215"),
+		ID:               fmt.Sprintf("%x", md5.Sum([]byte(park.ID + "_" + lastHour.Format("2006010215")))),
 		Time:             common.LocalTime(lastHour),
 		ParkID:           park.ID,
 		WaterConsumption: waterConsumption,
