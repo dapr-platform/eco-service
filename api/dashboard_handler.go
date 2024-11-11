@@ -27,7 +27,7 @@ func InitDashboardRoute(r chi.Router) {
 // @Summary 建筑用电量
 // @Description 建筑用电量，根据粒度获取所有建筑的用电量
 // @Tags Dashboard
-// @Param period query string true "period"
+// @Param period query string true "period, hour/day/month/year"
 // @Param query_time query string false "query_time,格式2024-01-01,不传则默认当天"
 // @Produce  json
 // @Success 200 {object} common.Response{data=[]entity.LabelData} "objects array"
@@ -60,7 +60,7 @@ func BuildingPowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 // @Summary 建筑细分用电量
 // @Description 建筑细分用电量，根据粒度,和分类获取所有建筑的用电量。分类为1:照明，2:动力
 // @Tags Dashboard
-// @Param period query string true "period"
+// @Param period query string true "period, hour/day/month/year"
 // @Param query_time query string false "query_time,格式2024-01-01,不传则默认当天"
 // @Param type query string true "type"
 // @Produce  json
@@ -104,7 +104,7 @@ func BuildingTypePowerConsumptionHandler(w http.ResponseWriter, r *http.Request)
 // @Summary 建筑楼层用电量
 // @Description 建筑楼层用电量，根据粒度获取建筑所有楼层的用电量
 // @Tags Dashboard
-// @Param period query string true "period"
+// @Param period query string true "period, hour/day/month/year"
 // @Param building_id query string true "building_id"
 // @Param query_time query string false "query_time,格式2024-01-01,不传则默认当天"
 // @Produce  json
@@ -142,7 +142,7 @@ func BuildingFloorPowerConsumptionHandler(w http.ResponseWriter, r *http.Request
 // @Summary 园区碳排放
 // @Description 园区碳排放，根据粒度获取园区历史的碳排放,不同粒度返回不同数量的数据。日粒度，返回24小时数据。月粒度，返回31天数据。年粒度，返回12个月数据。包括同比环比
 // @Tags Dashboard
-// @Param period query string true "period"
+// @Param period query string true "period, hour/day/month/year"
 // @Param query_time query string false "query_time,格式2024-01-01,不传则默认当天"
 // @Produce  json
 // @Success 200 {object} common.Response{data=[]entity.LabelData} "objects array"
@@ -174,7 +174,7 @@ func ParkCarbonEmissionHandler(w http.ResponseWriter, r *http.Request) {
 // @Summary 园区标准煤排放
 // @Description 园区标准煤排放，根据粒度获取园区历史的标准煤排放,不同粒度返回不同数量的数据。日粒度，返回24小时数据。月粒度，返回31天数据。年粒度，返回12个月数据。包括同比环比
 // @Tags Dashboard
-// @Param period query string true "period"
+// @Param period query string true "period, hour/day/month/year"
 // @Param query_time query string false "query_time,格式2024-01-01,不传则默认当天"
 // @Produce  json
 // @Success 200 {object} common.Response{data=[]entity.LabelData} "objects array"
@@ -206,7 +206,7 @@ func ParkStandardCoalEmissionHandler(w http.ResponseWriter, r *http.Request) {
 // @Summary 园区用电量
 // @Description 园区用电量，根据粒度获取园区历史的用电量,不同粒度返回不同数量的数据。日粒度，返回24小时数据。月粒度，返回31天数据。年粒度，返回12个月数据。包括同比环比
 // @Tags Dashboard
-// @Param period query string true "period"
+// @Param period query string true "period, hour/day/month/year"
 // @Param query_time query string false "query_time,格式2024-01-01,不传则默认当天"
 // @Produce  json
 // @Success 200 {object} common.Response{data=[]map[string]any} "objects array"
@@ -238,7 +238,7 @@ func ParkPowerConsumptionHandler(w http.ResponseWriter, r *http.Request) {
 // @Summary 园区用水量
 // @Description 园区用水量，根据粒度获取园区当前的用水量,不同粒度返回不同的数据。
 // @Tags Dashboard
-// @Param period query string true "period"
+// @Param period query string true "period, hour/day/month/year"
 // @Param query_time query string false "query_time,格式2024-01-01,不传则默认当天"
 // @Produce  json
 // @Success 200 {object} common.Response{data=[]map[string]any} "objects array"

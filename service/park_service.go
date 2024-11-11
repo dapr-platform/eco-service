@@ -5,6 +5,8 @@ import (
 	"eco-service/entity"
 	"eco-service/model"
 	"fmt"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/dapr-platform/common"
@@ -18,6 +20,7 @@ const (
 type ParkDataGetter func(time.Time) ([]entity.LabelData, error)
 
 func GetParkWaterConsumption(period string, queryTime time.Time) ([]entity.LabelData, error) {
+	fmt.Printf("GetParkWaterConsumption: period=%s, queryTime=%v\n", period, queryTime)
 	switch period {
 	case PERIOD_DAY:
 		return getParkDataDay(queryTime, 0)
@@ -31,6 +34,7 @@ func GetParkWaterConsumption(period string, queryTime time.Time) ([]entity.Label
 }
 
 func GetParkCarbonEmissionRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("GetParkCarbonEmissionRange: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
 	result, err := GetParkPowerConsumptionRange(period, queryTime, gatewayType)
 	if err != nil {
 		return nil, err
@@ -43,6 +47,7 @@ func GetParkCarbonEmissionRange(period string, queryTime time.Time, gatewayType 
 	return result, nil
 }
 func GetParkStandardCoalRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("GetParkStandardCoalRange: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
 	result, err := GetParkPowerConsumptionRange(period, queryTime, gatewayType)
 	if err != nil {
 		return nil, err
@@ -56,6 +61,7 @@ func GetParkStandardCoalRange(period string, queryTime time.Time, gatewayType in
 }
 
 func GetParkPowerConsumptionRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("GetParkPowerConsumptionRange: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
 	var result []entity.LabelData
 	var err error
 
@@ -86,6 +92,7 @@ func GetParkPowerConsumptionRange(period string, queryTime time.Time, gatewayTyp
 }
 
 func GetParkPowerConsumption(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("GetParkPowerConsumption: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
 	getters := map[string]ParkDataGetter{
 		PERIOD_HOUR:  func(t time.Time) ([]entity.LabelData, error) { return getParkDataHour(t, gatewayType) },
 		PERIOD_DAY:   func(t time.Time) ([]entity.LabelData, error) { return getParkDataDay(t, gatewayType) },
@@ -115,6 +122,7 @@ func getParkDataWithTimeOffset(period string, queryTime time.Time, years, months
 	switch period {
 	case PERIOD_HOUR:
 		tableName = model.Eco_park_1hTableInfo.Name
+		fmt.Printf("Querying %s: time=%s%s\n", tableName, offsetTime.Format("2006-01-02 15"), whereClause)
 		data, err = common.DbQuery[model.Eco_park_1h](
 			context.Background(),
 			common.GetDaprClient(),
@@ -123,6 +131,7 @@ func getParkDataWithTimeOffset(period string, queryTime time.Time, years, months
 		)
 	case PERIOD_DAY:
 		tableName = model.Eco_park_1dTableInfo.Name
+		fmt.Printf("Querying %s: time=%s%s\n", tableName, offsetTime.Format("2006-01-02"), whereClause)
 		data, err = common.DbQuery[model.Eco_park_1d](
 			context.Background(),
 			common.GetDaprClient(),
@@ -131,6 +140,7 @@ func getParkDataWithTimeOffset(period string, queryTime time.Time, years, months
 		)
 	case PERIOD_MONTH:
 		tableName = model.Eco_park_1mTableInfo.Name
+		fmt.Printf("Querying %s: time=%s%s\n", tableName, offsetTime.Format("2006-01"), whereClause)
 		data, err = common.DbQuery[model.Eco_park_1m](
 			context.Background(),
 			common.GetDaprClient(),
@@ -139,6 +149,7 @@ func getParkDataWithTimeOffset(period string, queryTime time.Time, years, months
 		)
 	case PERIOD_YEAR:
 		tableName = model.Eco_park_1yTableInfo.Name
+		fmt.Printf("Querying %s: time=%s%s\n", tableName, offsetTime.Format("2006"), whereClause)
 		data, err = common.DbQuery[model.Eco_park_1y](
 			context.Background(),
 			common.GetDaprClient(),
@@ -150,6 +161,7 @@ func getParkDataWithTimeOffset(period string, queryTime time.Time, years, months
 	}
 
 	if err != nil {
+		fmt.Printf("Query error: %v\n", err)
 		return nil, err
 	}
 
@@ -215,6 +227,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 	switch period {
 	case PERIOD_HOUR:
 		tableName = model.Eco_park_1hTableInfo.Name
+		fmt.Printf("Querying %s: time=$gte.%s&time=$lte.%s%s\n", tableName, startTime.Format("2006-01-02T15:00:00"), endTime.Format("2006-01-02T15:00:00"), whereClause)
 		data, err = common.DbQuery[model.Eco_park_1h](
 			context.Background(),
 			common.GetDaprClient(),
@@ -223,6 +236,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		)
 	case PERIOD_DAY:
 		tableName = model.Eco_park_1dTableInfo.Name
+		fmt.Printf("Querying %s: time=$gte.%s&time=$lte.%s%s\n", tableName, startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T23:59:59"), whereClause)
 		data, err = common.DbQuery[model.Eco_park_1d](
 			context.Background(),
 			common.GetDaprClient(),
@@ -231,6 +245,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		)
 	case PERIOD_MONTH:
 		tableName = model.Eco_park_1mTableInfo.Name
+		fmt.Printf("Querying %s: time=$gte.%s&time=$lte.%s%s\n", tableName, startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-31T23:59:59"), whereClause)
 		data, err = common.DbQuery[model.Eco_park_1m](
 			context.Background(),
 			common.GetDaprClient(),
@@ -239,6 +254,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		)
 	case PERIOD_YEAR:
 		tableName = model.Eco_park_1yTableInfo.Name
+		fmt.Printf("Querying %s: time=$gte.%s&time=$lte.%s%s\n", tableName, startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-12-31T23:59:59"), whereClause)
 		data, err = common.DbQuery[model.Eco_park_1y](
 			context.Background(),
 			common.GetDaprClient(),
@@ -250,58 +266,85 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 	}
 
 	if err != nil {
+		fmt.Printf("Query error: %v\n", err)
 		return nil, err
 	}
 
 	result := make([]entity.LabelData, 0)
 	parkPowerMap := make(map[string]float64)
+	timeFormat := "2006-01-02T15:04:05"
 
 	switch period {
 	case PERIOD_HOUR:
 		for _, v := range data.([]model.Eco_park_1h) {
+			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(timeFormat))
 			if gatewayType == 0 {
-				parkPowerMap[v.ParkID] += v.PowerConsumption
+				parkPowerMap[key] += v.PowerConsumption
 			} else {
-				parkPowerMap[v.ParkID] = v.PowerConsumption
+				parkPowerMap[key] = v.PowerConsumption
 			}
 		}
 	case PERIOD_DAY:
 		for _, v := range data.([]model.Eco_park_1d) {
+			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(timeFormat))
 			if gatewayType == 0 {
-				parkPowerMap[v.ParkID] += v.PowerConsumption
+				parkPowerMap[key] += v.PowerConsumption
 			} else {
-				parkPowerMap[v.ParkID] = v.PowerConsumption
+				parkPowerMap[key] = v.PowerConsumption
 			}
 		}
 	case PERIOD_MONTH:
 		for _, v := range data.([]model.Eco_park_1m) {
+			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(timeFormat))
 			if gatewayType == 0 {
-				parkPowerMap[v.ParkID] += v.PowerConsumption
+				parkPowerMap[key] += v.PowerConsumption
 			} else {
-				parkPowerMap[v.ParkID] = v.PowerConsumption
+				parkPowerMap[key] = v.PowerConsumption
 			}
 		}
 	case PERIOD_YEAR:
 		for _, v := range data.([]model.Eco_park_1y) {
+			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(timeFormat))
 			if gatewayType == 0 {
-				parkPowerMap[v.ParkID] += v.PowerConsumption
+				parkPowerMap[key] += v.PowerConsumption
 			} else {
-				parkPowerMap[v.ParkID] = v.PowerConsumption
+				parkPowerMap[key] = v.PowerConsumption
 			}
 		}
 	}
 
-	for parkID, powerConsumption := range parkPowerMap {
+	// Convert map to slice and sort by time
+	type keyValue struct {
+		key   string
+		value float64
+	}
+	var sortedData []keyValue
+	for k, v := range parkPowerMap {
+		sortedData = append(sortedData, keyValue{k, v})
+	}
+	
+	// Sort by time (second part of key after "_")
+	sort.Slice(sortedData, func(i, j int) bool {
+		time1 := strings.Split(sortedData[i].key, "_")[1]
+		time2 := strings.Split(sortedData[j].key, "_")[1]
+		return time1 < time2
+	})
+
+	// Convert sorted data to result
+	for _, kv := range sortedData {
+		parts := strings.Split(kv.key, "_")
+		parkID := parts[0]
 		result = append(result, entity.LabelData{
 			Id:    parkID,
 			Label: parkID,
-			Value: powerConsumption,
+			Value: kv.value,
 		})
 	}
 
 	return result, nil
 }
 func getParkDataHourRange(startTime time.Time, endTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("getParkDataHourRange: startTime=%v, endTime=%v, gatewayType=%d\n", startTime, endTime, gatewayType)
 	// 获取当前数据
 	current, err := getParkDataWithTimeRange(PERIOD_HOUR, startTime, endTime, gatewayType)
 	if err != nil {
@@ -329,6 +372,7 @@ func getParkDataHourRange(startTime time.Time, endTime time.Time, gatewayType in
 }
 
 func getParkDataDayRange(startTime time.Time, endTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("getParkDataDayRange: startTime=%v, endTime=%v, gatewayType=%d\n", startTime, endTime, gatewayType)
 	// 获取当前数据
 	current, err := getParkDataWithTimeRange(PERIOD_DAY, startTime, endTime, gatewayType)
 	if err != nil {
@@ -356,6 +400,7 @@ func getParkDataDayRange(startTime time.Time, endTime time.Time, gatewayType int
 }
 
 func getParkDataMonthRange(startTime time.Time, endTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("getParkDataMonthRange: startTime=%v, endTime=%v, gatewayType=%d\n", startTime, endTime, gatewayType)
 	// 获取当前数据
 	current, err := getParkDataWithTimeRange(PERIOD_MONTH, startTime, endTime, gatewayType)
 	if err != nil {
@@ -383,6 +428,7 @@ func getParkDataMonthRange(startTime time.Time, endTime time.Time, gatewayType i
 }
 
 func getParkDataYearRange(startTime time.Time, endTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("getParkDataYearRange: startTime=%v, endTime=%v, gatewayType=%d\n", startTime, endTime, gatewayType)
 	// 获取当前数据
 	current, err := getParkDataWithTimeRange(PERIOD_YEAR, startTime, endTime, gatewayType)
 	if err != nil {
@@ -402,6 +448,7 @@ func getParkDataYearRange(startTime time.Time, endTime time.Time, gatewayType in
 }
 
 func getParkDataHour(queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("getParkDataHour: queryTime=%v, gatewayType=%d\n", queryTime, gatewayType)
 	// 获取当前数据
 	current, err := getParkDataWithTimeOffset(PERIOD_HOUR, queryTime, 0, 0, 0, 0, gatewayType)
 	if err != nil {
@@ -425,6 +472,7 @@ func getParkDataHour(queryTime time.Time, gatewayType int) ([]entity.LabelData, 
 }
 
 func getParkDataDay(queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("getParkDataDay: queryTime=%v, gatewayType=%d\n", queryTime, gatewayType)
 	// 获取当前数据
 	current, err := getParkDataWithTimeOffset(PERIOD_DAY, queryTime, 0, 0, 0, 0, gatewayType)
 	if err != nil {
@@ -448,6 +496,7 @@ func getParkDataDay(queryTime time.Time, gatewayType int) ([]entity.LabelData, e
 }
 
 func getParkDataMonth(queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("getParkDataMonth: queryTime=%v, gatewayType=%d\n", queryTime, gatewayType)
 	// 获取当前数据
 	current, err := getParkDataWithTimeOffset(PERIOD_MONTH, queryTime, 0, 0, 0, 0, gatewayType)
 	if err != nil {
@@ -471,6 +520,7 @@ func getParkDataMonth(queryTime time.Time, gatewayType int) ([]entity.LabelData,
 }
 
 func getParkDataYear(queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
+	fmt.Printf("getParkDataYear: queryTime=%v, gatewayType=%d\n", queryTime, gatewayType)
 	// 获取当前数据
 	current, err := getParkDataWithTimeOffset(PERIOD_YEAR, queryTime, 0, 0, 0, 0, gatewayType)
 	if err != nil {
