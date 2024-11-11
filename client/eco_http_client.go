@@ -125,7 +125,7 @@ func (c *EcoClient) getInitialToken() error {
 	}
 
 	if codeResp.Success != "true" {
-		return fmt.Errorf("failed to get auth code, success=%s", codeResp.Success)
+		return fmt.Errorf("failed to get auth code, success=%s, response body: %s", codeResp.Success, string(respBody))
 	}
 
 	// Then exchange code for token
@@ -159,7 +159,7 @@ func (c *EcoClient) getInitialToken() error {
 	}
 
 	if !tr.Success {
-		return fmt.Errorf("get token failed: %s", tr.Code)
+		return fmt.Errorf("get token failed: %s, response body: %s", tr.Code, string(tokenRespBody))
 	}
 
 	c.accessToken = tr.Data.AccessToken
@@ -172,10 +172,6 @@ func (c *EcoClient) getInitialToken() error {
 func (c *EcoClient) refreshAccessToken() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
-
-	if time.Now().Before(c.expireTime) {
-		return nil
-	}
 
 	data := url.Values{}
 	data.Set("client_id", config.ECO_APP_KEY)
@@ -207,7 +203,7 @@ func (c *EcoClient) refreshAccessToken() error {
 	}
 
 	if !tokenResp.Success {
-		return fmt.Errorf("refresh token failed: %s", tokenResp.Code)
+		return fmt.Errorf("refresh token failed: %s, response body: %s", tokenResp.Code, string(respBody))
 	}
 
 	c.accessToken = tokenResp.Data.AccessToken
@@ -234,14 +230,19 @@ func (c *EcoClient) ensureValidToken() error {
 func (c *EcoClient) doRequest(req *http.Request) ([]byte, error) {
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to do request: %v", err)
 	}
 	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %v", err)
+	}
 
 	// If unauthorized, try to refresh token and retry once
 	if resp.StatusCode == http.StatusUnauthorized {
 		if err := c.getInitialToken(); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to refresh token after unauthorized: %v", err)
 		}
 
 		// Update Authorization header with new token
@@ -249,22 +250,27 @@ func (c *EcoClient) doRequest(req *http.Request) ([]byte, error) {
 
 		resp, err = c.client.Do(req)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to retry request after token refresh: %v", err)
 		}
 		defer resp.Body.Close()
+
+		body, err = io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read response body after retry: %v", err)
+		}
 	}
 
-	return io.ReadAll(resp.Body)
+	return body, nil
 }
 
 func (c *EcoClient) Get(url string) ([]byte, error) {
 	if err := c.ensureValidToken(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to ensure valid token: %v", err)
 	}
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create GET request: %v", err)
 	}
 
 	req.Header.Add("Authorization", "Bearer "+c.accessToken)
@@ -273,12 +279,12 @@ func (c *EcoClient) Get(url string) ([]byte, error) {
 
 func (c *EcoClient) Post(url string, body []byte) ([]byte, error) {
 	if err := c.ensureValidToken(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to ensure valid token: %v", err)
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create POST request: %v", err)
 	}
 
 	req.Header.Add("Authorization", "Bearer "+c.accessToken)
