@@ -545,8 +545,8 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 
 	switch period {
 	case PERIOD_HOUR:
-		tableName = model.Eco_park_water_1dTableInfo.Name
-		data, err = common.DbQuery[model.Eco_park_water_1d](
+		tableName = model.Eco_park_water_1hTableInfo.Name
+		data, err = common.DbQuery[model.Eco_park_water_1h](
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
@@ -554,7 +554,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 		)
 	case PERIOD_DAY:
 		tableName = model.Eco_park_water_1dTableInfo.Name
-		data, err = common.DbQuery[model.Eco_park_1d](
+		data, err = common.DbQuery[model.Eco_park_water_1d](
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
