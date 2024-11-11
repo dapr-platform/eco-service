@@ -149,28 +149,36 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TABLE f_eco_park_water_1d (
+CREATE TABLE f_eco_park_water_1h (
     id VARCHAR(32),
     time TIMESTAMP NOT NULL,
     park_id VARCHAR(32) NOT NULL,
     water_consumption DECIMAL(20,2) NOT NULL,
     PRIMARY KEY (id, time)
 );
-SELECT create_hypertable('f_eco_park_water_1d', 'time');
-CREATE INDEX idx_park_water_1d_park_id ON f_eco_park_water_1d(park_id, time DESC);
-COMMENT ON TABLE f_eco_park_water_1d IS '园区日用水量';
-COMMENT ON COLUMN f_eco_park_water_1d.time IS '时间';
-COMMENT ON COLUMN f_eco_park_water_1d.park_id IS '园区ID';
-COMMENT ON COLUMN f_eco_park_water_1d.water_consumption IS '用水量(m³)';
+SELECT create_hypertable('f_eco_park_water_1h', 'time');
+CREATE INDEX idx_park_water_1h_park_id ON f_eco_park_water_1h(park_id, time DESC);
+COMMENT ON TABLE f_eco_park_water_1h IS '园区小时用水量';
+COMMENT ON COLUMN f_eco_park_water_1h.time IS '时间';
+COMMENT ON COLUMN f_eco_park_water_1h.park_id IS '园区ID';
+COMMENT ON COLUMN f_eco_park_water_1h.water_consumption IS '用水量(m³)';
 
 -- Create continuous aggregates for park daily water metrics
--- Create continuous aggregates for park monthly water metrics
+CREATE MATERIALIZED VIEW f_eco_park_water_1d
+WITH (timescaledb.continuous) AS
+SELECT time_bucket(INTERVAL '1 day', time) AS time,
+       park_id,
+       sum(water_consumption) as water_consumption
+FROM f_eco_park_water_1h
+GROUP BY time_bucket(INTERVAL '1 day', time), park_id
+WITH NO DATA;
+-- Create continuous aggregates for park monthly water metrics 
 CREATE MATERIALIZED VIEW f_eco_park_water_1m
 WITH (timescaledb.continuous) AS
 SELECT time_bucket(INTERVAL '1 month', time) AS time,
        park_id,
        sum(water_consumption) as water_consumption
-FROM f_eco_park_water_1d
+FROM f_eco_park_water_1h
 GROUP BY time_bucket(INTERVAL '1 month', time), park_id
 WITH NO DATA;
 
@@ -506,7 +514,8 @@ VALUES
 -- +goose StatementBegin
 DROP MATERIALIZED VIEW IF EXISTS f_eco_park_water_1m;
 DROP MATERIALIZED VIEW IF EXISTS f_eco_park_water_1y;
-DROP TABLE IF EXISTS f_eco_park_water_1d;
+DROP MATERIALIZED VIEW IF EXISTS f_eco_park_water_1d;
+DROP TABLE IF EXISTS f_eco_park_water_1h;
 DROP MATERIALIZED VIEW IF EXISTS v_eco_park_1d;
 DROP MATERIALIZED VIEW IF EXISTS v_eco_park_1m;
 DROP MATERIALIZED VIEW IF EXISTS v_eco_park_1y;

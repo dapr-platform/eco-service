@@ -66,48 +66,85 @@ func init() {
 	}()
 	go func() {
 		for {
-			demoWaterDataGen()
-			time.Sleep(time.Hour * 24)
+			demoWaterDataGenHourly(time.Now())
+			time.Sleep(time.Hour)
 		}
 	}()
 }
+func ManuGenDemoWaterData(startDayStr ...string) {
+	startTime := time.Now()
+	if len(startDayStr) > 0 {
+		var err error
+		startTime, err = time.Parse("2006-01-01", startDayStr[0])
+		if err != nil {
+			common.Logger.Errorf("Failed to parse start day: %v", err)
+			return
+		}
+	}
+	endTime := startTime.Add(time.Hour * 25)
+	for currentTime := startTime.Add(time.Hour); !currentTime.After(endTime); currentTime = currentTime.Add(time.Hour) {
+		demoWaterDataGenHourly(currentTime)
+	}
+}
+func demoWaterDataGenHourly(startTime time.Time) {
 
-func demoWaterDataGen() {
-	// 获取当前时间
-	now := time.Now()
-	// 生成昨天的日期，因为是按天统计
-	yesterday := now.AddDate(0, 0, -1)
-	// 生成随机数，基准值100，上下浮动20
+	// 生成上一个小时的时间
+	lastHour := startTime.Add(-time.Hour)
+
+	// 根据是否周末决定基准用水量
+	baseWaterConsumption := 2000.0
+	if lastHour.Weekday() == time.Saturday || lastHour.Weekday() == time.Sunday {
+		baseWaterConsumption = 500.0
+	}
+
+	// 根据时段分配权重
+	hourWeight := 1.0
+	hour := lastHour.Hour()
+	switch {
+	case hour >= 6 && hour <= 9: // 早高峰
+		hourWeight = 2.0
+	case hour >= 11 && hour <= 13: // 午高峰
+		hourWeight = 1.8
+	case hour >= 17 && hour <= 19: // 晚高峰
+		hourWeight = 1.5
+	case hour >= 1 && hour <= 5: // 凌晨
+		hourWeight = 0.3
+	}
+
+	// 生成随机数
 	rand.Seed(uint64(time.Now().UnixNano()))
-	waterConsumption := 100.0 + (rand.Float64()-0.5)*40
+	// 计算这个小时的用水量：基准值/24*权重，上下浮动20%
+	waterConsumption := (baseWaterConsumption/24.0)*hourWeight + (rand.Float64()-0.5)*baseWaterConsumption/24.0*0.4
+
 	park, err := common.DbGetOne[model.Ecpark](context.Background(), common.GetDaprClient(), model.EcparkTableInfo.Name, "")
 	if err != nil {
 		common.Logger.Errorf("Failed to get park: %v", err)
 		return
 	}
+
 	// 构造数据
-	waterData := model.Eco_park_water_1d{
-		ID:               park.ID + "_" + yesterday.Format("20060102"),
-		Time:             common.LocalTime(yesterday),
+	waterData := model.Eco_park_water_1h{
+		ID:               park.ID + "_" + lastHour.Format("2006010215"),
+		Time:             common.LocalTime(lastHour),
 		ParkID:           park.ID,
 		WaterConsumption: waterConsumption,
 	}
 
 	// 插入数据
-	err = common.DbBatchUpsert(context.Background(), common.GetDaprClient(), []model.Eco_park_water_1d{waterData}, model.Eco_park_water_1dTableInfo.Name, model.Eco_park_water_1d_FIELD_NAME_id)
+	err = common.DbBatchUpsert(context.Background(), common.GetDaprClient(), []model.Eco_park_water_1h{waterData}, model.Eco_park_water_1hTableInfo.Name, model.Eco_park_water_1h_FIELD_NAME_id)
 	if err != nil {
 		common.Logger.Errorf("Failed to insert water consumption data: %v", err)
 		return
 	}
 
 	// 刷新连续聚合表
-	err = refreshContinuousAggregate(yesterday, waterNeedRefreshContinuousAggregateMap)
+	err = refreshContinuousAggregate(lastHour, waterNeedRefreshContinuousAggregateMap)
 	if err != nil {
 		common.Logger.Errorf("Failed to refresh water continuous aggregates: %v", err)
 		return
 	}
 
-	common.Logger.Infof("Generated water consumption data for %s: %.2f", yesterday.Format("2006-01-02"), waterConsumption)
+	common.Logger.Infof("Generated water consumption data for %s: %.2f", lastHour.Format("2006-01-02 15:04"), waterConsumption)
 }
 
 // 手动收集指定日期的数据，开始时间结束时间格式为 2024-01-01

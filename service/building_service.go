@@ -409,6 +409,9 @@ func getBuildingDataYear(queryTime time.Time, gatewayType int) ([]entity.LabelDa
 
 func calculateRatios(current, hb, tb []entity.LabelData) {
 	for i := range current {
+		// 取小数点后2位
+		current[i].Value = float64(int(current[i].Value*100)) / 100
+
 		// 计算环比
 		if i < len(hb) && hb[i].Value != 0 {
 			current[i].HB = float64(int((current[i].Value-hb[i].Value)/hb[i].Value*10000)) / 10000

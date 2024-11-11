@@ -27,7 +27,7 @@ Table: f_eco_building_1m
 
 JSON Sample
 -------------------------------------
-{    "time": 50,    "building_id": "vHoKfbRmjuTLhtwLIIYYtwyrV",    "park_id": "NEPlTebWxegqdCWyWcxEnfWQM",    "type": 20,    "power_consumption": 0.5528717356071021}
+{    "time": 2,    "building_id": "gjXslASCrLlbkcrqSEiaMmAyn",    "park_id": "auoaEPbGovpmoThUNfIOtTNpr",    "type": 50,    "power_consumption": 0.05542214751240122}
 
 
 Comments

@@ -273,6 +273,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "type,1:照明,2:动力",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "query_time,格式2024-01-01,不传则默认当天",
                         "name": "query_time",
                         "in": "query"
@@ -376,6 +382,63 @@ const docTemplate = `{
                     "Dashboard"
                 ],
                 "summary": "园区用水量",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "period, hour/day/month/year",
+                        "name": "period",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "query_time,格式2024-01-01,不传则默认当天",
+                        "name": "query_time",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "objects array",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "additionalProperties": true
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard/park-water-consumption-range": {
+            "get": {
+                "description": "园区用水量范围，根据粒度获取园区历史的用水量范围,不同粒度返回不同数量的数据。日粒度，返回24小时数据。月粒度，返回31天数据。年粒度，返回12个月数据。包括同比环比",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "园区用水量范围",
                 "parameters": [
                     {
                         "type": "string",
@@ -2384,6 +2447,34 @@ const docTemplate = `{
                         "type": "string",
                         "description": "End time (2024-01-01)",
                         "name": "end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/manu_gen_demo_water_data": {
+            "get": {
+                "description": "Manually generate demo water data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manually generate demo water data"
+                ],
+                "summary": "Manually generate demo water data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start time (2024-01-01)",
+                        "name": "start",
                         "in": "query"
                     }
                 ],

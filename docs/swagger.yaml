@@ -318,6 +318,10 @@ paths:
         name: period
         required: true
         type: string
+      - description: type,1:照明,2:动力
+        in: query
+        name: type
+        type: string
       - description: query_time,格式2024-01-01,不传则默认当天
         in: query
         name: query_time
@@ -411,6 +415,41 @@ paths:
           schema:
             $ref: '#/definitions/common.Response'
       summary: 园区用水量
+      tags:
+      - Dashboard
+  /dashboard/park-water-consumption-range:
+    get:
+      description: 园区用水量范围，根据粒度获取园区历史的用水量范围,不同粒度返回不同数量的数据。日粒度，返回24小时数据。月粒度，返回31天数据。年粒度，返回12个月数据。包括同比环比
+      parameters:
+      - description: period, hour/day/month/year
+        in: query
+        name: period
+        required: true
+        type: string
+      - description: query_time,格式2024-01-01,不传则默认当天
+        in: query
+        name: query_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: objects array
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  items:
+                    additionalProperties: true
+                    type: object
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 园区用水量范围
       tags:
       - Dashboard
   /ecbuilding:
@@ -1655,4 +1694,22 @@ paths:
       summary: Manually collect data
       tags:
       - Manually collect data
+  /manu_gen_demo_water_data:
+    get:
+      description: Manually generate demo water data
+      parameters:
+      - description: Start time (2024-01-01)
+        in: query
+        name: start
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: Manually generate demo water data
+      tags:
+      - Manually generate demo water data
 swagger: "2.0"
