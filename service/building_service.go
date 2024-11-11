@@ -411,12 +411,12 @@ func calculateRatios(current, hb, tb []entity.LabelData) {
 	for i := range current {
 		// 计算环比
 		if i < len(hb) && hb[i].Value != 0 {
-			current[i].HB = (current[i].Value - hb[i].Value) / hb[i].Value
+			current[i].HB = float64(int((current[i].Value-hb[i].Value)/hb[i].Value*10000)) / 10000
 		}
 
 		// 计算同比
 		if tb != nil && i < len(tb) && tb[i].Value != 0 {
-			current[i].TB = (current[i].Value - tb[i].Value) / tb[i].Value
+			current[i].TB = float64(int((current[i].Value-tb[i].Value)/tb[i].Value*10000)) / 10000
 		}
 	}
 }
