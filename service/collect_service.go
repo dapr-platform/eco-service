@@ -76,7 +76,7 @@ func ManuGenDemoWaterData(startDayStr ...string) {
 	startTime := time.Now()
 	if len(startDayStr) > 0 {
 		var err error
-		startTime, err = time.Parse("2006-01-01", startDayStr[0])
+		startTime, err = time.Parse("2006-01-02", startDayStr[0])
 		if err != nil {
 			common.Logger.Errorf("Failed to parse start day: %v", err)
 			return
