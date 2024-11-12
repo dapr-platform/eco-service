@@ -67,7 +67,9 @@ func init() {
 	}()
 	go func() {
 		for {
-			demoWaterDataGenHourly(time.Now())
+			now := time.Now()
+			timeHour := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), 0, 0, 0, now.Location())
+			demoWaterDataGenHourly(timeHour)
 			time.Sleep(time.Hour)
 		}
 	}()

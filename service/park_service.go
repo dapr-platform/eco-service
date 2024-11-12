@@ -30,12 +30,12 @@ type DataFetcher func(period string, queryTime time.Time, years, months, days, h
 type RangeDataFetcher func(period string, startTime, endTime time.Time, gatewayType ...int) ([]entity.LabelData, error)
 
 func GetParkWaterConsumption(period string, queryTime time.Time) ([]entity.LabelData, error) {
-	fmt.Printf("GetParkWaterConsumption: period=%s, queryTime=%v\n", period, queryTime)
+	common.Logger.Debugf("GetParkWaterConsumption: period=%s, queryTime=%v", period, queryTime)
 	return getPeriodData(period, queryTime, getParkWaterDataWithTimeOffset)
 }
 
 func GetParkWaterConsumptionSubRange(period string, queryTime time.Time) ([]entity.LabelData, error) {
-	fmt.Printf("GetParkWaterConsumptionSubRange: period=%s, queryTime=%v\n", period, queryTime)
+	common.Logger.Debugf("GetParkWaterConsumptionSubRange: period=%s, queryTime=%v", period, queryTime)
 	var startTime, endTime time.Time
 	gatewayType := 0
 	switch period {
@@ -57,7 +57,7 @@ func GetParkWaterConsumptionSubRange(period string, queryTime time.Time) ([]enti
 }
 
 func GetParkCarbonEmissionSubRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
-	fmt.Printf("GetParkCarbonEmissionSubRange: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
+	common.Logger.Debugf("GetParkCarbonEmissionSubRange: period=%s, queryTime=%v, gatewayType=%d", period, queryTime, gatewayType)
 	result, err := GetParkPowerConsumptionSubRange(period, queryTime, gatewayType)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func GetParkCarbonEmissionSubRange(period string, queryTime time.Time, gatewayTy
 }
 
 func GetParkStandardCoalSubRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
-	fmt.Printf("GetParkStandardCoalSubRange: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
+	common.Logger.Debugf("GetParkStandardCoalSubRange: period=%s, queryTime=%v, gatewayType=%d", period, queryTime, gatewayType)
 	result, err := GetParkPowerConsumptionSubRange(period, queryTime, gatewayType)
 	if err != nil {
 		return nil, err
@@ -88,29 +88,33 @@ func GetParkStandardCoalSubRange(period string, queryTime time.Time, gatewayType
 }
 
 func GetParkPowerConsumptionSubRange(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
-	fmt.Printf("GetParkPowerConsumptionSubRange: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
+	common.Logger.Debugf("GetParkPowerConsumptionSubRange: period=%s, queryTime=%v, gatewayType=%d", period, queryTime, gatewayType)
 
 	var startTime, endTime time.Time
 	switch period {
 	case PERIOD_DAY:
 		startTime = time.Date(queryTime.Year(), queryTime.Month(), queryTime.Day(), 0, 0, 0, 0, queryTime.Location())
 		endTime = startTime.AddDate(0, 0, 1)
+		common.Logger.Debugf("PERIOD_DAY: startTime=%v, endTime=%v", startTime, endTime)
 		return getRangeData(PERIOD_HOUR, startTime, endTime, gatewayType, getParkDataWithTimeRange)
 	case PERIOD_MONTH:
 		startTime = time.Date(queryTime.Year(), queryTime.Month(), 1, 0, 0, 0, 0, queryTime.Location())
 		endTime = startTime.AddDate(0, 1, 0)
+		common.Logger.Debugf("PERIOD_MONTH: startTime=%v, endTime=%v", startTime, endTime)
 		return getRangeData(PERIOD_DAY, startTime, endTime, gatewayType, getParkDataWithTimeRange)
 	case PERIOD_YEAR:
 		startTime = time.Date(queryTime.Year(), 1, 1, 0, 0, 0, 0, queryTime.Location())
 		endTime = startTime.AddDate(1, 0, 0)
+		common.Logger.Debugf("PERIOD_YEAR: startTime=%v, endTime=%v", startTime, endTime)
 		return getRangeData(PERIOD_MONTH, startTime, endTime, gatewayType, getParkDataWithTimeRange)
 	default:
+		common.Logger.Debugf("Unsupported period: %s", period)
 		return nil, fmt.Errorf("unsupported period: %s", period)
 	}
 }
 
 func GetParkPowerConsumption(period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
-	fmt.Printf("GetParkPowerConsumption: period=%s, queryTime=%v, gatewayType=%d\n", period, queryTime, gatewayType)
+	common.Logger.Debugf("GetParkPowerConsumption: period=%s, queryTime=%v, gatewayType=%d", period, queryTime, gatewayType)
 	return getPeriodData(period, queryTime, getParkDataWithTimeOffset)
 }
 
@@ -144,16 +148,19 @@ func getPeriodData(period string, queryTime time.Time, fetcher DataFetcher) ([]e
 	}
 
 	if getter, ok := getters[period]; ok {
+		common.Logger.Debugf("Getting current period data for period: %s", period)
 		current, err := getter.current()
 		if err != nil {
 			return nil, err
 		}
 
+		common.Logger.Debugf("Getting HB period data for period: %s", period)
 		hb, err := getter.hb()
 		if err != nil {
 			return nil, err
 		}
 
+		common.Logger.Debugf("Getting TB period data for period: %s", period)
 		tb, err := getter.tb()
 		if err != nil {
 			return nil, err
@@ -168,6 +175,7 @@ func getPeriodData(period string, queryTime time.Time, fetcher DataFetcher) ([]e
 
 // 通用的时间范围数据获取函数
 func getRangeData(period string, startTime, endTime time.Time, gatewayType int, fetcher RangeDataFetcher) ([]entity.LabelData, error) {
+	common.Logger.Debugf("Getting range data: period=%s, startTime=%v, endTime=%v, gatewayType=%d", period, startTime, endTime, gatewayType)
 	current, err := fetcher(period, startTime, endTime, gatewayType)
 	if err != nil {
 		return nil, err
@@ -203,12 +211,14 @@ func getRangeData(period string, startTime, endTime time.Time, gatewayType int, 
 
 	var hb, tb []entity.LabelData
 	if getHb {
+		common.Logger.Debugf("Getting HB data for range: startTime=%v, endTime=%v", hbStartTime, hbEndTime)
 		hb, err = fetcher(period, hbStartTime, hbEndTime, gatewayType)
 		if err != nil {
 			return nil, err
 		}
 	}
 	if getTb {
+		common.Logger.Debugf("Getting TB data for range: startTime=%v, endTime=%v", tbStartTime, tbEndTime)
 		tb, err = fetcher(period, tbStartTime, tbEndTime, gatewayType)
 		if err != nil {
 			return nil, err
@@ -225,6 +235,7 @@ func getParkDataWithTimeOffset(period string, queryTime time.Time, years, months
 	var tableName string
 
 	offsetTime := queryTime.AddDate(years, months, days).Add(time.Duration(hours) * time.Hour)
+	common.Logger.Debugf("Getting park data with time offset: period=%s, queryTime=%v, offsetTime=%v", period, queryTime, offsetTime)
 
 	whereClause := ""
 	if len(gatewayType) > 0 && gatewayType[0] > 0 {
@@ -269,7 +280,7 @@ func getParkDataWithTimeOffset(period string, queryTime time.Time, years, months
 	}
 
 	if err != nil {
-		fmt.Printf("Query error: %v\n", err)
+		common.Logger.Debugf("Query error: %v", err)
 		return nil, err
 	}
 
@@ -328,6 +339,7 @@ func getParkWaterDataWithTimeOffset(period string, queryTime time.Time, years, m
 	var tableName string
 
 	offsetTime := queryTime.AddDate(years, months, days).Add(time.Duration(hours) * time.Hour)
+	common.Logger.Debugf("Getting water data with time offset: period=%s, queryTime=%v, offsetTime=%v", period, queryTime, offsetTime)
 
 	switch period {
 	case PERIOD_HOUR:
@@ -367,7 +379,7 @@ func getParkWaterDataWithTimeOffset(period string, queryTime time.Time, years, m
 	}
 
 	if err != nil {
-		fmt.Printf("Query error: %v\n", err)
+		common.Logger.Debugf("Query error: %v", err)
 		return nil, err
 	}
 
@@ -408,6 +420,8 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 	var data interface{}
 	var err error
 	var tableName string
+
+	common.Logger.Debugf("Getting park data with time range: period=%s, startTime=%v, endTime=%v", period, startTime, endTime)
 
 	whereClause := ""
 	if len(gatewayType) > 0 && gatewayType[0] > 0 {
@@ -452,7 +466,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 	}
 
 	if err != nil {
-		fmt.Printf("Query error: %v\n", err)
+		common.Logger.Debugf("Query error: %v", err)
 		return nil, err
 	}
 
@@ -535,6 +549,8 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	var err error
 	var tableName string
 
+	common.Logger.Debugf("Getting water data with time range: period=%s, startTime=%v, endTime=%v", period, startTime, endTime)
+
 	whereClause := ""
 	if len(gatewayType) > 0 && gatewayType[0] > 0 {
 		whereClause = fmt.Sprintf("&type=%d", gatewayType[0])
@@ -578,6 +594,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	}
 
 	if err != nil {
+		common.Logger.Debugf("Query error: %v", err)
 		fmt.Printf("Query error: %v\n", err)
 		return nil, err
 	}
