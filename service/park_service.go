@@ -717,28 +717,67 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 	}
 
 	// 生成连续的时间点
-	var step time.Duration
+	var current time.Time
 	switch period {
 	case PERIOD_HOUR:
-		step = time.Hour
+		// 整点小时
+		current = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), startTime.Hour(), 0, 0, 0, startTime.Location())
+		for !current.After(endTime) {
+			timeStr := current.Format(calcTimeFormat)
+			label := current.Format(timeFormat)
+			value := valueMap[timeStr]
+
+			uniqueLabels[label] = entity.LabelData{
+				Id:    parkID,
+				Label: label,
+				Value: value,
+			}
+			current = current.Add(time.Hour)
+		}
 	case PERIOD_DAY:
-		step = 24 * time.Hour
+		// 整天
+		current = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), 0, 0, 0, 0, startTime.Location())
+		for !current.After(endTime) {
+			timeStr := current.Format(calcTimeFormat)
+			label := current.Format(timeFormat)
+			value := valueMap[timeStr]
+
+			uniqueLabels[label] = entity.LabelData{
+				Id:    parkID,
+				Label: label,
+				Value: value,
+			}
+			current = current.AddDate(0, 0, 1)
+		}
 	case PERIOD_MONTH:
-		step = 30 * 24 * time.Hour
+		// 整月
+		current = time.Date(startTime.Year(), startTime.Month(), 1, 0, 0, 0, 0, startTime.Location())
+		for !current.After(endTime) {
+			timeStr := current.Format(calcTimeFormat)
+			label := current.Format(timeFormat)
+			value := valueMap[timeStr]
+
+			uniqueLabels[label] = entity.LabelData{
+				Id:    parkID,
+				Label: label,
+				Value: value,
+			}
+			current = current.AddDate(0, 1, 0)
+		}
 	case PERIOD_YEAR:
-		step = 365 * 24 * time.Hour
-	}
+		// 整年
+		current = time.Date(startTime.Year(), 1, 1, 0, 0, 0, 0, startTime.Location())
+		for !current.After(endTime) {
+			timeStr := current.Format(calcTimeFormat)
+			label := current.Format(timeFormat)
+			value := valueMap[timeStr]
 
-	// 使用map来确保label唯一性
-	for t := startTime; !t.After(endTime); t = t.Add(step) {
-		timeStr := t.Format(calcTimeFormat)
-		label := t.Format(timeFormat)
-		value := valueMap[timeStr]
-
-		uniqueLabels[label] = entity.LabelData{
-			Id:    parkID,
-			Label: label,
-			Value: value,
+			uniqueLabels[label] = entity.LabelData{
+				Id:    parkID,
+				Label: label,
+				Value: value,
+			}
+			current = current.AddDate(1, 0, 0)
 		}
 	}
 
