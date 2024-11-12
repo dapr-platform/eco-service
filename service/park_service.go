@@ -624,7 +624,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	calcTimeFormat := "2006-01-02_15:04:05"
 	switch period {
 	case PERIOD_HOUR:
-		for _, v := range data.([]model.Eco_park_water_1d) {
+		for _, v := range data.([]model.Eco_park_water_1h) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
 			if len(gatewayType) > 0 && gatewayType[0] > 0 {
 				parkPowerMap[key] += v.WaterConsumption
