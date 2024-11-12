@@ -323,13 +323,18 @@ func getParkDataWithTimeOffset(period string, queryTime time.Time, years, months
 		}
 	}
 
-	for parkID, powerConsumption := range parkPowerMap {
-		result = append(result, entity.LabelData{
-			Id:    parkID,
-			Label: parkID,
-			Value: powerConsumption,
-		})
+	// Get park info
+	park, err := getParkInfo()
+	if err != nil {
+		return nil, err
 	}
+
+	// Return result with park ID even if no data
+	result = append(result, entity.LabelData{
+		Id:    park.ID,
+		Label: park.ID,
+		Value: parkPowerMap[park.ID],
+	})
 
 	return result, nil
 }
@@ -406,13 +411,18 @@ func getParkWaterDataWithTimeOffset(period string, queryTime time.Time, years, m
 		}
 	}
 
-	for parkID, waterConsumption := range parkWaterMap {
-		result = append(result, entity.LabelData{
-			Id:    parkID,
-			Label: parkID,
-			Value: waterConsumption,
-		})
+	// Get park info
+	park, err := getParkInfo()
+	if err != nil {
+		return nil, err
 	}
+
+	// Return result with park ID even if no data
+	result = append(result, entity.LabelData{
+		Id:    park.ID,
+		Label: park.ID,
+		Value: parkWaterMap[park.ID],
+	})
 
 	return result, nil
 }
@@ -667,6 +677,19 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	result = fillSortedData(sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
 
 	return result, nil
+}
+
+func getParkInfo() (*model.Ecpark, error) {
+	park, err := common.DbGetOne[model.Ecpark](
+		context.Background(),
+		common.GetDaprClient(),
+		model.EcparkTableInfo.Name,
+		"",
+	)
+	if err != nil {
+		return nil, err
+	}
+	return park, nil
 }
 
 // fillSortedData fills in missing time points in sorted data with zero values
