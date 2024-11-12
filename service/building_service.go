@@ -5,7 +5,6 @@ import (
 	"eco-service/entity"
 	"eco-service/model"
 	"fmt"
-	"sort"
 	"time"
 
 	"github.com/dapr-platform/common"
@@ -114,7 +113,7 @@ func getBuildingDataWithTimeOffset(period string, queryTime time.Time, years, mo
 		context.Background(),
 		common.GetDaprClient(),
 		model.EcbuildingTableInfo.Name,
-		"",
+		"_order=index",
 	)
 	if err != nil {
 		return nil, err
@@ -159,11 +158,6 @@ func getBuildingDataWithTimeOffset(period string, queryTime time.Time, years, mo
 			Value: buildingPowerMap[building.ID], // Will be 0 if no data exists
 		}
 	}
-
-	// Sort by building index
-	sort.Slice(result, func(i, j int) bool {
-		return buildings[i].Index < buildings[j].Index
-	})
 
 	return result, nil
 }
@@ -218,7 +212,7 @@ func getBuildingFloorDataWithTimeOffset(buildingID string, period string, queryT
 		context.Background(),
 		common.GetDaprClient(),
 		model.EcfloorTableInfo.Name,
-		fmt.Sprintf("building_id=%s", buildingID),
+		fmt.Sprintf("building_id=%s&_order=index", buildingID),
 	)
 	if err != nil {
 		return nil, err
@@ -251,11 +245,6 @@ func getBuildingFloorDataWithTimeOffset(buildingID string, period string, queryT
 			Value: floorPowerMap[floor.ID], // Will be 0 if no data exists
 		}
 	}
-
-	// Sort by floor index
-	sort.Slice(result, func(i, j int) bool {
-		return floors[i].Index < floors[j].Index
-	})
 
 	return result, nil
 }

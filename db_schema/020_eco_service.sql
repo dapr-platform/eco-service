@@ -415,36 +415,36 @@ INSERT INTO o_eco_park (id, created_by, updated_by, park_name)
 VALUES (md5('教科院'), 'admin', 'admin', '教科院');
 
 -- Insert buildings
-INSERT INTO o_eco_building (id, created_by, updated_by, building_name, park_id)
+INSERT INTO o_eco_building (id, created_by, updated_by, building_name, park_id, index)
 VALUES 
-(md5('A栋'), 'admin', 'admin', 'A栋', md5('教科院')),
-(md5('B栋'), 'admin', 'admin', 'B栋', md5('教科院')),
-(md5('C栋'), 'admin', 'admin', 'C栋', md5('教科院')),
-(md5('E栋'), 'admin', 'admin', 'E栋', md5('教科院'));
+(md5('A栋'), 'admin', 'admin', 'A栋', md5('教科院'), 1),
+(md5('B栋'), 'admin', 'admin', 'B栋', md5('教科院'), 2),
+(md5('C栋'), 'admin', 'admin', 'C栋', md5('教科院'), 3),
+(md5('E栋'), 'admin', 'admin', 'E栋', md5('教科院'), 4);
 
 -- Insert floors
-INSERT INTO o_eco_floor (id, created_by, updated_by, floor_name, building_id, park_id)
+INSERT INTO o_eco_floor (id, created_by, updated_by, floor_name, building_id, park_id, index)
 VALUES
-(md5('A栋_一层'), 'admin', 'admin', '一层', md5('A栋'), md5('教科院')),
-(md5('A栋_二层'), 'admin', 'admin', '二层', md5('A栋'), md5('教科院')),
-(md5('A栋_三层'), 'admin', 'admin', '三层', md5('A栋'), md5('教科院')),
-(md5('A栋_四层'), 'admin', 'admin', '四层', md5('A栋'), md5('教科院')),
-(md5('A栋_五层'), 'admin', 'admin', '五层', md5('A栋'), md5('教科院')),
-(md5('A栋_六层'), 'admin', 'admin', '六层', md5('A栋'), md5('教科院')),
-(md5('B栋_一层'), 'admin', 'admin', '一层', md5('B栋'), md5('教科院')),
-(md5('B栋_二层'), 'admin', 'admin', '二层', md5('B栋'), md5('教科院')),
-(md5('B栋_三层'), 'admin', 'admin', '三层', md5('B栋'), md5('教科院')),
-(md5('B栋_四层'), 'admin', 'admin', '四层', md5('B栋'), md5('教科院')),
-(md5('B栋_五层'), 'admin', 'admin', '五层', md5('B栋'), md5('教科院')),
-(md5('B栋_六层'), 'admin', 'admin', '六层', md5('B栋'), md5('教科院')),
-(md5('C栋_一层'), 'admin', 'admin', '一层', md5('C栋'), md5('教科院')),
-(md5('C栋_二层'), 'admin', 'admin', '二层', md5('C栋'), md5('教科院')),
-(md5('C栋_三层'), 'admin', 'admin', '三层', md5('C栋'), md5('教科院')),
-(md5('C栋_四层'), 'admin', 'admin', '四层', md5('C栋'), md5('教科院')),
-(md5('C栋_六层'), 'admin', 'admin', '六层', md5('C栋'), md5('教科院')),
-(md5('C栋_七层'), 'admin', 'admin', '七层', md5('C栋'), md5('教科院')),
-(md5('E栋_一层'), 'admin', 'admin', '一层', md5('E栋'), md5('教科院')),
-(md5('E栋_二层'), 'admin', 'admin', '二层', md5('E栋'), md5('教科院'));
+(md5('A栋_一层'), 'admin', 'admin', '一层', md5('A栋'), md5('教科院'), 1),
+(md5('A栋_二层'), 'admin', 'admin', '二层', md5('A栋'), md5('教科院'), 2),
+(md5('A栋_三层'), 'admin', 'admin', '三层', md5('A栋'), md5('教科院'), 3),
+(md5('A栋_四层'), 'admin', 'admin', '四层', md5('A栋'), md5('教科院'), 4),
+(md5('A栋_五层'), 'admin', 'admin', '五层', md5('A栋'), md5('教科院'), 5),
+(md5('A栋_六层'), 'admin', 'admin', '六层', md5('A栋'), md5('教科院'), 6),
+(md5('B栋_一层'), 'admin', 'admin', '一层', md5('B栋'), md5('教科院'), 1),
+(md5('B栋_二层'), 'admin', 'admin', '二层', md5('B栋'), md5('教科院'), 2),
+(md5('B栋_三层'), 'admin', 'admin', '三层', md5('B栋'), md5('教科院'), 3),
+(md5('B栋_四层'), 'admin', 'admin', '四层', md5('B栋'), md5('教科院'), 4),
+(md5('B栋_五层'), 'admin', 'admin', '五层', md5('B栋'), md5('教科院'), 5),
+(md5('B栋_六层'), 'admin', 'admin', '六层', md5('B栋'), md5('教科院'), 6),
+(md5('C栋_一层'), 'admin', 'admin', '一层', md5('C栋'), md5('教科院'), 1),
+(md5('C栋_二层'), 'admin', 'admin', '二层', md5('C栋'), md5('教科院'), 2),
+(md5('C栋_三层'), 'admin', 'admin', '三层', md5('C栋'), md5('教科院'), 3),
+(md5('C栋_四层'), 'admin', 'admin', '四层', md5('C栋'), md5('教科院'), 4),
+(md5('C栋_六层'), 'admin', 'admin', '六层', md5('C栋'), md5('教科院'), 6),
+(md5('C栋_七层'), 'admin', 'admin', '七层', md5('C栋'), md5('教科院'), 7),
+(md5('E栋_一层'), 'admin', 'admin', '一层', md5('E栋'), md5('教科院'), 1),
+(md5('E栋_二层'), 'admin', 'admin', '二层', md5('E栋'), md5('教科院'), 2);
 
 -- Insert gateways
 INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type)
