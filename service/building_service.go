@@ -32,9 +32,15 @@ type BuildingDataGetter func(time.Time) ([]entity.LabelData, error)
 
 func GetBuildingFloorsPowerConsumption(buildingID string, period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
 	getters := map[string]BuildingDataGetter{
-		PERIOD_DAY:   func(t time.Time) ([]entity.LabelData, error) { return getBuildingFloorDataDay(buildingID, t, gatewayType) },
-		PERIOD_MONTH: func(t time.Time) ([]entity.LabelData, error) { return getBuildingFloorDataMonth(buildingID, t, gatewayType) },
-		PERIOD_YEAR:  func(t time.Time) ([]entity.LabelData, error) { return getBuildingFloorDataYear(buildingID, t, gatewayType) },
+		PERIOD_DAY: func(t time.Time) ([]entity.LabelData, error) {
+			return getBuildingFloorDataDay(buildingID, t, gatewayType)
+		},
+		PERIOD_MONTH: func(t time.Time) ([]entity.LabelData, error) {
+			return getBuildingFloorDataMonth(buildingID, t, gatewayType)
+		},
+		PERIOD_YEAR: func(t time.Time) ([]entity.LabelData, error) {
+			return getBuildingFloorDataYear(buildingID, t, gatewayType)
+		},
 	}
 
 	if getter, ok := getters[period]; ok {
@@ -103,7 +109,18 @@ func getBuildingDataWithTimeOffset(period string, queryTime time.Time, years, mo
 		return nil, err
 	}
 
-	result := make([]entity.LabelData, 0)
+	// Get all buildings first
+	buildings, err := common.DbQuery[model.Ecbuilding](
+		context.Background(),
+		common.GetDaprClient(),
+		model.EcbuildingTableInfo.Name,
+		"",
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create map for power consumption data
 	buildingPowerMap := make(map[string]float64)
 
 	switch period {
@@ -133,36 +150,20 @@ func getBuildingDataWithTimeOffset(period string, queryTime time.Time, years, mo
 		}
 	}
 
-	type buildingData struct {
-		labelData entity.LabelData
-		index     int32
-	}
-
-	tempResult := make([]buildingData, 0)
-	for buildingID, powerConsumption := range buildingPowerMap {
-		building, err := getBuildingInfo(buildingID)
-		if err != nil {
-			return nil, err
+	// Create result with all buildings
+	result := make([]entity.LabelData, len(buildings))
+	for i, building := range buildings {
+		result[i] = entity.LabelData{
+			Id:    building.ID,
+			Label: building.BuildingName,
+			Value: buildingPowerMap[building.ID], // Will be 0 if no data exists
 		}
-		tempResult = append(tempResult, buildingData{
-			labelData: entity.LabelData{
-				Id:    buildingID,
-				Label: building.BuildingName,
-				Value: powerConsumption,
-			},
-			index: building.Index,
-		})
 	}
 
 	// Sort by building index
-	sort.Slice(tempResult, func(i, j int) bool {
-		return tempResult[i].index < tempResult[j].index
+	sort.Slice(result, func(i, j int) bool {
+		return buildings[i].Index < buildings[j].Index
 	})
-
-	// Convert back to []entity.LabelData
-	for _, v := range tempResult {
-		result = append(result, v.labelData)
-	}
 
 	return result, nil
 }
@@ -212,71 +213,49 @@ func getBuildingFloorDataWithTimeOffset(buildingID string, period string, queryT
 		return nil, err
 	}
 
-	type floorData struct {
-		labelData entity.LabelData
-		index     int32
+	// Get all floors for this building
+	floors, err := common.DbQuery[model.Ecfloor](
+		context.Background(),
+		common.GetDaprClient(),
+		model.EcfloorTableInfo.Name,
+		fmt.Sprintf("building_id=%s", buildingID),
+	)
+	if err != nil {
+		return nil, err
 	}
 
-	tempResult := make([]floorData, 0)
+	// Create map for power consumption data
+	floorPowerMap := make(map[string]float64)
 
 	switch period {
 	case PERIOD_DAY:
 		for _, v := range data.([]model.Eco_floor_1d) {
-			floor, err := getFloorInfo(v.FloorID)
-			if err != nil {
-				return nil, err
-			}
-			tempResult = append(tempResult, floorData{
-				labelData: entity.LabelData{
-					Id:    v.FloorID,
-					Label: floor.FloorName,
-					Value: v.PowerConsumption,
-				},
-				index: floor.Index,
-			})
+			floorPowerMap[v.FloorID] = v.PowerConsumption
 		}
 	case PERIOD_MONTH:
 		for _, v := range data.([]model.Eco_floor_1m) {
-			floor, err := getFloorInfo(v.FloorID)
-			if err != nil {
-				return nil, err
-			}
-			tempResult = append(tempResult, floorData{
-				labelData: entity.LabelData{
-					Id:    v.FloorID,
-					Label: floor.FloorName,
-					Value: v.PowerConsumption,
-				},
-				index: floor.Index,
-			})
+			floorPowerMap[v.FloorID] = v.PowerConsumption
 		}
 	case PERIOD_YEAR:
 		for _, v := range data.([]model.Eco_floor_1y) {
-			floor, err := getFloorInfo(v.FloorID)
-			if err != nil {
-				return nil, err
-			}
-			tempResult = append(tempResult, floorData{
-				labelData: entity.LabelData{
-					Id:    v.FloorID,
-					Label: floor.FloorName,
-					Value: v.PowerConsumption,
-				},
-				index: floor.Index,
-			})
+			floorPowerMap[v.FloorID] = v.PowerConsumption
+		}
+	}
+
+	// Create result with all floors
+	result := make([]entity.LabelData, len(floors))
+	for i, floor := range floors {
+		result[i] = entity.LabelData{
+			Id:    floor.ID,
+			Label: floor.FloorName,
+			Value: floorPowerMap[floor.ID], // Will be 0 if no data exists
 		}
 	}
 
 	// Sort by floor index
-	sort.Slice(tempResult, func(i, j int) bool {
-		return tempResult[i].index < tempResult[j].index
+	sort.Slice(result, func(i, j int) bool {
+		return floors[i].Index < floors[j].Index
 	})
-
-	// Convert back to []entity.LabelData
-	result := make([]entity.LabelData, 0)
-	for _, v := range tempResult {
-		result = append(result, v.labelData)
-	}
 
 	return result, nil
 }
@@ -424,42 +403,4 @@ func calculateRatios(current, hb, tb []entity.LabelData) {
 			current[i].TBRatio = float64(int((current[i].Value-tb[i].Value)/tb[i].Value*10000)) / 10000
 		}
 	}
-}
-
-func getBuildingInfo(buildingID string) (*model.Ecbuilding, error) {
-	if building, ok := buildingCacheMap[buildingID]; ok {
-		return building, nil
-	}
-
-	building, err := common.DbGetOne[model.Ecbuilding](
-		context.Background(),
-		common.GetDaprClient(),
-		model.EcbuildingTableInfo.Name,
-		fmt.Sprintf("id=%s", buildingID),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	buildingCacheMap[buildingID] = building
-	return building, nil
-}
-
-func getFloorInfo(floorID string) (*model.Ecfloor, error) {
-	if floor, ok := floorCacheMap[floorID]; ok {
-		return floor, nil
-	}
-
-	floor, err := common.DbGetOne[model.Ecfloor](
-		context.Background(),
-		common.GetDaprClient(),
-		model.EcfloorTableInfo.Name,
-		fmt.Sprintf("id=%s", floorID),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	floorCacheMap[floorID] = floor
-	return floor, nil
 }
