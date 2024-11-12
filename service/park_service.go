@@ -16,6 +16,7 @@ const (
 	CARBON_FACTOR = 0.61   // 碳排放系数
 	COAL_FACTOR   = 0.1229 // 标准煤系数
 )
+
 type keyValue struct {
 	key   string
 	value float64
@@ -525,7 +526,6 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		}
 	}
 
-	
 	var sortedData []keyValue
 	for k, v := range parkPowerMap {
 		sortedData = append(sortedData, keyValue{k, v})
@@ -538,8 +538,6 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		return time1 < time2
 	})
 	result = fillSortedData(sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
-
-
 
 	return result, nil
 }
@@ -654,7 +652,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	}
 
 	// Convert map to slice and sort by time
-	
+
 	var sortedData []keyValue
 	for k, v := range parkPowerMap {
 		sortedData = append(sortedData, keyValue{k, v})
@@ -670,24 +668,13 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 
 	return result, nil
 }
+
 // fillSortedData fills in missing time points in sorted data with zero values
 func fillSortedData(sortedData []keyValue, period string, startTime time.Time, endTime time.Time, calcTimeFormat string, timeFormat string) []entity.LabelData {
-	var result []entity.LabelData
+	// 创建一个map来去重
+	uniqueLabels := make(map[string]entity.LabelData)
 
-	// Generate continuous time points
-	var step time.Duration
-	switch period {
-	case PERIOD_HOUR:
-		step = time.Hour
-	case PERIOD_DAY:
-		step = 24 * time.Hour
-	case PERIOD_MONTH:
-		step = 30 * 24 * time.Hour // Approximate
-	case PERIOD_YEAR:
-		step = 365 * 24 * time.Hour // Approximate
-	}
-
-	// Create map for quick lookup of values
+	// 创建map用于快速查找值
 	valueMap := make(map[string]float64)
 	var parkID string
 	if len(sortedData) > 0 {
@@ -701,21 +688,47 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 		}
 	}
 
-	// If no parkID found, use a default value
+	// 如果没有找到parkID，使用默认值
 	if parkID == "" {
 		parkID = "default"
 	}
 
-	// Generate continuous time points from startTime to endTime
+	// 生成连续的时间点
+	var step time.Duration
+	switch period {
+	case PERIOD_HOUR:
+		step = time.Hour
+	case PERIOD_DAY:
+		step = 24 * time.Hour
+	case PERIOD_MONTH:
+		step = 30 * 24 * time.Hour
+	case PERIOD_YEAR:
+		step = 365 * 24 * time.Hour
+	}
+
+	// 使用map来确保label唯一性
 	for t := startTime; !t.After(endTime); t = t.Add(step) {
 		timeStr := t.Format(calcTimeFormat)
-		value := valueMap[timeStr] // Will be 0 if not found
-		result = append(result, entity.LabelData{
+		label := t.Format(timeFormat)
+		value := valueMap[timeStr]
+
+		uniqueLabels[label] = entity.LabelData{
 			Id:    parkID,
-			Label: t.Format(timeFormat),
+			Label: label,
 			Value: value,
-		})
+		}
 	}
+
+	// 转换为有序切片
+	result := make([]entity.LabelData, 0, len(uniqueLabels))
+	for _, data := range uniqueLabels {
+		result = append(result, data)
+	}
+
+	// 按label排序
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Label < result[j].Label
+	})
 
 	return result
 }

@@ -143,7 +143,7 @@ func BuildingFloorPowerConsumptionHandler(w http.ResponseWriter, r *http.Request
 		common.HttpResult(w, common.ErrParam.AppendMsg(err.Error()))
 		return
 	}
-	data, err := service.GetBuildingFloorsPowerConsumption(period, buildingId, queryTime, 0)
+	data, err := service.GetBuildingFloorsPowerConsumption(buildingId, period, queryTime, 0)
 	if err != nil {
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
 		return
