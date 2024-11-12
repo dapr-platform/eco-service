@@ -332,7 +332,7 @@ func getParkDataWithTimeOffset(period string, queryTime time.Time, years, months
 	// Return result with park ID even if no data
 	result = append(result, entity.LabelData{
 		Id:    park.ID,
-		Label: park.ID,
+		Label: park.ParkName,
 		Value: parkPowerMap[park.ID],
 	})
 
@@ -420,7 +420,7 @@ func getParkWaterDataWithTimeOffset(period string, queryTime time.Time, years, m
 	// Return result with park ID even if no data
 	result = append(result, entity.LabelData{
 		Id:    park.ID,
-		Label: park.ID,
+		Label: park.ParkName,
 		Value: parkWaterMap[park.ID],
 	})
 
