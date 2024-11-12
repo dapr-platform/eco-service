@@ -442,36 +442,44 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 	switch period {
 	case PERIOD_HOUR:
 		tableName = model.Eco_park_1hTableInfo.Name
+		param := fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T15:00:00"), endTime.Format("2006-01-02T15:00:00"), whereClause)
 		data, err = common.DbQuery[model.Eco_park_1h](
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T15:00:00"), endTime.Format("2006-01-02T15:00:00"), whereClause),
+			param,
 		)
+		common.Logger.Debugf("table=%s, param=%s", tableName, param)
 	case PERIOD_DAY:
+		param := fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause)
 		tableName = model.Eco_park_1dTableInfo.Name
 		data, err = common.DbQuery[model.Eco_park_1d](
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause),
+			param,
 		)
+		common.Logger.Debugf("table=%s, param=%s", tableName, param)
 	case PERIOD_MONTH:
+		param := fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause)
 		tableName = model.Eco_park_1mTableInfo.Name
 		data, err = common.DbQuery[model.Eco_park_1m](
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause),
+			param,
 		)
+		common.Logger.Debugf("table=%s, param=%s", tableName, param)
 	case PERIOD_YEAR:
+		param := fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause)
 		tableName = model.Eco_park_1yTableInfo.Name
 		data, err = common.DbQuery[model.Eco_park_1y](
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause),
+			param,
 		)
+		common.Logger.Debugf("table=%s, param=%s", tableName, param)
 	default:
 		return nil, fmt.Errorf("unsupported period: %s", period)
 	}
