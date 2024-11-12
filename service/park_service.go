@@ -436,7 +436,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-02T15:00:00"), endTime.Format("2006-01-02T15:00:00"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T15:00:00"), endTime.Format("2006-01-02T15:00:00"), whereClause),
 		)
 	case PERIOD_DAY:
 		tableName = model.Eco_park_1dTableInfo.Name
@@ -444,7 +444,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause),
 		)
 	case PERIOD_MONTH:
 		tableName = model.Eco_park_1mTableInfo.Name
@@ -452,7 +452,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-01T00:00:00"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-01T00:00:00"), whereClause),
 		)
 	case PERIOD_YEAR:
 		tableName = model.Eco_park_1yTableInfo.Name
@@ -460,7 +460,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-01T00:00:00"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-01T00:00:00"), whereClause),
 		)
 	default:
 		return nil, fmt.Errorf("unsupported period: %s", period)
@@ -561,7 +561,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-02T15:00:00"), endTime.Format("2006-01-02T15:00:00"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T15:00:00"), endTime.Format("2006-01-02T15:00:00"), whereClause),
 		)
 	case PERIOD_DAY:
 		tableName = model.Eco_park_water_1dTableInfo.Name
@@ -569,7 +569,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause),
 		)
 	case PERIOD_MONTH:
 		tableName = model.Eco_park_water_1mTableInfo.Name
@@ -577,7 +577,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-01T00:00:00"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-01T00:00:00"), whereClause),
 		)
 	case PERIOD_YEAR:
 		tableName = model.Eco_park_water_1yTableInfo.Name
@@ -585,7 +585,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 			context.Background(),
 			common.GetDaprClient(),
 			tableName,
-			fmt.Sprintf("time=$gte.%s&time=$lte.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-01T00:00:00"), whereClause),
+			fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-01T00:00:00"), endTime.Format("2006-01-01T00:00:00"), whereClause),
 		)
 	default:
 		return nil, fmt.Errorf("unsupported period: %s", period)
