@@ -605,7 +605,6 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		return nil, err
 	}
 
-	result := make([]entity.LabelData, 0)
 	parkPowerMap := make(map[string]float64)
 	var timeFormat string
 
@@ -620,7 +619,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		timeFormat = "2006"
 	}
 	calcTimeFormat := "2006-01-02_15:04:05"
-
+	common.Logger.Debugf("getParkDataWithTimeRange data: %+v", data)
 	switch period {
 	case PERIOD_HOUR:
 		for _, v := range data.([]model.Eco_park_1h) {
@@ -671,7 +670,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		time2 := strings.Split(sortedData[j].key, "_")[1]
 		return time1 < time2
 	})
-	result = fillSortedData(sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
+	result := fillSortedData(sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
 
 	return result, nil
 }
@@ -818,6 +817,10 @@ func getParkInfo() (*model.Ecpark, error) {
 
 // fillSortedData fills in missing time points in sorted data with zero values
 func fillSortedData(sortedData []keyValue, period string, startTime time.Time, endTime time.Time, calcTimeFormat string, timeFormat string) []entity.LabelData {
+	common.Logger.Debugf("fillSortedData input data: sortedData=%+v, period=%s, startTime=%+v, endTime=%+v, calcTimeFormat=%s, timeFormat=%s",
+		sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
+
+	common.Logger.Debugf("sortedData %v", sortedData)
 	// 创建一个map来去重
 	uniqueLabels := make(map[string]entity.LabelData)
 
@@ -827,6 +830,10 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 	if len(sortedData) > 0 {
 		for _, kv := range sortedData {
 			parts := strings.Split(kv.key, "_")
+			if len(parts) != 2 {
+				common.Logger.Errorf("Invalid key format: %s", kv.key)
+				continue
+			}
 			if parkID == "" {
 				parkID = parts[0]
 			}
@@ -835,9 +842,15 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 		}
 	}
 
-	// 如果没有找到parkID，使用默认值
+	// 如果没有找到parkID，获取默认parkID
 	if parkID == "" {
-		parkID = "default"
+		park, err := getParkInfo()
+		if err != nil {
+			common.Logger.Errorf("Failed to get park info: %v", err)
+			parkID = "default"
+		} else {
+			parkID = park.ID
+		}
 	}
 
 	// 生成连续的时间点
@@ -846,7 +859,7 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 	case PERIOD_HOUR:
 		// 整点小时
 		current = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), startTime.Hour(), 0, 0, 0, startTime.Location())
-		for !current.After(endTime) {
+		for current.Before(endTime) {
 			timeStr := current.Format(calcTimeFormat)
 			label := current.Format(timeFormat)
 			value := valueMap[timeStr]
@@ -861,7 +874,7 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 	case PERIOD_DAY:
 		// 整天
 		current = time.Date(startTime.Year(), startTime.Month(), startTime.Day(), 0, 0, 0, 0, startTime.Location())
-		for !current.After(endTime) {
+		for current.Before(endTime) {
 			timeStr := current.Format(calcTimeFormat)
 			label := current.Format(timeFormat)
 			value := valueMap[timeStr]
@@ -876,7 +889,7 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 	case PERIOD_MONTH:
 		// 整月
 		current = time.Date(startTime.Year(), startTime.Month(), 1, 0, 0, 0, 0, startTime.Location())
-		for !current.After(endTime) {
+		for current.Before(endTime) {
 			timeStr := current.Format(calcTimeFormat)
 			label := current.Format(timeFormat)
 			value := valueMap[timeStr]
@@ -891,7 +904,7 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 	case PERIOD_YEAR:
 		// 整年
 		current = time.Date(startTime.Year(), 1, 1, 0, 0, 0, 0, startTime.Location())
-		for !current.After(endTime) {
+		for current.Before(endTime) {
 			timeStr := current.Format(calcTimeFormat)
 			label := current.Format(timeFormat)
 			value := valueMap[timeStr]
@@ -903,6 +916,9 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 			}
 			current = current.AddDate(1, 0, 0)
 		}
+	default:
+		common.Logger.Errorf("Unsupported period: %s", period)
+		return nil
 	}
 
 	// 转换为有序切片
@@ -916,5 +932,6 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 		return result[i].Label < result[j].Label
 	})
 
+	common.Logger.Debugf("fillSortedData output data: %+v", result)
 	return result
 }
