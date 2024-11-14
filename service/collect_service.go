@@ -380,7 +380,11 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 		projectCode := gateways[i].ProjectCode
 		if len(projectCode) == 0 {
 			var err error
-			projectCode, err = client.GetBoxProjectCode(gateways[i].MacAddr)
+			if strings.HasSuffix(gateways[i].MacAddr, "_1") {
+				projectCode, err = client.GetBoxProjectCode(strings.TrimSuffix(gateways[i].MacAddr, "_1"))
+			} else {
+				projectCode, err = client.GetBoxProjectCode(gateways[i].MacAddr)
+			}
 			if err != nil {
 				return errors.Wrapf(err, "Failed to get project code for gateway %s", gateways[i].ID)
 			}
@@ -511,7 +515,11 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 		projectCode := gateway.ProjectCode
 		if len(projectCode) == 0 {
 			var err error
-			projectCode, err = client.GetBoxProjectCode(gateway.MacAddr)
+			if strings.HasSuffix(gateway.MacAddr, "_1") {
+				projectCode, err = client.GetBoxProjectCode(strings.TrimSuffix(gateway.MacAddr, "_1"))
+			} else {
+				projectCode, err = client.GetBoxProjectCode(gateway.MacAddr)
+			}
 			if err != nil {
 				return errors.Wrapf(err, "Failed to get project code for gateway %s", gateway.ID)
 			}
@@ -539,7 +547,11 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 			gatewayBatch := projectGateways[i:end]
 			macAddrs := make([]string, len(gatewayBatch))
 			for j, gateway := range gatewayBatch {
-				macAddrs[j] = gateway.MacAddr
+				if strings.HasSuffix(gateway.MacAddr, "_1") {
+					macAddrs[j] = strings.TrimSuffix(gateway.MacAddr, "_1")
+				} else {
+					macAddrs[j] = gateway.MacAddr
+				}
 			}
 
 			for i := 1; i <= hoursAgo; i++ {
