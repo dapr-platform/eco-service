@@ -10,7 +10,7 @@ import (
 
 func InitManuCollectRoute(r chi.Router) {
 	r.Get(common.BASE_CONTEXT+"/manu_collect", ManuCollectHandler)
-	r.Get(common.BASE_CONTEXT+"/check_collect_date",CheckCollectPowerHandler)
+	r.Get(common.BASE_CONTEXT+"/check_collect_date", CheckCollectPowerHandler)
 	r.Get(common.BASE_CONTEXT+"/manu_gen_demo_water_data", ManuGenDemoWaterDataHandler)
 }
 
@@ -48,8 +48,6 @@ func ManuGenDemoWaterDataHandler(w http.ResponseWriter, r *http.Request) {
 	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }
 
-
-
 // @Summary 查看采集到的电表数据时间分布
 // @Description 查看采集到的电表数据时间分布
 // @Tags Manually collect data
@@ -61,6 +59,10 @@ func ManuGenDemoWaterDataHandler(w http.ResponseWriter, r *http.Request) {
 func CheckCollectPowerHandler(w http.ResponseWriter, r *http.Request) {
 	start := r.URL.Query().Get("start")
 	end := r.URL.Query().Get("end")
-	data,err :=service.CheckCollectPower(start,end)
-	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
+	data, err := service.CheckCollectPower(start, end)
+	if err != nil {
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
+	}
+	common.HttpResult(w, common.OK.WithData(data))
 }

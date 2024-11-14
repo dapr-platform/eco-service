@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/md5"
 	"eco-service/client"
-	"eco-service/entity"
 	"eco-service/model"
 	"encoding/json"
 	"fmt"
@@ -76,8 +75,23 @@ func init() {
 	}()
 }
 
-func CheckCollectPower(start, end string) ([]entity.LabelData, error) {
-
+func CheckCollectPower(start, end string) ([]map[string]interface{}, error) {
+	selectSql := "SELECT " +
+		"DATE_TRUNC('day', time) as day," +
+		"park_id," +
+		"COUNT(*) as actual_records," +
+		"24 as expected_records," +
+		"(COUNT(*) * 100.0 / 24) as completeness_percentage"
+	fromSql := " f_eco_park_water_1h " +
+		"GROUP BY DATE_TRUNC('day', time), park_id" +
+		"HAVING COUNT(*) < 24" +
+		"ORDER BY day, park_id;"
+	whereSql := "1=1"
+	data, err := common.CustomSql[map[string]interface{}](context.Background(), common.GetDaprClient(), selectSql, fromSql, whereSql)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 func ManuGenDemoWaterData(startDayStr ...string) {
 	startTime := time.Now()
