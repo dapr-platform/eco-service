@@ -226,7 +226,7 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 	return nil
 }
 func ManuFillGatewayHourStats(month, value string) error {
-	// Parse month string to time
+	// Parse month string to time 
 	startTime, err := time.Parse("2006-01", month)
 	if err != nil {
 		return errors.Wrap(err, "Failed to parse month")
@@ -254,6 +254,9 @@ func ManuFillGatewayHourStats(month, value string) error {
 
 	// Calculate base value per day
 	baseValuePerDay := totalValue / float64(totalDays)
+
+	// Track running total to ensure exact match
+	var runningTotal float64
 
 	// Generate and save hourly stats for each day
 	for currentDay := startTime; currentDay.Before(endTime); currentDay = currentDay.AddDate(0, 0, 1) {
@@ -295,15 +298,23 @@ func ManuFillGatewayHourStats(month, value string) error {
 			hourlyDistribution[i] = hourlyDistribution[i] / sum * dailyValue
 		}
 
-		// Save hourly stats
+		// Save hourly stats for each hour
 		for hour := 0; hour < 24; hour++ {
-			currentTime := currentDay.Add(time.Duration(hour) * time.Hour)
 			var hourlyStats []model.Eco_gateway_1h
-
+			currentTime := time.Date(currentDay.Year(), currentDay.Month(), currentDay.Day(), hour, 0, 0, 0, currentDay.Location())
+			
 			hourValue := hourlyDistribution[hour] / float64(len(gateways))
+			
+			// For the last hour of the last day, adjust to match total exactly
+			isLastHour := currentDay.AddDate(0, 0, 1).Equal(endTime) && hour == 23
+			if isLastHour {
+				remaining := totalValue - runningTotal
+				hourValue = remaining / float64(len(gateways))
+			} else {
+				runningTotal += hourValue * float64(len(gateways))
+			}
+
 			for _, gateway := range gateways {
-				// Add small random variation per gateway (-5% to +5%)
-				gatewayFactor := 0.95 + (rand.Float64() * 0.1)
 				stat := model.Eco_gateway_1h{
 					ID:               gateway.ID + "_" + currentTime.Format("2006010215"),
 					Time:             common.LocalTime(currentTime),
@@ -312,7 +323,7 @@ func ManuFillGatewayHourStats(month, value string) error {
 					BuildingID:       gateway.BuildingID,
 					Type:             gateway.Type,
 					ParkID:           gateway.ParkID,
-					PowerConsumption: hourValue * gatewayFactor,
+					PowerConsumption: hourValue,
 				}
 				hourlyStats = append(hourlyStats, stat)
 			}
