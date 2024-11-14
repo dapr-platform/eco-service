@@ -701,6 +701,15 @@ func saveGatewayHourlyStats(stats []model.Eco_gateway_1h) error {
 	return nil
 }
 
+func refreshContinuousAggregateFull(refreshDefineMap map[string]string) error {
+	for tableName := range refreshDefineMap {
+		if err := common.DbRefreshContinuousAggregateFull(context.Background(), common.GetDaprClient(), tableName); err != nil {
+			return errors.Wrapf(err, "Failed to refresh continuous aggregate for table %s", tableName)
+		}
+	}
+	return nil
+}
+
 func refreshContinuousAggregate(collectTime time.Time, refreshDefineMap map[string]string) error {
 	common.Logger.Infof("Starting continuous aggregate refresh for time: %s", collectTime.Format("2006-01-02 15:04:05"))
 

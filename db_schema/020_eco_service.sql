@@ -410,6 +410,7 @@ FROM f_eco_gateway_1h
 GROUP BY time_bucket(INTERVAL '1 year', time), park_id, type
 WITH NO DATA;
 
+
 -- Insert park
 INSERT INTO o_eco_park (id, created_by, updated_by, park_name)
 VALUES (md5('教科院'), 'admin', 'admin', '教科院');
