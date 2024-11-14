@@ -32,6 +32,7 @@ var gatewayNeedRefreshContinuousAggregateMap = map[string]string{
 	"f_eco_park_1y":     "year",
 }
 var waterNeedRefreshContinuousAggregateMap = map[string]string{
+	"f_eco_park_water_1d": "day",
 	"f_eco_park_water_1m": "month",
 	"f_eco_park_water_1y": "year",
 }
@@ -94,13 +95,13 @@ func CheckCollectPower(start, end string) ([]map[string]interface{}, error) {
 	}
 	return data, nil
 }
-func ManuGenDemoWaterData(startDayStr,endTimeStr string) {
-	startTime, err := time.Parse("2006-01-01", startDayStr)
+func ManuGenDemoWaterData(startDayStr, endTimeStr string) {
+	startTime, err := time.Parse("2006-01-02", startDayStr)
 	if err != nil {
 		common.Logger.Errorf("Failed to parse start date: %v", err)
 		return
 	}
-	endTime, err := time.Parse("2006-01-01", endTimeStr)
+	endTime, err := time.Parse("2006-01-02", endTimeStr)
 	if err != nil {
 		common.Logger.Errorf("Failed to parse end date: %v", err)
 		return
@@ -225,7 +226,7 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 	return nil
 }
 func ManuFillGatewayHourStats(month, value string) error {
-	// Parse month string to time 
+	// Parse month string to time
 	startTime, err := time.Parse("2006-01", month)
 	if err != nil {
 		return errors.Wrap(err, "Failed to parse month")
@@ -301,9 +302,9 @@ func ManuFillGatewayHourStats(month, value string) error {
 		for hour := 0; hour < 24; hour++ {
 			var hourlyStats []model.Eco_gateway_1h
 			currentTime := time.Date(currentDay.Year(), currentDay.Month(), currentDay.Day(), hour, 0, 0, 0, currentDay.Location())
-			
+
 			hourValue := hourlyDistribution[hour] / float64(len(gateways))
-			
+
 			// For the last hour of the last day, adjust to match total exactly
 			isLastHour := currentDay.AddDate(0, 0, 1).Equal(endTime) && hour == 23
 			if isLastHour {
