@@ -15,6 +15,40 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/check_collect_date": {
+            "get": {
+                "description": "查看采集到的电表数据时间分布",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manually collect data"
+                ],
+                "summary": "查看采集到的电表数据时间分布",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start time (2024-01-01)",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End time (2024-01-01)",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/dashboard/building-floor-power-consumption": {
             "get": {
                 "description": "建筑楼层用电量，根据粒度获取建筑所有楼层的用电量",
@@ -42,7 +76,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "query_time,格式2024-01-01,不传则默认当天",
+                        "description": "query_time,格式2024-01-01/2024-01/2024,不传则默认当天/当月/当年",
                         "name": "query_time",
                         "in": "query"
                     }
@@ -91,14 +125,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "period, hour/day/month/year",
+                        "description": "period, day/month/year",
                         "name": "period",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "query_time,格式2024-01-01,不传则默认当天",
+                        "description": "query_time,格式2024-01-01/2024-01/2024,不传则默认当天/当月/当年",
                         "name": "query_time",
                         "in": "query"
                     }
@@ -147,14 +181,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "period, hour/day/month/year",
+                        "description": "period, day/month/year",
                         "name": "period",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "query_time,格式2024-01-01,不传则默认当天",
+                        "description": "query_time,格式2024-01-01/2024-01/2024,不传则默认当天/当月/当年",
                         "name": "query_time",
                         "in": "query"
                     },
@@ -210,14 +244,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "period, hour/day/month/year",
+                        "description": "period, day/month/year",
                         "name": "period",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "query_time,格式2024-01-01,不传则默认当天",
+                        "description": "query_time,格式2024-01-01/2024-01/2024,不传则默认当天/当月/当年",
                         "name": "query_time",
                         "in": "query"
                     }
@@ -266,7 +300,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "period, hour/day/month/year",
+                        "description": "period, day/month/year",
                         "name": "period",
                         "in": "query",
                         "required": true
@@ -279,7 +313,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "query_time,格式2024-01-01,不传则默认当天",
+                        "description": "query_time,格式2024-01-01/2024-01/2024,不传则默认当天/当月/当年",
                         "name": "query_time",
                         "in": "query"
                     }
@@ -329,14 +363,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "period, hour/day/month/year",
+                        "description": "period, day/month/year",
                         "name": "period",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "query_time,格式2024-01-01,不传则默认当天",
+                        "description": "query_time,格式2024-01-01/2024-01/2024,不传则默认当天/当月/当年",
                         "name": "query_time",
                         "in": "query"
                     }
@@ -385,14 +419,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "period, hour/day/month/year",
+                        "description": "period, day/month/year",
                         "name": "period",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "query_time,格式2024-01-01,不传则默认当天",
+                        "description": "query_time,格式2024-01-01/2024-01/2024,不传则默认当天/当月/当年",
                         "name": "query_time",
                         "in": "query"
                     }
@@ -442,14 +476,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "period, hour/day/month/year",
+                        "description": "period, day/month/year",
                         "name": "period",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "query_time,格式2024-01-01,不传则默认当天",
+                        "description": "query_time,格式2024-01-01/2024-01/2024,不传则默认当天/当月/当年",
                         "name": "query_time",
                         "in": "query"
                     }
@@ -2523,6 +2557,9 @@ const docTemplate = `{
                 "hb": {
                     "type": "number"
                 },
+                "hb_ratio": {
+                    "type": "number"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -2530,6 +2567,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tb": {
+                    "type": "number"
+                },
+                "tb_ratio": {
                     "type": "number"
                 },
                 "value": {
