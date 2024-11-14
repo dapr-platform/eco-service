@@ -188,7 +188,7 @@ paths:
             $ref: '#/definitions/common.Response'
       summary: 查看采集到的电表数据时间分布
       tags:
-      - Manually collect data
+      - Manually
   /dashboard/building-floor-power-consumption:
     get:
       description: 建筑楼层用电量，根据粒度获取建筑所有楼层的用电量
@@ -511,7 +511,7 @@ paths:
             $ref: '#/definitions/common.Response'
       summary: Manually collect data
       tags:
-      - Manually collect data
+      - Manually
   /ecbuilding:
     get:
       description: query objects
@@ -1753,7 +1753,31 @@ paths:
             $ref: '#/definitions/common.Response'
       summary: Manually collect data
       tags:
-      - Manually collect data
+      - Manually
+  /manu_fill_gateway_hour_stats:
+    get:
+      description: Manually fill gateway hour stats
+      parameters:
+      - description: month
+        in: query
+        name: month
+        required: true
+        type: string
+      - description: value
+        in: query
+        name: value
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: Manually fill gateway hour stats
+      tags:
+      - Manually
   /manu_gen_demo_water_data:
     get:
       description: Manually generate demo water data
@@ -1771,5 +1795,5 @@ paths:
             $ref: '#/definitions/common.Response'
       summary: Manually generate demo water data
       tags:
-      - Manually generate demo water data
+      - Manually
 swagger: "2.0"

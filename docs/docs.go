@@ -22,7 +22,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Manually collect data"
+                    "Manually"
                 ],
                 "summary": "查看采集到的电表数据时间分布",
                 "parameters": [
@@ -527,7 +527,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Manually collect data"
+                    "Manually"
                 ],
                 "summary": "Manually collect data",
                 "parameters": [
@@ -2517,7 +2517,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Manually collect data"
+                    "Manually"
                 ],
                 "summary": "Manually collect data",
                 "parameters": [
@@ -2544,6 +2544,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/manu_fill_gateway_hour_stats": {
+            "get": {
+                "description": "Manually fill gateway hour stats",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manually"
+                ],
+                "summary": "Manually fill gateway hour stats",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "month",
+                        "name": "month",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "value",
+                        "name": "value",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/manu_gen_demo_water_data": {
             "get": {
                 "description": "Manually generate demo water data",
@@ -2551,7 +2587,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Manually generate demo water data"
+                    "Manually"
                 ],
                 "summary": "Manually generate demo water data",
                 "parameters": [

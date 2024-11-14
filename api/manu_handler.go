@@ -18,7 +18,7 @@ func InitManuCollectRoute(r chi.Router) {
 
 // @Summary Manually fill gateway hour stats
 // @Description Manually fill gateway hour stats
-// @Tags Manually fill gateway hour stats
+// @Tags Manually
 // @Produce  json
 // @Param month query string true "month"
 // @Param value query string true "value"
@@ -38,7 +38,7 @@ func ManuFillGatewayHourStatsHandler(w http.ResponseWriter, r *http.Request) {
 
 // @Summary Manually collect data
 // @Description Manually collect data
-// @Tags Manually collect data
+// @Tags Manually
 // @Produce  json
 // @Param mac_addr query string true "mac_addr"
 // @Param year query string true "year"
@@ -58,7 +58,7 @@ func DebugGetBoxHourStatsHandler(w http.ResponseWriter, r *http.Request) {
 
 // @Summary Manually collect data
 // @Description Manually collect data
-// @Tags Manually collect data
+// @Tags Manually
 // @Produce  json
 // @Param start query string false "Start time (2024-01-01)"
 // @Param end query string false "End time (2024-01-01)"
@@ -78,7 +78,7 @@ func ManuCollectHandler(w http.ResponseWriter, r *http.Request) {
 
 // @Summary Manually generate demo water data
 // @Description Manually generate demo water data
-// @Tags Manually generate demo water data
+// @Tags Manually
 // @Produce  json
 // @Param start query string false "Start time (2024-01-01)"
 // @Success 200 {object} common.Response "success"
@@ -92,7 +92,7 @@ func ManuGenDemoWaterDataHandler(w http.ResponseWriter, r *http.Request) {
 
 // @Summary 查看采集到的电表数据时间分布
 // @Description 查看采集到的电表数据时间分布
-// @Tags Manually collect data
+// @Tags Manually
 // @Produce  json
 // @Param start query string false "Start time (2024-01-01)"
 // @Param end query string false "End time (2024-01-01)"
