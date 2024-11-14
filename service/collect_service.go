@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"eco-service/client"
+	"eco-service/entity"
 	"eco-service/model"
 	"encoding/json"
 	"fmt"
@@ -73,6 +74,10 @@ func init() {
 			time.Sleep(time.Hour)
 		}
 	}()
+}
+
+func CheckCollectPower(start, end string) ([]entity.LabelData, error) {
+
 }
 func ManuGenDemoWaterData(startDayStr ...string) {
 	startTime := time.Now()
@@ -208,20 +213,20 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) error {
 	// Group gateways by project code
 	projectGateways := make(map[string][]model.Ecgateway)
-	for _, gateway := range gateways {
-		projectCode := gateway.ProjectCode
+	for i := range gateways {
+		projectCode := gateways[i].ProjectCode
 		if len(projectCode) == 0 {
 			var err error
-			projectCode, err = client.GetBoxProjectCode(gateway.MacAddr)
+			projectCode, err = client.GetBoxProjectCode(gateways[i].MacAddr)
 			if err != nil {
-				return errors.Wrapf(err, "Failed to get project code for gateway %s", gateway.ID)
+				return errors.Wrapf(err, "Failed to get project code for gateway %s", gateways[i].ID)
 			}
-			gateway.ProjectCode = projectCode
-			if err := common.DbUpsert[model.Ecgateway](context.Background(), common.GetDaprClient(), gateway, model.EcgatewayTableInfo.Name, model.Ecgateway_FIELD_NAME_id); err != nil {
-				return errors.Wrapf(err, "Failed to update project code for gateway %s", gateway.ID)
+			gateways[i].ProjectCode = projectCode
+			if err := common.DbUpsert[model.Ecgateway](context.Background(), common.GetDaprClient(), gateways[i], model.EcgatewayTableInfo.Name, model.Ecgateway_FIELD_NAME_id); err != nil {
+				return errors.Wrapf(err, "Failed to update project code for gateway %s", gateways[i].ID)
 			}
 		}
-		projectGateways[projectCode] = append(projectGateways[projectCode], gateway)
+		projectGateways[projectCode] = append(projectGateways[projectCode], gateways[i])
 	}
 
 	common.Logger.Infof("Grouped gateways into %d projects", len(projectGateways))
