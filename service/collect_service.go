@@ -104,13 +104,14 @@ func ManuGenDemoWaterData(startDayStr ...string) {
 			return
 		}
 	}
+	common.Logger.Infof("Generating demo water data from %s", startTime.Format("2006-01-02"))
 	endTime := startTime.Add(time.Hour * 25)
 	for currentTime := startTime.Add(time.Hour); !currentTime.After(endTime); currentTime = currentTime.Add(time.Hour) {
 		demoWaterDataGenHourly(currentTime)
 	}
 }
 func demoWaterDataGenHourly(startTime time.Time) {
-
+	common.Logger.Infof("Generating demo water data for %s", startTime.Format("2006-01-02 15:04"))
 	// 生成上一个小时的时间
 	lastHour := startTime.Add(-time.Hour)
 
@@ -154,7 +155,7 @@ func demoWaterDataGenHourly(startTime time.Time) {
 	}
 
 	// 插入数据
-	err = common.DbBatchUpsert(context.Background(), common.GetDaprClient(), []model.Eco_park_water_1h{waterData}, model.Eco_park_water_1hTableInfo.Name, model.Eco_park_water_1h_FIELD_NAME_id)
+	err = common.DbUpsert(context.Background(), common.GetDaprClient(), waterData, model.Eco_park_water_1hTableInfo.Name, model.Eco_park_water_1h_FIELD_NAME_id)
 	if err != nil {
 		common.Logger.Errorf("Failed to insert water consumption data: %v", err)
 		return
