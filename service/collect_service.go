@@ -36,7 +36,6 @@ var waterNeedRefreshContinuousAggregateMap = map[string]string{
 	"f_eco_park_water_1m": "month",
 	"f_eco_park_water_1y": "year",
 }
-
 func init() {
 	// Start goroutine to collect stats every hour at 5 minutes past
 	go func() {
@@ -67,12 +66,32 @@ func init() {
 			common.Logger.Info("Scheduled data collection completed")
 		}
 	}()
+
+	// Start goroutine for demo water data generation
 	go func() {
 		for {
 			now := time.Now()
 			timeHour := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), 0, 0, 0, now.Location())
 			demoWaterDataGenHourly(timeHour)
 			time.Sleep(time.Hour)
+		}
+	}()
+
+	// Start goroutine for daily full refresh at midnight
+	go func() {
+		for {
+			now := time.Now()
+			// Calculate next run time (midnight)
+			next := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
+			time.Sleep(next.Sub(now))
+
+			common.Logger.Info("Starting daily full continuous aggregate refresh...")
+
+			if err := refreshContinuousAggregateFull(gatewayNeedRefreshContinuousAggregateMap); err != nil {
+				common.Logger.Errorf("Failed to perform full refresh of continuous aggregates: %v", err)
+			}
+
+			common.Logger.Info("Daily full continuous aggregate refresh completed")
 		}
 	}()
 }
