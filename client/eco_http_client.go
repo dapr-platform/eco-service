@@ -14,6 +14,8 @@ import (
 	"time"
 
 	"eco-service/config"
+
+	"github.com/dapr-platform/common"
 )
 
 type TokenResponse struct {
@@ -56,7 +58,7 @@ func (c *EcoClient) startRefreshTimer() {
 		// Try to get initial token
 		err := c.getInitialToken()
 		if err != nil {
-			fmt.Printf("Failed to get initial token: %v, retrying in 5 seconds...\n", err)
+			common.Logger.Errorf("Failed to get initial token: %v, retrying in 5 seconds...\n", err)
 			time.Sleep(5 * time.Second)
 			continue
 		}
@@ -68,11 +70,15 @@ func (c *EcoClient) startRefreshTimer() {
 				return
 			case <-time.After(time.Until(c.expireTime) - 5*time.Minute):
 				if err := c.refreshAccessToken(); err != nil {
-					fmt.Printf("Failed to refresh token: %v, retrying in 5 seconds...\n", err)
+					common.Logger.Errorf("Failed to refresh token: %v, retrying in 5 seconds...\n", err)
 					time.Sleep(5 * time.Second)
+					c.accessToken = ""
+					c.refreshToken = ""
+					c.expireTime = time.Time{}
+
 					// Try to get a new initial token if refresh fails
 					if err := c.getInitialToken(); err != nil {
-						fmt.Printf("Failed to get new token: %v, retrying in 5 seconds...\n", err)
+						common.Logger.Errorf("Failed to get new token: %v, retrying in 5 seconds...\n", err)
 						time.Sleep(5 * time.Second)
 					}
 				}

@@ -11,6 +11,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/dapr-platform/common"
 )
 
 type BoxResponse struct {
@@ -42,9 +44,9 @@ func generateSign(data url.Values) string {
 }
 
 func GetBoxProjectCode(mac string) (string, error) {
-	fmt.Printf("Getting project code for MAC: %s\n", mac)
+	common.Logger.Infof("Getting project code for MAC: %s\n", mac)
 	if err := defaultClient.ensureValidToken(); err != nil {
-		fmt.Printf("Failed to ensure valid token: %v\n", err)
+		common.Logger.Errorf("Failed to ensure valid token: %v\n", err)
 		return "", err
 	}
 
@@ -62,7 +64,7 @@ func GetBoxProjectCode(mac string) (string, error) {
 	// Create request
 	req, err := http.NewRequest("POST", config.ECO_INVOKE_URL, strings.NewReader(data.Encode()))
 	if err != nil {
-		fmt.Printf("Failed to create request: %v\n", err)
+		common.Logger.Errorf("Failed to create request: %v\n", err)
 		return "", err
 	}
 
@@ -70,13 +72,13 @@ func GetBoxProjectCode(mac string) (string, error) {
 
 	resp, err := defaultClient.doRequest(req)
 	if err != nil {
-		fmt.Printf("Request failed: %v\n", err)
+		common.Logger.Errorf("Request failed: %v\n", err)
 		return "", err
 	}
 
 	var boxResp BoxResponse
 	if err := json.Unmarshal(resp, &boxResp); err != nil {
-		fmt.Printf("Failed to unmarshal response: %v\n", err)
+		common.Logger.Errorf("Failed to unmarshal response: %v\n", err)
 		return "", err
 	}
 	if boxResp.Code != "0" {
@@ -87,7 +89,7 @@ func GetBoxProjectCode(mac string) (string, error) {
 
 func GetBoxesHourStats(params map[string]string) ([]byte, error) {
 	if err := defaultClient.ensureValidToken(); err != nil {
-		fmt.Printf("Failed to ensure valid token: %v\n", err)
+		common.Logger.Errorf("Failed to ensure valid token: %v\n", err)
 		return nil, err
 	}
 
@@ -109,14 +111,14 @@ func GetBoxesHourStats(params map[string]string) ([]byte, error) {
 	// Create request
 	req, err := http.NewRequest("POST", config.ECO_INVOKE_URL, strings.NewReader(data.Encode()))
 	if err != nil {
-		fmt.Printf("Failed to create request: %v\n", err)
+		common.Logger.Errorf("Failed to create request: %v\n", err)
 		return nil, err
 	}
 
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := defaultClient.doRequest(req)
 	if err != nil {
-		fmt.Printf("Request failed: %v\n", err)
+		common.Logger.Errorf("Request failed: %v\n", err)
 		return nil, err
 	}
 
