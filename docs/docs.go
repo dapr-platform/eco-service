@@ -520,6 +520,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/debug_get_box_hour_stats": {
+            "get": {
+                "description": "Manually collect data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manually collect data"
+                ],
+                "summary": "Manually collect data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mac_addr",
+                        "name": "mac_addr",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "year",
+                        "name": "year",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "month",
+                        "name": "month",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "day",
+                        "name": "day",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/ecbuilding": {
             "get": {
                 "description": "query objects",

@@ -478,6 +478,40 @@ paths:
       summary: 园区用水量范围
       tags:
       - Dashboard
+  /debug_get_box_hour_stats:
+    get:
+      description: Manually collect data
+      parameters:
+      - description: mac_addr
+        in: query
+        name: mac_addr
+        required: true
+        type: string
+      - description: year
+        in: query
+        name: year
+        required: true
+        type: string
+      - description: month
+        in: query
+        name: month
+        required: true
+        type: string
+      - description: day
+        in: query
+        name: day
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: Manually collect data
+      tags:
+      - Manually collect data
   /ecbuilding:
     get:
       description: query objects

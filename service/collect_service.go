@@ -12,6 +12,7 @@ import (
 
 	"github.com/dapr-platform/common"
 	"github.com/pkg/errors"
+	"github.com/spf13/cast"
 	"golang.org/x/exp/rand"
 )
 
@@ -82,7 +83,7 @@ func CheckCollectPower(start, end string) ([]map[string]interface{}, error) {
 		"COUNT(*) as actual_records," +
 		"24 as expected_records," +
 		"(COUNT(*) * 100.0 / 24) as completeness_percentage"
-	fromSql := " f_eco_park_water_1h " +
+	fromSql := " f_eco_gateway_1h " +
 		"GROUP BY DATE_TRUNC('day', time), park_id" +
 		"HAVING COUNT(*) < 24" +
 		"ORDER BY day, park_id;"
@@ -222,6 +223,48 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 	}
 
 	return nil
+}
+
+func DebugGetBoxHourStats(mac string, year string, month string, day string) (map[string]interface{}, error) {
+	box, err := common.DbGetOne[model.Ecgateway](context.Background(), common.GetDaprClient(), model.EcgatewayTableInfo.Name, "mac_addr="+mac)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to get gateway %s", mac)
+	}
+	reqBody := map[string]string{
+		"projectCode": box.ProjectCode,
+		"mac":         mac,
+		"year":        year,
+		"month":       month,
+		"day":         day,
+	}
+
+	common.Logger.Infof("Requesting data for batch of %d gateways, date: %s", 1,
+		time.Date(cast.ToInt(year), time.Month(cast.ToInt(month)), cast.ToInt(day), 0, 0, 0, 0, time.Local).Format("2006-01-02"))
+
+	respBytes, err := client.GetBoxesHourStats(reqBody)
+	if err != nil {
+		common.Logger.Errorf("API request failed: %v", err)
+		return nil, errors.Wrap(err, "Failed to get box hour stats")
+	}
+
+	var resp struct {
+		Code    string                 `json:"code"`
+		Message string                 `json:"message"`
+		Data    map[string]interface{} `json:"data"`
+	}
+
+	if err := json.Unmarshal(respBytes, &resp); err != nil {
+		common.Logger.Errorf("Failed to parse API response: %v", err)
+		return nil, errors.Wrap(err, "Failed to unmarshal response")
+	}
+
+	if resp.Code != "0" {
+		common.Logger.Errorf("API returned error code: %s, message: %s", resp.Code, resp.Message)
+		return nil, fmt.Errorf("API error: %s", resp.Message)
+	}
+
+	common.Logger.Infof("Received data for %d gateways", len(resp.Data))
+	return resp.Data, nil
 }
 
 func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) error {
