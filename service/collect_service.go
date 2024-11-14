@@ -36,6 +36,7 @@ var waterNeedRefreshContinuousAggregateMap = map[string]string{
 	"f_eco_park_water_1m": "month",
 	"f_eco_park_water_1y": "year",
 }
+
 func init() {
 	// Start goroutine to collect stats every hour at 5 minutes past
 	go func() {
@@ -96,14 +97,14 @@ func init() {
 	}()
 }
 
-func CheckCollectPower(start, end string) ([]map[string]interface{}, error) {
+func CheckCollectData(start, end, tablename string) ([]map[string]interface{}, error) {
 	selectSql := "SELECT " +
 		"DATE_TRUNC('day', time) as day," +
 		"park_id," +
 		"COUNT(*) as actual_records," +
 		"24 as expected_records," +
 		"(COUNT(*) * 100.0 / 24) as completeness_percentage"
-	fromSql := " f_eco_gateway_1h " +
+	fromSql := tablename +
 		"GROUP BY DATE_TRUNC('day', time), park_id" +
 		"HAVING COUNT(*) < 24" +
 		"ORDER BY day, park_id;"

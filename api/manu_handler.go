@@ -97,12 +97,14 @@ func ManuGenDemoWaterDataHandler(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Param start query string false "Start time (2024-01-01)"
 // @Param end query string false "End time (2024-01-01)"
+// @Param tablename query string false "tablename"
 // @Success 200 {object} common.Response "success"
 // @Router /check_collect_date [get]
 func CheckCollectPowerHandler(w http.ResponseWriter, r *http.Request) {
 	start := r.URL.Query().Get("start")
 	end := r.URL.Query().Get("end")
-	data, err := service.CheckCollectPower(start, end)
+	tablename := r.URL.Query().Get("tablename")
+	data, err := service.CheckCollectData(start, end, tablename)
 	if err != nil {
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
 		return
