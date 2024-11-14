@@ -408,7 +408,11 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 			gatewayBatch := projectGateways[i:end]
 			macAddrs := make([]string, len(gatewayBatch))
 			for j, gateway := range gatewayBatch {
-				macAddrs[j] = gateway.MacAddr
+				if strings.HasSuffix(gateway.MacAddr, "_1") {
+					macAddrs[j] = strings.TrimSuffix(gateway.MacAddr, "_1")
+				} else {
+					macAddrs[j] = gateway.MacAddr
+				}
 			}
 
 			reqBody := map[string]string{
@@ -449,8 +453,15 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 			// Process response for each gateway and hour
 			for _, gateway := range gatewayBatch {
 				var hourlyStats []model.Eco_gateway_1h
-
-				if gatewayData, ok := resp.Data[gateway.MacAddr].(map[string]interface{}); ok {
+				var macAddr string
+				addr := 0
+				if strings.HasSuffix(gateway.MacAddr, "_1") {
+					macAddr = strings.TrimSuffix(gateway.MacAddr, "_1")
+					addr = 1
+				} else {
+					macAddr = gateway.MacAddr
+				}
+				if gatewayData, ok := resp.Data[macAddr].(map[string]interface{}); ok {
 					for hour := 0; hour < 24; hour++ {
 						hourStr := fmt.Sprintf("%02d", hour)
 						if hourData, ok := gatewayData[hourStr].([]interface{}); ok {
@@ -465,7 +476,7 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 								BuildingID:       gateway.BuildingID,
 								Type:             gateway.Type,
 								ParkID:           gateway.ParkID,
-								PowerConsumption: getTotalElectricity(stats),
+								PowerConsumption: getTotalElectricity(stats, addr),
 							}
 							hourlyStats = append(hourlyStats, stat)
 						}
@@ -574,7 +585,15 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 
 				// Process response for each gateway
 				for _, gateway := range gatewayBatch {
-					if statsArr, ok := resp.Data[gateway.MacAddr].([]interface{}); ok {
+					var macAddr string
+					addr := 0
+					if strings.HasSuffix(gateway.MacAddr, "_1") {
+						macAddr = strings.TrimSuffix(gateway.MacAddr, "_1")
+						addr = 1
+					} else {
+						macAddr = gateway.MacAddr
+					}
+					if statsArr, ok := resp.Data[macAddr].([]interface{}); ok {
 						stats := processHourStats(statsArr)
 						hourlyStats := []model.Eco_gateway_1h{{
 							ID:               gateway.ID + "_" + hourTime.Format("2006010215"),
@@ -584,7 +603,7 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 							BuildingID:       gateway.BuildingID,
 							ParkID:           gateway.ParkID,
 							Type:             gateway.Type,
-							PowerConsumption: getTotalElectricity(stats),
+							PowerConsumption: getTotalElectricity(stats, addr),
 						}}
 
 						common.Logger.Infof("Saving hourly stats for gateway %s, hour: %s",
@@ -637,9 +656,9 @@ func processHourStats(data []interface{}) []struct {
 func getTotalElectricity(stats []struct {
 	Addr        int     `json:"addr"`
 	Electricity float64 `json:"electricity"`
-}) float64 {
+}, addr int) float64 {
 	for _, stat := range stats {
-		if stat.Addr == 0 {
+		if stat.Addr == addr {
 			return stat.Electricity
 		}
 	}
