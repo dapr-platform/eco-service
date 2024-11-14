@@ -224,6 +224,111 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 
 	return nil
 }
+func ManuFillGatewayHourStats(month, value string) error {
+	// Parse month string to time
+	startTime, err := time.Parse("2006-01", month)
+	if err != nil {
+		return errors.Wrap(err, "Failed to parse month")
+	}
+
+	// Parse value to float64
+	totalValue, err := cast.ToFloat64E(value)
+	if err != nil {
+		return errors.Wrap(err, "Failed to parse value")
+	}
+
+	// Get all gateways
+	gateways, err := GetAllEcgateways()
+	if err != nil {
+		return errors.Wrap(err, "Failed to get gateways")
+	}
+
+	if len(gateways) == 0 {
+		return errors.New("No gateways found")
+	}
+
+	// Calculate days in month
+	endTime := startTime.AddDate(0, 1, 0)
+	totalDays := int(endTime.Sub(startTime).Hours()) / 24
+
+	// Calculate base value per day
+	baseValuePerDay := totalValue / float64(totalDays)
+
+	// Generate and save hourly stats for each day
+	for currentDay := startTime; currentDay.Before(endTime); currentDay = currentDay.AddDate(0, 0, 1) {
+		// Calculate daily value with random variation (-10% to +10%)
+		randomFactor := 0.9 + (rand.Float64() * 0.2) // 0.9 to 1.1
+		dailyValue := baseValuePerDay * randomFactor
+
+		// Distribute daily value across hours with different patterns based on day type
+		isWeekend := currentDay.Weekday() == time.Saturday || currentDay.Weekday() == time.Sunday
+		hourlyDistribution := make([]float64, 24)
+
+		for hour := 0; hour < 24; hour++ {
+			if isWeekend {
+				// Weekend pattern: more even distribution
+				hourlyDistribution[hour] = 1.0
+			} else {
+				// Weekday pattern: peak during working hours
+				switch {
+				case hour < 6: // Night (0-5)
+					hourlyDistribution[hour] = 0.3
+				case hour < 9: // Morning ramp-up (6-8)
+					hourlyDistribution[hour] = 0.8
+				case hour < 18: // Working hours (9-17)
+					hourlyDistribution[hour] = 1.5
+				case hour < 22: // Evening (18-21)
+					hourlyDistribution[hour] = 1.0
+				default: // Late night (22-23)
+					hourlyDistribution[hour] = 0.5
+				}
+			}
+		}
+
+		// Normalize distribution
+		var sum float64
+		for _, v := range hourlyDistribution {
+			sum += v
+		}
+		for i := range hourlyDistribution {
+			hourlyDistribution[i] = hourlyDistribution[i] / sum * dailyValue
+		}
+
+		// Save hourly stats
+		for hour := 0; hour < 24; hour++ {
+			currentTime := currentDay.Add(time.Duration(hour) * time.Hour)
+			var hourlyStats []model.Eco_gateway_1h
+
+			hourValue := hourlyDistribution[hour] / float64(len(gateways))
+			for _, gateway := range gateways {
+				// Add small random variation per gateway (-5% to +5%)
+				gatewayFactor := 0.95 + (rand.Float64() * 0.1)
+				stat := model.Eco_gateway_1h{
+					ID:               gateway.ID + "_" + currentTime.Format("2006010215"),
+					Time:             common.LocalTime(currentTime),
+					GatewayID:        gateway.ID,
+					FloorID:          gateway.FloorID,
+					BuildingID:       gateway.BuildingID,
+					Type:             gateway.Type,
+					ParkID:           gateway.ParkID,
+					PowerConsumption: hourValue * gatewayFactor,
+				}
+				hourlyStats = append(hourlyStats, stat)
+			}
+
+			if err := saveGatewayHourlyStats(hourlyStats); err != nil {
+				return errors.Wrapf(err, "Failed to save hourly stats for time %s", currentTime.Format("2006-01-02 15:04"))
+			}
+		}
+	}
+
+	// Refresh continuous aggregates
+	if err := refreshContinuousAggregate(startTime, gatewayNeedRefreshContinuousAggregateMap); err != nil {
+		return errors.Wrap(err, "Failed to refresh continuous aggregates")
+	}
+
+	return nil
+}
 
 func DebugGetBoxHourStats(mac string, year string, month string, day string) (map[string]interface{}, error) {
 	box, err := common.DbGetOne[model.Ecgateway](context.Background(), common.GetDaprClient(), model.EcgatewayTableInfo.Name, "mac_addr="+mac)
