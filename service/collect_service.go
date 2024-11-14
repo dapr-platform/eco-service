@@ -94,18 +94,17 @@ func CheckCollectPower(start, end string) ([]map[string]interface{}, error) {
 	}
 	return data, nil
 }
-func ManuGenDemoWaterData(startDayStr ...string) {
-	startTime := time.Now()
-	if len(startDayStr) > 0 {
-		var err error
-		startTime, err = time.Parse("2006-01-02", startDayStr[0])
-		if err != nil {
-			common.Logger.Errorf("Failed to parse start day: %v", err)
-			return
-		}
+func ManuGenDemoWaterData(startDayStr,endTimeStr string) {
+	startTime, err := time.Parse("2006-01-01", startDayStr)
+	if err != nil {
+		common.Logger.Errorf("Failed to parse start date: %v", err)
+		return
 	}
-	common.Logger.Infof("Generating demo water data from %s", startTime.Format("2006-01-02"))
-	endTime := startTime.Add(time.Hour * 25)
+	endTime, err := time.Parse("2006-01-01", endTimeStr)
+	if err != nil {
+		common.Logger.Errorf("Failed to parse end date: %v", err)
+		return
+	}
 	for currentTime := startTime.Add(time.Hour); !currentTime.After(endTime); currentTime = currentTime.Add(time.Hour) {
 		demoWaterDataGenHourly(currentTime)
 	}
