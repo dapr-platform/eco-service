@@ -81,11 +81,12 @@ func ManuCollectHandler(w http.ResponseWriter, r *http.Request) {
 // @Tags Manually
 // @Produce  json
 // @Param start query string false "Start time (2024-01-01)"
+// @Param end query string false "End time (2024-01-01)"
 // @Success 200 {object} common.Response "success"
 // @Router /manu_gen_demo_water_data [get]
 func ManuGenDemoWaterDataHandler(w http.ResponseWriter, r *http.Request) {
 	go func() {
-		service.ManuGenDemoWaterData(r.URL.Query().Get("start"))
+		service.ManuGenDemoWaterData(r.URL.Query().Get("start"), r.URL.Query().Get("end"))
 	}()
 	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }

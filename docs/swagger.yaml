@@ -1786,6 +1786,10 @@ paths:
         in: query
         name: start
         type: string
+      - description: End time (2024-01-01)
+        in: query
+        name: end
+        type: string
       produces:
       - application/json
       responses:

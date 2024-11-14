@@ -2596,6 +2596,12 @@ const docTemplate = `{
                         "description": "Start time (2024-01-01)",
                         "name": "start",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End time (2024-01-01)",
+                        "name": "end",
+                        "in": "query"
                     }
                 ],
                 "responses": {
