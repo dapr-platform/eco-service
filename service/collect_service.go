@@ -113,9 +113,9 @@ func CheckCollectData(start, end, tablename string) ([]map[string]interface{}, e
 		"park_id," +
 		"COUNT(*) as actual_records," +
 		"24 as expected_records," +
-		"(COUNT(*) * 100.0 / 24) as completeness_percentage"
+		"(COUNT(*) * 100.0 / 24) as completeness_percentage "
 	fromSql := tablename +
-		"GROUP BY DATE_TRUNC('day', time), park_id" +
+		" GROUP BY DATE_TRUNC('day', time), park_id" +
 		"HAVING COUNT(*) < 24" +
 		"ORDER BY day, park_id"
 	whereSql := "1=1"
