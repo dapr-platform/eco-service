@@ -245,32 +245,34 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 
 	return nil
 }
-func ManuFillGatewayHourStats(month, value string) error {
+func ManuFillParkWaterHourStats(month, value string) error {
+	common.Logger.Infof("Starting ManuFillParkWaterHourStats for month: %s, value: %s", month, value)
+
 	// Parse month string to time
 	startTime, err := time.Parse("2006-01", month)
 	if err != nil {
 		return errors.Wrap(err, "Failed to parse month")
 	}
 
-	// Parse value to float64 
+	// Parse value to float64
 	totalValue, err := cast.ToFloat64E(value)
 	if err != nil {
 		return errors.Wrap(err, "Failed to parse value")
 	}
 
-	// Get all gateways
-	gateways, err := GetAllEcgateways()
-	if err != nil {
-		return errors.Wrap(err, "Failed to get gateways")
-	}
+	common.Logger.Infof("Parsed inputs - Start time: %s, Total value: %.2f", startTime.Format("2006-01"), totalValue)
 
-	if len(gateways) == 0 {
-		return errors.New("No gateways found")
+	// Get park info
+	park, err := common.DbGetOne[model.Ecpark](context.Background(), common.GetDaprClient(), model.EcparkTableInfo.Name, "")
+	if err != nil {
+		return errors.Wrap(err, "Failed to get park")
 	}
 
 	// Calculate days in month
 	endTime := startTime.AddDate(0, 1, 0)
 	totalDays := int(endTime.Sub(startTime).Hours()) / 24
+
+	common.Logger.Infof("Generating daily values for %d days", totalDays)
 
 	// First generate daily values that sum to total
 	dailyValues := make([]float64, totalDays)
@@ -289,9 +291,129 @@ func ManuFillGatewayHourStats(month, value string) error {
 		dailyValues[i] = (dailyValues[i] / dailyTotal) * totalValue
 	}
 
+	// For each day in the month
+	for day := 0; day < totalDays; day++ {
+		currentDate := startTime.AddDate(0, 0, day)
+		dailyValue := dailyValues[day]
+
+		// Generate hourly values for this day
+		hourlyValues := make([]float64, 24)
+		var hourlyTotal float64
+
+		// Generate random hourly values with peak/off-peak patterns
+		isWeekend := currentDate.Weekday() == time.Saturday || currentDate.Weekday() == time.Sunday
+		for hour := 0; hour < 24; hour++ {
+			var baseFactor float64
+			if isWeekend {
+				baseFactor = 0.8 + (rand.Float64() * 0.4) // 0.8-1.2 for weekends
+			} else {
+				switch {
+				case hour < 6: // Night (0-5)
+					baseFactor = 0.2 + (rand.Float64() * 0.2) // 0.2-0.4
+				case hour < 9: // Morning ramp-up (6-8)
+					baseFactor = 0.6 + (rand.Float64() * 0.4) // 0.6-1.0
+				case hour < 18: // Working hours (9-17)
+					baseFactor = 1.3 + (rand.Float64() * 0.4) // 1.3-1.7
+				case hour < 22: // Evening (18-21)
+					baseFactor = 0.8 + (rand.Float64() * 0.4) // 0.8-1.2
+				default: // Late night (22-23)
+					baseFactor = 0.3 + (rand.Float64() * 0.4) // 0.3-0.7
+				}
+			}
+			hourlyValues[hour] = baseFactor
+			hourlyTotal += baseFactor
+		}
+
+		// Normalize hourly values to sum to daily value
+		for hour := range hourlyValues {
+			hourlyValues[hour] = (hourlyValues[hour] / hourlyTotal) * dailyValue
+		}
+
+		// Insert hourly values into database
+		for hour := 0; hour < 24; hour++ {
+			timestamp := time.Date(currentDate.Year(), currentDate.Month(), currentDate.Day(), hour, 0, 0, 0, time.Local)
+			waterData := model.Eco_park_water_1h{
+				ID:               fmt.Sprintf("%x", md5.Sum([]byte(park.ID+"_"+timestamp.Format("2006010215")))),
+				Time:             common.LocalTime(timestamp),
+				ParkID:           park.ID,
+				WaterConsumption: hourlyValues[hour],
+			}
+
+			err := common.DbUpsert(context.Background(), common.GetDaprClient(), waterData, model.Eco_park_water_1hTableInfo.Name, model.Eco_park_water_1h_FIELD_NAME_id)
+			if err != nil {
+				return errors.Wrapf(err, "Failed to insert hour stats for %s", timestamp.Format("2006-01-02 15:04:05"))
+			}
+		}
+
+		common.Logger.Infof("Successfully inserted hourly values for %s", currentDate.Format("2006-01-02"))
+	}
+
+	// Refresh continuous aggregates
+	if err := refreshContinuousAggregate(startTime, waterNeedRefreshContinuousAggregateMap); err != nil {
+		return errors.Wrap(err, "Failed to refresh continuous aggregates")
+	}
+
+	common.Logger.Info("Successfully completed ManuFillParkWaterHourStats")
+	return nil
+}
+func ManuFillGatewayHourStats(month, value string) error {
+	common.Logger.Infof("Starting ManuFillGatewayHourStats for month: %s, value: %s", month, value)
+
+	// Parse month string to time
+	startTime, err := time.Parse("2006-01", month)
+	if err != nil {
+		return errors.Wrap(err, "Failed to parse month")
+	}
+
+	// Parse value to float64 
+	totalValue, err := cast.ToFloat64E(value)
+	if err != nil {
+		return errors.Wrap(err, "Failed to parse value")
+	}
+
+	common.Logger.Infof("Parsed inputs - Start time: %s, Total value: %.2f", startTime.Format("2006-01"), totalValue)
+
+	// Get all gateways
+	gateways, err := GetAllEcgateways()
+	if err != nil {
+		return errors.Wrap(err, "Failed to get gateways")
+	}
+
+	if len(gateways) == 0 {
+		return errors.New("No gateways found")
+	}
+
+	common.Logger.Infof("Found %d gateways to distribute data to", len(gateways))
+
+	// Calculate days in month
+	endTime := startTime.AddDate(0, 1, 0)
+	totalDays := int(endTime.Sub(startTime).Hours()) / 24
+
+	common.Logger.Infof("Generating daily values for %d days", totalDays)
+
+	// First generate daily values that sum to total
+	dailyValues := make([]float64, totalDays)
+	var dailyTotal float64
+
+	// Generate random daily values
+	for i := 0; i < totalDays; i++ {
+		// Random factor between 0.8 and 1.2
+		factor := 0.8 + (rand.Float64() * 0.4)
+		dailyValues[i] = factor
+		dailyTotal += factor
+	}
+
+	// Normalize daily values to sum to total
+	for i := range dailyValues {
+		dailyValues[i] = (dailyValues[i] / dailyTotal) * totalValue
+	}
+
+	common.Logger.Infof("Generated daily values - First day: %.2f, Last day: %.2f", dailyValues[0], dailyValues[len(dailyValues)-1])
+
 	dayIndex := 0
 	for currentDay := startTime; currentDay.Before(endTime); currentDay = currentDay.AddDate(0, 0, 1) {
 		dailyValue := dailyValues[dayIndex]
+		common.Logger.Debugf("Processing day %s with value %.2f", currentDay.Format("2006-01-02"), dailyValue)
 		
 		// Generate hourly distribution for this day
 		isWeekend := currentDay.Weekday() == time.Saturday || currentDay.Weekday() == time.Sunday
@@ -332,6 +454,8 @@ func ManuFillGatewayHourStats(month, value string) error {
 			// Divide hourly value among gateways
 			hourValue := hourlyValues[hour] / float64(len(gateways))
 
+			common.Logger.Debugf("Hour %02d:00 - Value per gateway: %.4f", hour, hourValue)
+
 			for _, gateway := range gateways {
 				stat := model.Eco_gateway_1h{
 					ID:               gateway.ID + "_" + currentTime.Format("2006010215"),
@@ -354,11 +478,14 @@ func ManuFillGatewayHourStats(month, value string) error {
 		dayIndex++
 	}
 
+	common.Logger.Infof("Successfully generated and saved hourly stats for %d days", dayIndex)
+
 	// Refresh continuous aggregates
 	if err := refreshContinuousAggregate(startTime, gatewayNeedRefreshContinuousAggregateMap); err != nil {
 		return errors.Wrap(err, "Failed to refresh continuous aggregates")
 	}
 
+	common.Logger.Info("Completed ManuFillGatewayHourStats successfully")
 	return nil
 }
 
@@ -458,8 +585,8 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 				"day":         collectTime.Format("02"),
 			}
 
-			common.Logger.Infof("Requesting data for batch of %d gateways, date: %s", len(gatewayBatch),
-				collectTime.Format("2006-01-02"))
+			common.Logger.Infof("Requesting data for batch of %d gateways, date: %s",
+				len(gatewayBatch), collectTime.Format("2006-01-02"))
 
 			respBytes, err := client.GetBoxesHourStats(reqBody)
 			if err != nil {

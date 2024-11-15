@@ -179,6 +179,10 @@ paths:
         in: query
         name: end
         type: string
+      - description: tablename
+        in: query
+        name: tablename
+        type: string
       produces:
       - application/json
       responses:
@@ -1776,6 +1780,30 @@ paths:
           schema:
             $ref: '#/definitions/common.Response'
       summary: Manually fill gateway hour stats
+      tags:
+      - Manually
+  /manu_fill_park_water_hour_stats:
+    get:
+      description: Manually fill park water hour stats
+      parameters:
+      - description: month
+        in: query
+        name: month
+        required: true
+        type: string
+      - description: value
+        in: query
+        name: value
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: Manually fill park water hour stats
       tags:
       - Manually
   /manu_gen_demo_water_data:

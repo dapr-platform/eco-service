@@ -37,6 +37,12 @@ const docTemplate = `{
                         "description": "End time (2024-01-01)",
                         "name": "end",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "tablename",
+                        "name": "tablename",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2554,6 +2560,42 @@ const docTemplate = `{
                     "Manually"
                 ],
                 "summary": "Manually fill gateway hour stats",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "month",
+                        "name": "month",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "value",
+                        "name": "value",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/manu_fill_park_water_hour_stats": {
+            "get": {
+                "description": "Manually fill park water hour stats",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manually"
+                ],
+                "summary": "Manually fill park water hour stats",
                 "parameters": [
                     {
                         "type": "string",
