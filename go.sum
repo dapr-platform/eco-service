@@ -7,6 +7,8 @@ github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/dapr-platform/common v0.0.0-20241114070226-7e9fb4fbec68 h1:26hocUmI4142hEJ7JJHEw5IIo+/ibqWm92r2Ej/6GB4=
 github.com/dapr-platform/common v0.0.0-20241114070226-7e9fb4fbec68/go.mod h1:bvLwDx2IWA2rv9gngEm5I1C5iSkVzPA2t/ozjN/5s34=
+github.com/dapr-platform/common v0.0.0-20241115052626-caeef7d7942b h1:jzVrDvIiSIKbL3xo5Rez5DuKm3l2IFMHRiqXaK1wyUY=
+github.com/dapr-platform/common v0.0.0-20241115052626-caeef7d7942b/go.mod h1:bvLwDx2IWA2rv9gngEm5I1C5iSkVzPA2t/ozjN/5s34=
 github.com/dapr/dapr v1.14.4 h1:OEyAFvpW4AK+MWyX5xp9zVLiC+oY/5ziDzh16F+aoWU=
 github.com/dapr/dapr v1.14.4/go.mod h1:pZGJvUGT4IDhEuWVXBvJ73TkPnLAW34SDagth7G3f8w=
 github.com/dapr/go-sdk v1.11.0 h1:clANpOQd6MsfvSa6snaX8MVk6eRx26Vsj5GxGdQ6mpE=
@@ -127,6 +129,8 @@ google.golang.org/grpc v1.68.0 h1:aHQeeJbo8zAkAa3pRzrVjZlbz6uSfeOXlJNQM0RAbz0=
 google.golang.org/grpc v1.68.0/go.mod h1:fmSPC5AsjSBCK54MyHRx48kpOti1/jRfOlwEWywNjWA=
 google.golang.org/protobuf v1.35.1 h1:m3LfL6/Ca+fqnjnlqQXNpFPABW1UD7mjh8KO2mKFytA=
 google.golang.org/protobuf v1.35.1/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
+google.golang.org/protobuf v1.35.2 h1:8Ar7bF+apOIoThw1EdZl0p1oWvMqTHmpA2fRTyZO8io=
+google.golang.org/protobuf v1.35.2/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=

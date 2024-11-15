@@ -109,7 +109,7 @@ func ForceRefreshContinuousAggregate() error {
 	return nil
 }
 
-func CheckCollectData(start, end string, collectType int ) ([]map[string]interface{}, error) {
+func CheckCollectData(start, end string, collectType int) ([]map[string]interface{}, error) {
 	tablename := ""
 	totalCount := 0
 	if collectType == 0 {
@@ -117,18 +117,18 @@ func CheckCollectData(start, end string, collectType int ) ([]map[string]interfa
 		gateways, err := GetAllEcgateways()
 		if err != nil {
 			return nil, err
-		}	
+		}
 		totalCount = len(gateways) * 24
 	} else {
 		tablename = "f_eco_park_water_1h"
 		totalCount = 24
-	} 
+	}
 	selectSql := `DATE_TRUNC('day', time) as day,
 		park_id,
 		COUNT(*) as actual_records,
 		` + strconv.Itoa(totalCount) + ` as expected_records,
 		(COUNT(*) * 100.0 / ` + strconv.Itoa(totalCount) + `) as completeness_percentage `
-	fromSql := tablename 
+	fromSql := tablename
 	whereSql := "time<'" + end + "' and time>='" + start + "' "
 	whereSql += `GROUP BY DATE_TRUNC('day', time), park_id
 		HAVING COUNT(*) < ` + strconv.Itoa(totalCount) + `
@@ -877,6 +877,7 @@ func refreshContinuousAggregateFull(refreshDefineMap map[string]string) error {
 		if err := common.DbRefreshContinuousAggregateFull(context.Background(), common.GetDaprClient(), tableName); err != nil {
 			return errors.Wrapf(err, "Failed to refresh continuous aggregate for table %s", tableName)
 		}
+		common.Logger.Infof("Refreshed continuous aggregate for table %s", tableName)
 	}
 	return nil
 }

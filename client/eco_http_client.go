@@ -70,8 +70,7 @@ func (c *EcoClient) startRefreshTimer() {
 				return
 			case <-time.After(time.Until(c.expireTime) - 5*time.Minute):
 				if err := c.refreshAccessToken(); err != nil {
-					common.Logger.Errorf("Failed to refresh token: %v, retrying in 5 seconds...\n", err)
-					time.Sleep(5 * time.Second)
+					common.Logger.Errorf("Failed to refresh token: %v\n", err)
 					c.accessToken = ""
 					c.refreshToken = ""
 					c.expireTime = time.Time{}
