@@ -2509,6 +2509,26 @@
                 }
             }
         },
+        "/force_refresh_continuous_aggregate": {
+            "get": {
+                "description": "Manually refresh continuous aggregate",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manually"
+                ],
+                "summary": "Manually refresh continuous aggregate",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/manu_collect": {
             "get": {
                 "description": "Manually collect data",

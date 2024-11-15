@@ -96,6 +96,17 @@ func init() {
 		}
 	}()
 }
+func ForceRefreshContinuousAggregate() error {
+	err := refreshContinuousAggregateFull(gatewayNeedRefreshContinuousAggregateMap)
+	if err != nil {
+		return err
+	}
+	err = refreshContinuousAggregateFull(waterNeedRefreshContinuousAggregateMap)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func CheckCollectData(start, end, tablename string) ([]map[string]interface{}, error) {
 	selectSql := "SELECT " +

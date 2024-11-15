@@ -15,6 +15,23 @@ func InitManuCollectRoute(r chi.Router) {
 	r.Get(common.BASE_CONTEXT+"/debug_get_box_hour_stats", DebugGetBoxHourStatsHandler)
 	r.Get(common.BASE_CONTEXT+"/manu_fill_gateway_hour_stats", ManuFillGatewayHourStatsHandler)
 	r.Get(common.BASE_CONTEXT+"/manu_fill_park_water_hour_stats", ManuFillParkWaterHourStatsHandler)
+	r.Get(common.BASE_CONTEXT+"/force_refresh_continuous_aggregate", ForceRefreshContinuousAggregateHandler)
+}
+
+// @Summary Manually refresh continuous aggregate
+// @Description Manually refresh continuous aggregate
+// @Tags Manually
+// @Produce  json
+// @Success 200 {object} common.Response "success"
+// @Router /force_refresh_continuous_aggregate [get]
+func ForceRefreshContinuousAggregateHandler(w http.ResponseWriter, r *http.Request) {
+	go func() {
+		err := service.ForceRefreshContinuousAggregate()
+		if err != nil {
+			common.Logger.Error("手动刷新连续聚合失败," + err.Error())
+		}
+	}()
+	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }
 
 // @Summary Manually fill park water hour stats
@@ -36,6 +53,7 @@ func ManuFillParkWaterHourStatsHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }
+
 // @Summary Manually fill gateway hour stats
 // @Description Manually fill gateway hour stats
 // @Tags Manually

@@ -1736,6 +1736,19 @@ paths:
       summary: page query
       tags:
       - Ecpark
+  /force_refresh_continuous_aggregate:
+    get:
+      description: Manually refresh continuous aggregate
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: Manually refresh continuous aggregate
+      tags:
+      - Manually
   /manu_collect:
     get:
       description: Manually collect data
