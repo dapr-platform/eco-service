@@ -6,6 +6,7 @@ import (
 
 	"github.com/dapr-platform/common"
 	"github.com/go-chi/chi/v5"
+	"github.com/spf13/cast"
 )
 
 func InitManuCollectRoute(r chi.Router) {
@@ -135,14 +136,14 @@ func ManuGenDemoWaterDataHandler(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Param start query string true "Start time (2024-01-01)"
 // @Param end query string true "End time (2024-01-01)"
-// @Param tablename query string true "tablename"
+// @Param collect_type query string true "collect_type,0:gateway,1:park_water"
 // @Success 200 {object} common.Response "success"
 // @Router /check_collect_date [get]
 func CheckCollectPowerHandler(w http.ResponseWriter, r *http.Request) {
 	start := r.URL.Query().Get("start")
 	end := r.URL.Query().Get("end")
-	tablename := r.URL.Query().Get("tablename")
-	data, err := service.CheckCollectData(start, end, tablename)
+	collectType := r.URL.Query().Get("collect_type")
+	data, err := service.CheckCollectData(start, end, cast.ToInt(collectType))
 	if err != nil {
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
 		return

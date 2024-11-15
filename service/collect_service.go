@@ -7,6 +7,7 @@ import (
 	"eco-service/model"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -108,17 +109,30 @@ func ForceRefreshContinuousAggregate() error {
 	return nil
 }
 
-func CheckCollectData(start, end, tablename string) ([]map[string]interface{}, error) {
-	selectSql := "DATE_TRUNC('day', time) as day," +
-		"park_id," +
-		"COUNT(*) as actual_records," +
-		"24 as expected_records," +
-		"(COUNT(*) * 100.0 / 24) as completeness_percentage "
-	fromSql := tablename +
-		" GROUP BY DATE_TRUNC('day', time), park_id" +
-		"HAVING COUNT(*) < 24" +
-		"ORDER BY day, park_id"
-	whereSql := "1=1"
+func CheckCollectData(start, end string, collectType int ) ([]map[string]interface{}, error) {
+	tablename := ""
+	totalCount := 0
+	if collectType == 0 {
+		tablename = "f_eco_gateway_1h"
+		gateways, err := GetAllEcgateways()
+		if err != nil {
+			return nil, err
+		}	
+		totalCount = len(gateways) * 24
+	} else {
+		tablename = "f_eco_park_water_1h"
+		totalCount = 24
+	} 
+	selectSql := `DATE_TRUNC('day', time) as day,
+		park_id,
+		COUNT(*) as actual_records,
+		` + strconv.Itoa(totalCount) + ` as expected_records,
+		(COUNT(*) * 100.0 / ` + strconv.Itoa(totalCount) + `) as completeness_percentage `
+	fromSql := tablename 
+	whereSql := "time<'" + end + "' and time>='" + start + "' "
+	whereSql += `GROUP BY DATE_TRUNC('day', time), park_id
+		HAVING COUNT(*) < ` + strconv.Itoa(totalCount) + `
+		ORDER BY day, park_id`
 	data, err := common.CustomSql[map[string]interface{}](context.Background(), common.GetDaprClient(), selectSql, fromSql, whereSql)
 	if err != nil {
 		return nil, err

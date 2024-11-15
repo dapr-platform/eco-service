@@ -42,8 +42,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "tablename",
-                        "name": "tablename",
+                        "description": "collect_type,0:gateway,1:park_water",
+                        "name": "collect_type",
                         "in": "query",
                         "required": true
                     }

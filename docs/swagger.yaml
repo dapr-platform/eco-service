@@ -181,9 +181,9 @@ paths:
         name: end
         required: true
         type: string
-      - description: tablename
+      - description: collect_type,0:gateway,1:park_water
         in: query
-        name: tablename
+        name: collect_type
         required: true
         type: string
       produces:
