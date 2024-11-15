@@ -109,8 +109,7 @@ func ForceRefreshContinuousAggregate() error {
 }
 
 func CheckCollectData(start, end, tablename string) ([]map[string]interface{}, error) {
-	selectSql := "SELECT " +
-		"DATE_TRUNC('day', time) as day," +
+	selectSql := "DATE_TRUNC('day', time) as day," +
 		"park_id," +
 		"COUNT(*) as actual_records," +
 		"24 as expected_records," +
@@ -118,7 +117,7 @@ func CheckCollectData(start, end, tablename string) ([]map[string]interface{}, e
 	fromSql := tablename +
 		"GROUP BY DATE_TRUNC('day', time), park_id" +
 		"HAVING COUNT(*) < 24" +
-		"ORDER BY day, park_id;"
+		"ORDER BY day, park_id"
 	whereSql := "1=1"
 	data, err := common.CustomSql[map[string]interface{}](context.Background(), common.GetDaprClient(), selectSql, fromSql, whereSql)
 	if err != nil {
@@ -376,7 +375,7 @@ func ManuFillGatewayHourStats(month, value string) error {
 		return errors.Wrap(err, "Failed to parse month")
 	}
 
-	// Parse value to float64 
+	// Parse value to float64
 	totalValue, err := cast.ToFloat64E(value)
 	if err != nil {
 		return errors.Wrap(err, "Failed to parse value")
@@ -425,7 +424,7 @@ func ManuFillGatewayHourStats(month, value string) error {
 	for currentDay := startTime; currentDay.Before(endTime); currentDay = currentDay.AddDate(0, 0, 1) {
 		dailyValue := dailyValues[dayIndex]
 		common.Logger.Debugf("Processing day %s with value %.2f", currentDay.Format("2006-01-02"), dailyValue)
-		
+
 		// Generate hourly distribution for this day
 		isWeekend := currentDay.Weekday() == time.Saturday || currentDay.Weekday() == time.Sunday
 		hourlyValues := make([]float64, 24)
@@ -457,11 +456,11 @@ func ManuFillGatewayHourStats(month, value string) error {
 		// Normalize hourly values to sum to daily value
 		for hour := 0; hour < 24; hour++ {
 			hourlyValues[hour] = (hourlyValues[hour] / hourlyTotal) * dailyValue
-			
+
 			// Save stats for this hour
 			var hourlyStats []model.Eco_gateway_1h
 			currentTime := time.Date(currentDay.Year(), currentDay.Month(), currentDay.Day(), hour, 0, 0, 0, currentDay.Location())
-			
+
 			// Divide hourly value among gateways
 			hourValue := hourlyValues[hour] / float64(len(gateways))
 
@@ -485,7 +484,7 @@ func ManuFillGatewayHourStats(month, value string) error {
 				return errors.Wrapf(err, "Failed to save hourly stats for time %s", currentTime.Format("2006-01-02 15:04"))
 			}
 		}
-		
+
 		dayIndex++
 	}
 

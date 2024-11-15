@@ -10,32 +10,35 @@
     "paths": {
         "/check_collect_date": {
             "get": {
-                "description": "查看采集到的电表数据时间分布",
+                "description": "查看采集到的数据时间分布",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Manually"
                 ],
-                "summary": "查看采集到的电表数据时间分布",
+                "summary": "查看采集到的数据时间分布",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Start time (2024-01-01)",
                         "name": "start",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "string",
                         "description": "End time (2024-01-01)",
                         "name": "end",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "string",
                         "description": "tablename",
                         "name": "tablename",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {

@@ -129,13 +129,13 @@ func ManuGenDemoWaterDataHandler(w http.ResponseWriter, r *http.Request) {
 	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }
 
-// @Summary 查看采集到的电表数据时间分布
-// @Description 查看采集到的电表数据时间分布
+// @Summary 查看采集到的数据时间分布
+// @Description 查看采集到的数据时间分布
 // @Tags Manually
 // @Produce  json
-// @Param start query string false "Start time (2024-01-01)"
-// @Param end query string false "End time (2024-01-01)"
-// @Param tablename query string false "tablename"
+// @Param start query string true "Start time (2024-01-01)"
+// @Param end query string true "End time (2024-01-01)"
+// @Param tablename query string true "tablename"
 // @Success 200 {object} common.Response "success"
 // @Router /check_collect_date [get]
 func CheckCollectPowerHandler(w http.ResponseWriter, r *http.Request) {

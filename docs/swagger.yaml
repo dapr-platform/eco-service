@@ -169,19 +169,22 @@ info:
 paths:
   /check_collect_date:
     get:
-      description: 查看采集到的电表数据时间分布
+      description: 查看采集到的数据时间分布
       parameters:
       - description: Start time (2024-01-01)
         in: query
         name: start
+        required: true
         type: string
       - description: End time (2024-01-01)
         in: query
         name: end
+        required: true
         type: string
       - description: tablename
         in: query
         name: tablename
+        required: true
         type: string
       produces:
       - application/json
@@ -190,7 +193,7 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/common.Response'
-      summary: 查看采集到的电表数据时间分布
+      summary: 查看采集到的数据时间分布
       tags:
       - Manually
   /dashboard/building-floor-power-consumption:
