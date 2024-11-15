@@ -252,7 +252,7 @@ func ManuFillGatewayHourStats(month, value string) error {
 		return errors.Wrap(err, "Failed to parse month")
 	}
 
-	// Parse value to float64
+	// Parse value to float64 
 	totalValue, err := cast.ToFloat64E(value)
 	if err != nil {
 		return errors.Wrap(err, "Failed to parse value")
@@ -272,67 +272,65 @@ func ManuFillGatewayHourStats(month, value string) error {
 	endTime := startTime.AddDate(0, 1, 0)
 	totalDays := int(endTime.Sub(startTime).Hours()) / 24
 
-	// Calculate base value per day
-	baseValuePerDay := totalValue / float64(totalDays)
+	// First generate daily values that sum to total
+	dailyValues := make([]float64, totalDays)
+	var dailyTotal float64
 
-	// Track running total to ensure exact match
-	var runningTotal float64
+	// Generate random daily values
+	for i := 0; i < totalDays; i++ {
+		// Random factor between 0.8 and 1.2
+		factor := 0.8 + (rand.Float64() * 0.4)
+		dailyValues[i] = factor
+		dailyTotal += factor
+	}
 
-	// Generate and save hourly stats for each day
+	// Normalize daily values to sum to total
+	for i := range dailyValues {
+		dailyValues[i] = (dailyValues[i] / dailyTotal) * totalValue
+	}
+
+	dayIndex := 0
 	for currentDay := startTime; currentDay.Before(endTime); currentDay = currentDay.AddDate(0, 0, 1) {
-		// Calculate daily value with random variation (-10% to +10%)
-		randomFactor := 0.9 + (rand.Float64() * 0.2) // 0.9 to 1.1
-		dailyValue := baseValuePerDay * randomFactor
-
-		// Distribute daily value across hours with different patterns based on day type
+		dailyValue := dailyValues[dayIndex]
+		
+		// Generate hourly distribution for this day
 		isWeekend := currentDay.Weekday() == time.Saturday || currentDay.Weekday() == time.Sunday
-		hourlyDistribution := make([]float64, 24)
+		hourlyValues := make([]float64, 24)
+		var hourlyTotal float64
 
+		// Generate random hourly values with peak/off-peak patterns
 		for hour := 0; hour < 24; hour++ {
+			var baseFactor float64
 			if isWeekend {
-				// Weekend pattern: more even distribution
-				hourlyDistribution[hour] = 1.0
+				baseFactor = 0.8 + (rand.Float64() * 0.4) // 0.8-1.2 for weekends
 			} else {
-				// Weekday pattern: peak during working hours
 				switch {
 				case hour < 6: // Night (0-5)
-					hourlyDistribution[hour] = 0.3
+					baseFactor = 0.2 + (rand.Float64() * 0.2) // 0.2-0.4
 				case hour < 9: // Morning ramp-up (6-8)
-					hourlyDistribution[hour] = 0.8
+					baseFactor = 0.6 + (rand.Float64() * 0.4) // 0.6-1.0
 				case hour < 18: // Working hours (9-17)
-					hourlyDistribution[hour] = 1.5
+					baseFactor = 1.3 + (rand.Float64() * 0.4) // 1.3-1.7
 				case hour < 22: // Evening (18-21)
-					hourlyDistribution[hour] = 1.0
+					baseFactor = 0.8 + (rand.Float64() * 0.4) // 0.8-1.2
 				default: // Late night (22-23)
-					hourlyDistribution[hour] = 0.5
+					baseFactor = 0.3 + (rand.Float64() * 0.4) // 0.3-0.7
 				}
 			}
+			hourlyValues[hour] = baseFactor
+			hourlyTotal += baseFactor
 		}
 
-		// Normalize distribution
-		var sum float64
-		for _, v := range hourlyDistribution {
-			sum += v
-		}
-		for i := range hourlyDistribution {
-			hourlyDistribution[i] = hourlyDistribution[i] / sum * dailyValue
-		}
-
-		// Save hourly stats for each hour
+		// Normalize hourly values to sum to daily value
 		for hour := 0; hour < 24; hour++ {
+			hourlyValues[hour] = (hourlyValues[hour] / hourlyTotal) * dailyValue
+			
+			// Save stats for this hour
 			var hourlyStats []model.Eco_gateway_1h
 			currentTime := time.Date(currentDay.Year(), currentDay.Month(), currentDay.Day(), hour, 0, 0, 0, currentDay.Location())
-
-			hourValue := hourlyDistribution[hour] / float64(len(gateways))
-
-			// For the last hour of the last day, adjust to match total exactly
-			isLastHour := currentDay.AddDate(0, 0, 1).Equal(endTime) && hour == 23
-			if isLastHour {
-				remaining := totalValue - runningTotal
-				hourValue = remaining / float64(len(gateways))
-			} else {
-				runningTotal += hourValue * float64(len(gateways))
-			}
+			
+			// Divide hourly value among gateways
+			hourValue := hourlyValues[hour] / float64(len(gateways))
 
 			for _, gateway := range gateways {
 				stat := model.Eco_gateway_1h{
@@ -352,6 +350,8 @@ func ManuFillGatewayHourStats(month, value string) error {
 				return errors.Wrapf(err, "Failed to save hourly stats for time %s", currentTime.Format("2006-01-02 15:04"))
 			}
 		}
+		
+		dayIndex++
 	}
 
 	// Refresh continuous aggregates
