@@ -12,7 +12,7 @@ import (
 func InitManuCollectRoute(r chi.Router) {
 	r.Get(common.BASE_CONTEXT+"/manu_collect", ManuCollectHandler)
 	r.Get(common.BASE_CONTEXT+"/check_collect_date", CheckCollectPowerHandler)
-	r.Get(common.BASE_CONTEXT+"/manu_gen_demo_water_data", ManuGenDemoWaterDataHandler)
+	r.Get(common.BASE_CONTEXT+"/manu_collect_water_data", ManuCollectWaterDataHandler)
 	r.Get(common.BASE_CONTEXT+"/debug_get_box_hour_stats", DebugGetBoxHourStatsHandler)
 	r.Get(common.BASE_CONTEXT+"/manu_fill_gateway_hour_stats", ManuFillGatewayHourStatsHandler)
 	r.Get(common.BASE_CONTEXT+"/manu_fill_park_water_hour_stats", ManuFillParkWaterHourStatsHandler)
@@ -115,17 +115,17 @@ func ManuCollectHandler(w http.ResponseWriter, r *http.Request) {
 	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }
 
-// @Summary Manually generate demo water data
-// @Description Manually generate demo water data
+// @Summary Manually collect water data
+// @Description Manually collect water data
 // @Tags Manually
 // @Produce  json
 // @Param start query string false "Start time (2024-01-01)"
 // @Param end query string false "End time (2024-01-01)"
 // @Success 200 {object} common.Response "success"
-// @Router /manu_gen_demo_water_data [get]
-func ManuGenDemoWaterDataHandler(w http.ResponseWriter, r *http.Request) {
+// @Router /manu_collect_water_data [get]
+func ManuCollectWaterDataHandler(w http.ResponseWriter, r *http.Request) {
 	go func() {
-		service.ManuGenDemoWaterData(r.URL.Query().Get("start"), r.URL.Query().Get("end"))
+		service.CollectWaterMeterRealData()
 	}()
 	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }

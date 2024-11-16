@@ -13,6 +13,8 @@ var ECO_PROJECT_MAPPING = ""
 var ECO_INVOKE_URL = ""
 var ECO_PASSWORD = ""
 
+var ECO_REALTIME_DATA_URL = ""
+
 func init() {
 	if v := os.Getenv("ECO_USER"); v != "" {
 		ECO_USER = v
@@ -43,5 +45,8 @@ func init() {
 	}
 	if v := os.Getenv("ECO_PASSWORD"); v != "" {
 		ECO_PASSWORD = v
+	}
+	if v := os.Getenv("ECO_REALTIME_DATA_URL"); v != "" {
+		ECO_REALTIME_DATA_URL = v
 	}
 }

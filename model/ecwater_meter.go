@@ -17,7 +17,7 @@ DB Table Details
 -------------------------------------
 
 
-Table: o_eco_gateway
+Table: o_eco_water_meter
 [ 0] id                                             VARCHAR(32)          null: false  primary: true   isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 1] created_by                                     VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 2] created_time                                   TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: [CURRENT_TIMESTAMP]
@@ -25,78 +25,74 @@ Table: o_eco_gateway
 [ 4] updated_time                                   TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: [CURRENT_TIMESTAMP]
 [ 5] model_name                                     VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
 [ 6] dev_name                                       VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
-[ 7] mac_addr                                       VARCHAR(64)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 64      default: []
+[ 7] channel_no                                     VARCHAR(64)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 64      default: []
 [ 8] cm_code                                        VARCHAR(64)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 64      default: []
-[ 9] project_code                                   VARCHAR(64)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 64      default: []
-[10] location                                       VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
-[11] floor_id                                       VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[12] building_id                                    VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[13] park_id                                        VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[14] type                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[ 9] location                                       VARCHAR(128)         null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 128     default: []
+[10] building_id                                    VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
+[11] park_id                                        VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
+[12] type                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[13] total_value                                    NUMERIC              null: false  primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: [0]
 
 
 JSON Sample
 -------------------------------------
-{    "id": "tUYhSDiHDZSSHFvTpipriPOoQ",    "created_by": "FuZYAbiLVRjbNKEIlBeGQRWXA",    "created_time": 73,    "updated_by": "itlbqlroEsEEbLcrkyAdpKrpX",    "updated_time": 33,    "model_name": "HmEkVEubCVEapSVNqlfZHDvVC",    "dev_name": "SxTbSNGdbtSsgivxAMiheHkHi",    "mac_addr": "CpNLvDFViGGEHQtJxwIraKWDM",    "cm_code": "UGtQnUqhOiUQJaVQWiFQdnCtm",    "project_code": "NiBCcKGPOcTCabYIxseQEkAEa",    "location": "ivEgtLGxKZDxvaRLIqCbahnlY",    "floor_id": "BwpXykbbBqBLRHiADVLyZBFss",    "building_id": "rRwBGLtaqAJtOQIQhgHbtLQIY",    "park_id": "iYocCgCrZpsDBaQckBdpYrMCj",    "type": 83}
+{    "id": "VjLPaDJPstiOUVZtBailQldJX",    "created_by": "OGntAsJBLbJmCAdjGBgnuAVvT",    "created_time": 56,    "updated_by": "NrGnvrpxIFqsAYSAnDlbICMBw",    "updated_time": 52,    "model_name": "gCpLVlQQmXPqBxtMablrQnfEB",    "dev_name": "gZHrcyewyyhjnnlsycrIxMDNc",    "channel_no": "exewMlSGoBkWkQyLbIhkmXWNh",    "cm_code": "eaTVGytRsrXDHGuHMWvXRNVmv",    "location": "JASgoSrWtQlMGZcjwVsZZHDky",    "building_id": "tZjRUMAHNSlFxVHFtgcXkxYle",    "park_id": "QvatRmCiCoivVbECFpERWSijn",    "type": 97,    "total_value": 0.05923150839295331}
 
 
 
 */
 
 var (
-	Ecgateway_FIELD_NAME_id = "id"
+	Ecwater_meter_FIELD_NAME_id = "id"
 
-	Ecgateway_FIELD_NAME_created_by = "created_by"
+	Ecwater_meter_FIELD_NAME_created_by = "created_by"
 
-	Ecgateway_FIELD_NAME_created_time = "created_time"
+	Ecwater_meter_FIELD_NAME_created_time = "created_time"
 
-	Ecgateway_FIELD_NAME_updated_by = "updated_by"
+	Ecwater_meter_FIELD_NAME_updated_by = "updated_by"
 
-	Ecgateway_FIELD_NAME_updated_time = "updated_time"
+	Ecwater_meter_FIELD_NAME_updated_time = "updated_time"
 
-	Ecgateway_FIELD_NAME_model_name = "model_name"
+	Ecwater_meter_FIELD_NAME_model_name = "model_name"
 
-	Ecgateway_FIELD_NAME_dev_name = "dev_name"
+	Ecwater_meter_FIELD_NAME_dev_name = "dev_name"
 
-	Ecgateway_FIELD_NAME_mac_addr = "mac_addr"
+	Ecwater_meter_FIELD_NAME_channel_no = "channel_no"
 
-	Ecgateway_FIELD_NAME_cm_code = "cm_code"
+	Ecwater_meter_FIELD_NAME_cm_code = "cm_code"
 
-	Ecgateway_FIELD_NAME_project_code = "project_code"
+	Ecwater_meter_FIELD_NAME_location = "location"
 
-	Ecgateway_FIELD_NAME_location = "location"
+	Ecwater_meter_FIELD_NAME_building_id = "building_id"
 
-	Ecgateway_FIELD_NAME_floor_id = "floor_id"
+	Ecwater_meter_FIELD_NAME_park_id = "park_id"
 
-	Ecgateway_FIELD_NAME_building_id = "building_id"
+	Ecwater_meter_FIELD_NAME_type = "type"
 
-	Ecgateway_FIELD_NAME_park_id = "park_id"
-
-	Ecgateway_FIELD_NAME_type = "type"
+	Ecwater_meter_FIELD_NAME_total_value = "total_value"
 )
 
-// Ecgateway struct is a row record of the o_eco_gateway table in the  database
-type Ecgateway struct {
+// Ecwater_meter struct is a row record of the o_eco_water_meter table in the  database
+type Ecwater_meter struct {
 	ID          string           `json:"id"`           //主键ID
 	CreatedBy   string           `json:"created_by"`   //创建人
 	CreatedTime common.LocalTime `json:"created_time"` //创建时间
 	UpdatedBy   string           `json:"updated_by"`   //更新人
 	UpdatedTime common.LocalTime `json:"updated_time"` //更新时间
 	ModelName   string           `json:"model_name"`   //型号名称
-	DevName     string           `json:"dev_name"`     //设备名称
-	MacAddr     string           `json:"mac_addr"`     //MAC地址
+	DevName     string           `json:"dev_name"`     //dev_name
+	ChannelNo   string           `json:"channel_no"`   //通道号
 	CmCode      string           `json:"cm_code"`      //通信码
-	ProjectCode string           `json:"project_code"` //项目编码
 	Location    string           `json:"location"`     //组织名称
-	FloorID     string           `json:"floor_id"`     //楼层ID
 	BuildingID  string           `json:"building_id"`  //楼栋ID
 	ParkID      string           `json:"park_id"`      //园区ID
-	Type        int32            `json:"type"`         //网关类型(1:AL,2:AP)
+	Type        int32            `json:"type"`         //水表类型(1:低区,2:高区)
+	TotalValue  float64          `json:"total_value"`  //总用水量
 
 }
 
-var EcgatewayTableInfo = &TableInfo{
-	Name: "o_eco_gateway",
+var Ecwater_meterTableInfo = &TableInfo{
+	Name: "o_eco_water_meter",
 	Columns: []*ColumnInfo{
 
 		&ColumnInfo{
@@ -228,7 +224,7 @@ var EcgatewayTableInfo = &TableInfo{
 		&ColumnInfo{
 			Index:              6,
 			Name:               "dev_name",
-			Comment:            `设备名称`,
+			Comment:            `dev_name`,
 			Notes:              ``,
 			Nullable:           false,
 			DatabaseTypeName:   "VARCHAR",
@@ -248,8 +244,8 @@ var EcgatewayTableInfo = &TableInfo{
 
 		&ColumnInfo{
 			Index:              7,
-			Name:               "mac_addr",
-			Comment:            `MAC地址`,
+			Name:               "channel_no",
+			Comment:            `通道号`,
 			Notes:              ``,
 			Nullable:           false,
 			DatabaseTypeName:   "VARCHAR",
@@ -259,10 +255,10 @@ var EcgatewayTableInfo = &TableInfo{
 			IsArray:            false,
 			ColumnType:         "VARCHAR",
 			ColumnLength:       64,
-			GoFieldName:        "MacAddr",
+			GoFieldName:        "ChannelNo",
 			GoFieldType:        "string",
-			JSONFieldName:      "mac_addr",
-			ProtobufFieldName:  "mac_addr",
+			JSONFieldName:      "channel_no",
+			ProtobufFieldName:  "channel_no",
 			ProtobufType:       "string",
 			ProtobufPos:        8,
 		},
@@ -290,27 +286,6 @@ var EcgatewayTableInfo = &TableInfo{
 
 		&ColumnInfo{
 			Index:              9,
-			Name:               "project_code",
-			Comment:            `项目编码`,
-			Notes:              ``,
-			Nullable:           false,
-			DatabaseTypeName:   "VARCHAR",
-			DatabaseTypePretty: "VARCHAR(64)",
-			IsPrimaryKey:       false,
-			IsAutoIncrement:    false,
-			IsArray:            false,
-			ColumnType:         "VARCHAR",
-			ColumnLength:       64,
-			GoFieldName:        "ProjectCode",
-			GoFieldType:        "string",
-			JSONFieldName:      "project_code",
-			ProtobufFieldName:  "project_code",
-			ProtobufType:       "string",
-			ProtobufPos:        10,
-		},
-
-		&ColumnInfo{
-			Index:              10,
 			Name:               "location",
 			Comment:            `组织名称`,
 			Notes:              ``,
@@ -327,32 +302,11 @@ var EcgatewayTableInfo = &TableInfo{
 			JSONFieldName:      "location",
 			ProtobufFieldName:  "location",
 			ProtobufType:       "string",
-			ProtobufPos:        11,
+			ProtobufPos:        10,
 		},
 
 		&ColumnInfo{
-			Index:              11,
-			Name:               "floor_id",
-			Comment:            `楼层ID`,
-			Notes:              ``,
-			Nullable:           false,
-			DatabaseTypeName:   "VARCHAR",
-			DatabaseTypePretty: "VARCHAR(32)",
-			IsPrimaryKey:       false,
-			IsAutoIncrement:    false,
-			IsArray:            false,
-			ColumnType:         "VARCHAR",
-			ColumnLength:       32,
-			GoFieldName:        "FloorID",
-			GoFieldType:        "string",
-			JSONFieldName:      "floor_id",
-			ProtobufFieldName:  "floor_id",
-			ProtobufType:       "string",
-			ProtobufPos:        12,
-		},
-
-		&ColumnInfo{
-			Index:              12,
+			Index:              10,
 			Name:               "building_id",
 			Comment:            `楼栋ID`,
 			Notes:              ``,
@@ -369,11 +323,11 @@ var EcgatewayTableInfo = &TableInfo{
 			JSONFieldName:      "building_id",
 			ProtobufFieldName:  "building_id",
 			ProtobufType:       "string",
-			ProtobufPos:        13,
+			ProtobufPos:        11,
 		},
 
 		&ColumnInfo{
-			Index:              13,
+			Index:              11,
 			Name:               "park_id",
 			Comment:            `园区ID`,
 			Notes:              ``,
@@ -390,13 +344,13 @@ var EcgatewayTableInfo = &TableInfo{
 			JSONFieldName:      "park_id",
 			ProtobufFieldName:  "park_id",
 			ProtobufType:       "string",
-			ProtobufPos:        14,
+			ProtobufPos:        12,
 		},
 
 		&ColumnInfo{
-			Index:              14,
+			Index:              12,
 			Name:               "type",
-			Comment:            `网关类型(1:AL,2:AP)`,
+			Comment:            `水表类型(1:低区,2:高区)`,
 			Notes:              ``,
 			Nullable:           false,
 			DatabaseTypeName:   "INT4",
@@ -411,31 +365,52 @@ var EcgatewayTableInfo = &TableInfo{
 			JSONFieldName:      "type",
 			ProtobufFieldName:  "type",
 			ProtobufType:       "int32",
-			ProtobufPos:        15,
+			ProtobufPos:        13,
+		},
+
+		&ColumnInfo{
+			Index:              13,
+			Name:               "total_value",
+			Comment:            `总用水量`,
+			Notes:              ``,
+			Nullable:           false,
+			DatabaseTypeName:   "NUMERIC",
+			DatabaseTypePretty: "NUMERIC",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "NUMERIC",
+			ColumnLength:       -1,
+			GoFieldName:        "TotalValue",
+			GoFieldType:        "float64",
+			JSONFieldName:      "total_value",
+			ProtobufFieldName:  "total_value",
+			ProtobufType:       "float",
+			ProtobufPos:        14,
 		},
 	},
 }
 
 // TableName sets the insert table name for this struct type
-func (e *Ecgateway) TableName() string {
-	return "o_eco_gateway"
+func (e *Ecwater_meter) TableName() string {
+	return "o_eco_water_meter"
 }
 
 // BeforeSave invoked before saving, return an error if field is not populated.
-func (e *Ecgateway) BeforeSave() error {
+func (e *Ecwater_meter) BeforeSave() error {
 	return nil
 }
 
 // Prepare invoked before saving, can be used to populate fields etc.
-func (e *Ecgateway) Prepare() {
+func (e *Ecwater_meter) Prepare() {
 }
 
 // Validate invoked before performing action, return an error if field is not populated.
-func (e *Ecgateway) Validate(action Action) error {
+func (e *Ecwater_meter) Validate(action Action) error {
 	return nil
 }
 
 // TableInfo return table meta data
-func (e *Ecgateway) TableInfo() *TableInfo {
-	return EcgatewayTableInfo
+func (e *Ecwater_meter) TableInfo() *TableInfo {
+	return Ecwater_meterTableInfo
 }

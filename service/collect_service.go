@@ -38,6 +38,7 @@ var waterNeedRefreshContinuousAggregateMap = map[string]string{
 	"f_eco_park_water_1y": "year",
 }
 
+// 初始化函数,启动定时任务收集数据
 func init() {
 	// Start goroutine to collect stats every hour at 5 minutes past
 	go func() {
@@ -69,16 +70,6 @@ func init() {
 		}
 	}()
 
-	// Start goroutine for demo water data generation
-	go func() {
-		for {
-			now := time.Now()
-			timeHour := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), 0, 0, 0, now.Location())
-			demoWaterDataGenHourly(timeHour)
-			time.Sleep(time.Hour)
-		}
-	}()
-
 	// Start goroutine for daily full refresh at midnight
 	go func() {
 		for {
@@ -96,7 +87,30 @@ func init() {
 			common.Logger.Info("Daily full continuous aggregate refresh completed")
 		}
 	}()
+
+	// Start goroutine to collect water meter data every hour at 59 minutes past
+	go func() {
+		for {
+			now := time.Now()
+			// Calculate next run time (59 minutes past the hour)
+			next := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), 59, 0, 0, now.Location())
+			if next.Before(now) {
+				next = next.Add(time.Hour)
+			}
+			time.Sleep(next.Sub(now))
+
+			common.Logger.Info("Starting water meter data collection...")
+
+			if err := CollectWaterMeterRealData(); err != nil {
+				common.Logger.Errorf("Failed to collect water meter data: %v", err)
+			}
+
+			common.Logger.Info("Water meter data collection completed")
+		}
+	}()
 }
+
+// 强制刷新所有连续聚合数据
 func ForceRefreshContinuousAggregate() error {
 	err := refreshContinuousAggregateFull(gatewayNeedRefreshContinuousAggregateMap)
 	if err != nil {
@@ -109,6 +123,7 @@ func ForceRefreshContinuousAggregate() error {
 	return nil
 }
 
+// 检查数据收集情况,返回数据缺失的记录
 func CheckCollectData(start, end string, collectType int) ([]map[string]interface{}, error) {
 	tablename := ""
 	totalCount := 0
@@ -139,83 +154,70 @@ func CheckCollectData(start, end string, collectType int) ([]map[string]interfac
 	}
 	return data, nil
 }
-func ManuGenDemoWaterData(startDayStr, endTimeStr string) {
-	startTime, err := time.Parse("2006-01-02", startDayStr)
+
+// 收集水表实时数据
+func CollectWaterMeterRealData() error {
+	waterMeters, err := GetAllWaterMeters()
 	if err != nil {
-		common.Logger.Errorf("Failed to parse start date: %v", err)
-		return
-	}
-	endTime, err := time.Parse("2006-01-02", endTimeStr)
-	if err != nil {
-		common.Logger.Errorf("Failed to parse end date: %v", err)
-		return
-	}
-	for currentTime := startTime.Add(time.Hour); !currentTime.After(endTime); currentTime = currentTime.Add(time.Hour) {
-		demoWaterDataGenHourly(currentTime)
-	}
-}
-func demoWaterDataGenHourly(startTime time.Time) {
-	common.Logger.Infof("Generating demo water data for %s", startTime.Format("2006-01-02 15:04"))
-	// 生成上一个小时的时间
-	lastHour := startTime.Add(-time.Hour)
-
-	// 根据是否周末决定基准用水量
-	baseWaterConsumption := 2000.0
-	if lastHour.Weekday() == time.Saturday || lastHour.Weekday() == time.Sunday {
-		baseWaterConsumption = 500.0
+		return errors.Wrap(err, "Failed to get water meters")
 	}
 
-	// 根据时段分配权重
-	hourWeight := 1.0
-	hour := lastHour.Hour()
-	switch {
-	case hour >= 6 && hour <= 9: // 早高峰
-		hourWeight = 2.0
-	case hour >= 11 && hour <= 13: // 午高峰
-		hourWeight = 1.8
-	case hour >= 17 && hour <= 19: // 晚高峰
-		hourWeight = 1.5
-	case hour >= 1 && hour <= 5: // 凌晨
-		hourWeight = 0.3
+	// Get current time rounded to hour
+	now := time.Now().Truncate(time.Hour)
+
+	for _, meter := range waterMeters {
+		// Get real-time data for each water meter
+		resp, err := client.GetRealDataByCmCode[client.WaterMeterData](meter.CmCode)
+		if err != nil {
+			common.Logger.Errorf("Failed to get real data for meter %s: %v", meter.CmCode, err)
+			continue
+		}
+
+		if resp.ResultCode != "0000" {
+			common.Logger.Errorf("Error response for meter %s: %s", meter.CmCode, resp.Message.Message)
+			continue
+		}
+
+		// Calculate hourly usage by comparing with stored cumulative flow
+		currentCumFlow := resp.QueryData.RtData.CumFlow
+		hourlyUsage := currentCumFlow - meter.TotalValue
+		initial := false
+		if meter.TotalValue == 0 {
+			initial = true
+		}
+		// Update meter's cumulative flow
+		meter.TotalValue = currentCumFlow
+		if err := common.DbUpsert[model.Ecwater_meter](context.Background(), common.GetDaprClient(), meter,
+			model.Ecwater_meterTableInfo.Name, model.Ecwater_meter_FIELD_NAME_id); err != nil {
+			common.Logger.Errorf("Failed to update meter %s: %v", meter.CmCode, err)
+			continue
+		}
+		if initial {
+			continue
+		}
+		// Insert hourly usage into 1h table
+		hourData := model.Eco_water_meter_1h{
+			ID:               fmt.Sprintf("%x", md5.Sum([]byte(meter.ID+"_"+now.Format("2006010215")))),
+			Time:             common.LocalTime(now),
+			WaterMeterID:     meter.ID,
+			BuildingID:       meter.BuildingID,
+			ParkID:           meter.ParkID,
+			Type:             meter.Type,
+			WaterConsumption: hourlyUsage,
+		}
+
+		if err := common.DbUpsert[model.Eco_water_meter_1h](context.Background(), common.GetDaprClient(), hourData, model.Eco_water_meter_1hTableInfo.Name, model.Eco_water_meter_1h_FIELD_NAME_id); err != nil {
+			common.Logger.Errorf("Failed to insert hourly data for meter %s: %v", meter.CmCode, err)
+			continue
+		}
+
+		common.Logger.Infof("Successfully collected data for meter %s: hourly usage %.2f", meter.CmCode, hourlyUsage)
 	}
 
-	// 生成随机数
-	rand.Seed(uint64(time.Now().UnixNano()))
-	// 计算这个小时的用水量：基准值/24*权重，上下浮动20%
-	waterConsumption := (baseWaterConsumption/24.0)*hourWeight + (rand.Float64()-0.5)*baseWaterConsumption/24.0*0.4
-
-	park, err := common.DbGetOne[model.Ecpark](context.Background(), common.GetDaprClient(), model.EcparkTableInfo.Name, "")
-	if err != nil {
-		common.Logger.Errorf("Failed to get park: %v", err)
-		return
-	}
-
-	// 构造数据
-	waterData := model.Eco_park_water_1h{
-		ID:               fmt.Sprintf("%x", md5.Sum([]byte(park.ID+"_"+lastHour.Format("2006010215")))),
-		Time:             common.LocalTime(lastHour),
-		ParkID:           park.ID,
-		WaterConsumption: waterConsumption,
-	}
-
-	// 插入数据
-	err = common.DbUpsert(context.Background(), common.GetDaprClient(), waterData, model.Eco_park_water_1hTableInfo.Name, model.Eco_park_water_1h_FIELD_NAME_id)
-	if err != nil {
-		common.Logger.Errorf("Failed to insert water consumption data: %v", err)
-		return
-	}
-
-	// 刷新连续聚合表
-	err = refreshContinuousAggregate(lastHour, waterNeedRefreshContinuousAggregateMap)
-	if err != nil {
-		common.Logger.Errorf("Failed to refresh water continuous aggregates: %v", err)
-		return
-	}
-
-	common.Logger.Infof("Generated water consumption data for %s: %.2f", lastHour.Format("2006-01-02 15:04"), waterConsumption)
+	return nil
 }
 
-// 手动收集指定日期的数据，开始时间结束时间格式为 2024-01-01
+// 手动收集指定日期的网关数据
 func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 	common.Logger.Infof("Starting manual data collection from %s to %s", start, end)
 
@@ -269,6 +271,8 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 
 	return nil
 }
+
+// 手动填充园区水表小时数据
 func ManuFillParkWaterHourStats(month, value string) error {
 	common.Logger.Infof("Starting ManuFillParkWaterHourStats for month: %s, value: %s", month, value)
 
@@ -286,10 +290,9 @@ func ManuFillParkWaterHourStats(month, value string) error {
 
 	common.Logger.Infof("Parsed inputs - Start time: %s, Total value: %.2f", startTime.Format("2006-01"), totalValue)
 
-	// Get park info
-	park, err := common.DbGetOne[model.Ecpark](context.Background(), common.GetDaprClient(), model.EcparkTableInfo.Name, "")
+	waterMeters, err := GetAllWaterMeters()
 	if err != nil {
-		return errors.Wrap(err, "Failed to get park")
+		return errors.Wrap(err, "Failed to get water meters")
 	}
 
 	// Calculate days in month
@@ -312,7 +315,7 @@ func ManuFillParkWaterHourStats(month, value string) error {
 
 	// Normalize daily values to sum to total
 	for i := range dailyValues {
-		dailyValues[i] = (dailyValues[i] / dailyTotal) * totalValue
+		dailyValues[i] = (dailyValues[i] / dailyTotal) * totalValue / float64(len(waterMeters))
 	}
 
 	// For each day in the month
@@ -356,16 +359,20 @@ func ManuFillParkWaterHourStats(month, value string) error {
 		// Insert hourly values into database
 		for hour := 0; hour < 24; hour++ {
 			timestamp := time.Date(currentDate.Year(), currentDate.Month(), currentDate.Day(), hour, 0, 0, 0, time.Local)
-			waterData := model.Eco_park_water_1h{
-				ID:               fmt.Sprintf("%x", md5.Sum([]byte(park.ID+"_"+timestamp.Format("2006010215")))),
-				Time:             common.LocalTime(timestamp),
-				ParkID:           park.ID,
-				WaterConsumption: hourlyValues[hour],
-			}
+			for _, waterMeter := range waterMeters {
+				waterData := model.Eco_water_meter_1h{
+					ID:               fmt.Sprintf("%x", md5.Sum([]byte(waterMeter.ID+"_"+timestamp.Format("2006010215")))),
+					Time:             common.LocalTime(timestamp),
+					ParkID:           waterMeter.ParkID,
+					WaterMeterID:     waterMeter.ID,
+					BuildingID:       waterMeter.BuildingID,
+					WaterConsumption: hourlyValues[hour],
+				}
 
-			err := common.DbUpsert(context.Background(), common.GetDaprClient(), waterData, model.Eco_park_water_1hTableInfo.Name, model.Eco_park_water_1h_FIELD_NAME_id)
-			if err != nil {
-				return errors.Wrapf(err, "Failed to insert hour stats for %s", timestamp.Format("2006-01-02 15:04:05"))
+				err := common.DbUpsert(context.Background(), common.GetDaprClient(), waterData, model.Eco_park_water_1hTableInfo.Name, model.Eco_park_water_1h_FIELD_NAME_id)
+				if err != nil {
+					return errors.Wrapf(err, "Failed to insert hour stats for %s", timestamp.Format("2006-01-02 15:04:05"))
+				}
 			}
 		}
 
@@ -380,6 +387,8 @@ func ManuFillParkWaterHourStats(month, value string) error {
 	common.Logger.Info("Successfully completed ManuFillParkWaterHourStats")
 	return nil
 }
+
+// 手动填充网关小时数据
 func ManuFillGatewayHourStats(month, value string) error {
 	common.Logger.Infof("Starting ManuFillGatewayHourStats for month: %s, value: %s", month, value)
 
@@ -513,6 +522,7 @@ func ManuFillGatewayHourStats(month, value string) error {
 	return nil
 }
 
+// 调试获取网关小时数据
 func DebugGetBoxHourStats(mac string, year string, month string, day string) (map[string]interface{}, error) {
 	box, err := common.DbGetOne[model.Ecgateway](context.Background(), common.GetDaprClient(), model.EcgatewayTableInfo.Name, "mac_addr="+mac)
 	if err != nil {
@@ -555,6 +565,7 @@ func DebugGetBoxHourStats(mac string, year string, month string, day string) (ma
 	return resp.Data, nil
 }
 
+// 收集网关全天数据
 func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) error {
 	// Group gateways by project code
 	projectGateways := make(map[string][]model.Ecgateway)
@@ -931,6 +942,13 @@ func GetAllEcgateways() ([]model.Ecgateway, error) {
 	datas, err := common.DbQuery[model.Ecgateway](context.Background(), common.GetDaprClient(), model.EcgatewayTableInfo.Name, "")
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to query gateways")
+	}
+	return datas, nil
+}
+func GetAllWaterMeters() ([]model.Ecwater_meter, error) {
+	datas, err := common.DbQuery[model.Ecwater_meter](context.Background(), common.GetDaprClient(), model.Ecwater_meterTableInfo.Name, "")
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to query water meters")
 	}
 	return datas, nil
 }

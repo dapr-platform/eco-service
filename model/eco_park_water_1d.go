@@ -20,12 +20,13 @@ DB Table Details
 Table: f_eco_park_water_1d
 [ 0] time                                           TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: []
 [ 1] park_id                                        VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[ 2] water_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
+[ 2] type                                           INT4                 null: true   primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[ 3] water_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "time": 79,    "park_id": "MFTlOeBNOtrjduXLSuaZEkxTE",    "water_consumption": 0.6242438102410359}
+{    "time": 52,    "park_id": "OXebJnnCyYnCitStZDpMSqstj",    "type": 86,    "water_consumption": 0.6658225436913178}
 
 
 Comments
@@ -43,6 +44,8 @@ var (
 
 	Eco_park_water_1d_FIELD_NAME_park_id = "park_id"
 
+	Eco_park_water_1d_FIELD_NAME_type = "type"
+
 	Eco_park_water_1d_FIELD_NAME_water_consumption = "water_consumption"
 )
 
@@ -50,6 +53,7 @@ var (
 type Eco_park_water_1d struct {
 	Time             common.LocalTime `json:"time"`              //time
 	ParkID           string           `json:"park_id"`           //park_id
+	Type             int32            `json:"type"`              //type
 	WaterConsumption float64          `json:"water_consumption"` //water_consumption
 
 }
@@ -104,6 +108,27 @@ Warning table: f_eco_park_water_1d primary key column time is nullable column, s
 
 		&ColumnInfo{
 			Index:              2,
+			Name:               "type",
+			Comment:            `type`,
+			Notes:              ``,
+			Nullable:           true,
+			DatabaseTypeName:   "INT4",
+			DatabaseTypePretty: "INT4",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "INT4",
+			ColumnLength:       -1,
+			GoFieldName:        "Type",
+			GoFieldType:        "int32",
+			JSONFieldName:      "type",
+			ProtobufFieldName:  "type",
+			ProtobufType:       "int32",
+			ProtobufPos:        3,
+		},
+
+		&ColumnInfo{
+			Index:              3,
 			Name:               "water_consumption",
 			Comment:            `water_consumption`,
 			Notes:              ``,
@@ -120,7 +145,7 @@ Warning table: f_eco_park_water_1d primary key column time is nullable column, s
 			JSONFieldName:      "water_consumption",
 			ProtobufFieldName:  "water_consumption",
 			ProtobufType:       "float",
-			ProtobufPos:        3,
+			ProtobufPos:        4,
 		},
 	},
 }

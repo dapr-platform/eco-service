@@ -103,6 +103,41 @@ COMMENT ON COLUMN o_eco_gateway.building_id IS '楼栋ID';
 COMMENT ON COLUMN o_eco_gateway.park_id IS '园区ID';
 COMMENT ON COLUMN o_eco_gateway.type IS '网关类型(1:AL,2:AP)';
 
+CREATE TABLE o_eco_water_meter (
+    id VARCHAR(32) PRIMARY KEY,
+    created_by VARCHAR(32) NOT NULL,
+    created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(32) NOT NULL,
+    updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    model_name VARCHAR(128) NOT NULL,
+    dev_name VARCHAR(128) NOT NULL,
+    channel_no VARCHAR(64) NOT NULL,
+    cm_code VARCHAR(64) NOT NULL,
+    location VARCHAR(128) NOT NULL,
+    building_id VARCHAR(32) NOT NULL,
+    park_id VARCHAR(32) NOT NULL,
+    type INTEGER NOT NULL,
+    total_value DECIMAL(20,2) NOT NULL DEFAULT 0,
+    FOREIGN KEY (building_id) REFERENCES o_eco_building(id),
+    FOREIGN KEY (park_id) REFERENCES o_eco_park(id)
+);
+ALTER TABLE o_eco_water_meter ADD CONSTRAINT uk_eco_water_meter_cm_code UNIQUE(cm_code);
+COMMENT ON TABLE o_eco_water_meter IS '水表信息表';
+COMMENT ON COLUMN o_eco_water_meter.id IS '主键ID';
+COMMENT ON COLUMN o_eco_water_meter.model_name IS '型号名称';
+COMMENT ON COLUMN o_eco_gateway.dev_name IS '设备名称';
+COMMENT ON COLUMN o_eco_water_meter.channel_no IS '通道号';
+COMMENT ON COLUMN o_eco_water_meter.cm_code IS '通信码';
+COMMENT ON COLUMN o_eco_water_meter.location IS '组织名称';
+COMMENT ON COLUMN o_eco_water_meter.created_time IS '创建时间';
+COMMENT ON COLUMN o_eco_water_meter.updated_time IS '更新时间';
+COMMENT ON COLUMN o_eco_water_meter.created_by IS '创建人';
+COMMENT ON COLUMN o_eco_water_meter.updated_by IS '更新人';
+COMMENT ON COLUMN o_eco_water_meter.building_id IS '楼栋ID';
+COMMENT ON COLUMN o_eco_water_meter.park_id IS '园区ID';
+COMMENT ON COLUMN o_eco_water_meter.type IS '水表类型(1:低区,2:高区)';
+COMMENT ON COLUMN o_eco_water_meter.total_value IS '总用水量';
+
 -- Function to generate test data
 CREATE OR REPLACE FUNCTION generate_gateway_test_data(start_date DATE, end_date DATE)
 RETURNS void AS $$
@@ -149,49 +184,115 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TABLE f_eco_park_water_1h (
-    id VARCHAR(32),
+CREATE TABLE f_eco_water_meter_1h (
+   id VARCHAR(32),
     time TIMESTAMP NOT NULL,
+    water_meter_id VARCHAR(32) NOT NULL,
+    building_id VARCHAR(32) NOT NULL,
     park_id VARCHAR(32) NOT NULL,
+    type INTEGER NOT NULL,
     water_consumption DECIMAL(20,2) NOT NULL,
+    FOREIGN KEY (water_meter_id) REFERENCES o_eco_water_meter(id),
+    FOREIGN KEY (building_id) REFERENCES o_eco_building(id),
+    FOREIGN KEY (park_id) REFERENCES o_eco_park(id),
     PRIMARY KEY (id, time)
 );
-SELECT create_hypertable('f_eco_park_water_1h', 'time');
-CREATE INDEX idx_park_water_1h_park_id ON f_eco_park_water_1h(park_id, time DESC);
-COMMENT ON TABLE f_eco_park_water_1h IS '园区小时用水量';
-COMMENT ON COLUMN f_eco_park_water_1h.time IS '时间';
-COMMENT ON COLUMN f_eco_park_water_1h.park_id IS '园区ID';
-COMMENT ON COLUMN f_eco_park_water_1h.water_consumption IS '用水量(m³)';
+SELECT create_hypertable('f_eco_water_meter_1h', 'time');
+CREATE INDEX idx_water_meter_1h_water_meter_id ON f_eco_water_meter_1h(water_meter_id, time DESC);  
+CREATE INDEX idx_water_meter_1h_building_id ON f_eco_water_meter_1h(building_id, time DESC);
+CREATE INDEX idx_water_meter_1h_park_id ON f_eco_water_meter_1h(park_id, time DESC);    
 
--- Create continuous aggregates for park daily water metrics
+-- Create continuous aggregates for park water hourly metrics
+CREATE MATERIALIZED VIEW f_eco_park_water_1h
+WITH (timescaledb.continuous) AS
+SELECT time_bucket(INTERVAL '1 hour', time) AS time,
+       park_id,
+       type,
+       sum(water_consumption) as water_consumption
+FROM f_eco_water_meter_1h
+GROUP BY time_bucket(INTERVAL '1 hour', time), park_id, type
+WITH NO DATA;
+
+-- Create continuous aggregates for park water daily metrics
 CREATE MATERIALIZED VIEW f_eco_park_water_1d
 WITH (timescaledb.continuous) AS
 SELECT time_bucket(INTERVAL '1 day', time) AS time,
        park_id,
+       type,
        sum(water_consumption) as water_consumption
-FROM f_eco_park_water_1h
-GROUP BY time_bucket(INTERVAL '1 day', time), park_id
+FROM f_eco_water_meter_1h
+GROUP BY time_bucket(INTERVAL '1 day', time), park_id, type
 WITH NO DATA;
--- Create continuous aggregates for park monthly water metrics 
+
+-- Create continuous aggregates for park water monthly metrics
 CREATE MATERIALIZED VIEW f_eco_park_water_1m
 WITH (timescaledb.continuous) AS
 SELECT time_bucket(INTERVAL '1 month', time) AS time,
        park_id,
+       type,
        sum(water_consumption) as water_consumption
-FROM f_eco_park_water_1h
-GROUP BY time_bucket(INTERVAL '1 month', time), park_id
+FROM f_eco_water_meter_1h
+GROUP BY time_bucket(INTERVAL '1 month', time), park_id, type
 WITH NO DATA;
 
--- Create continuous aggregates for park yearly water metrics 
+-- Create continuous aggregates for park water yearly metrics
 CREATE MATERIALIZED VIEW f_eco_park_water_1y
 WITH (timescaledb.continuous) AS
 SELECT time_bucket(INTERVAL '1 year', time) AS time,
        park_id,
+       type,
        sum(water_consumption) as water_consumption
-FROM f_eco_park_water_1d
-GROUP BY time_bucket(INTERVAL '1 year', time), park_id
+FROM f_eco_water_meter_1h
+GROUP BY time_bucket(INTERVAL '1 year', time), park_id, type
 WITH NO DATA;
 
+-- Create continuous aggregates for building water hourly metrics
+CREATE MATERIALIZED VIEW f_eco_water_building_1h
+WITH (timescaledb.continuous) AS
+SELECT time_bucket(INTERVAL '1 hour', time) AS time,
+       building_id,
+       park_id,
+       type,
+       sum(water_consumption) as water_consumption
+FROM f_eco_water_meter_1h
+GROUP BY time_bucket(INTERVAL '1 hour', time), building_id, park_id, type
+WITH NO DATA;
+
+-- Create continuous aggregates for building water daily metrics
+CREATE MATERIALIZED VIEW f_eco_water_building_1d
+WITH (timescaledb.continuous) AS
+SELECT time_bucket(INTERVAL '1 day', time) AS time,
+       building_id,
+       park_id,
+       type,
+       sum(water_consumption) as water_consumption
+FROM f_eco_water_meter_1h
+GROUP BY time_bucket(INTERVAL '1 day', time), building_id, park_id, type
+WITH NO DATA;
+
+-- Create continuous aggregates for building water monthly metrics
+CREATE MATERIALIZED VIEW f_eco_water_building_1m
+WITH (timescaledb.continuous) AS
+SELECT time_bucket(INTERVAL '1 month', time) AS time,
+       building_id,
+       park_id,
+       type,
+       sum(water_consumption) as water_consumption
+FROM f_eco_water_meter_1h
+GROUP BY time_bucket(INTERVAL '1 month', time), building_id, park_id, type
+WITH NO DATA;
+
+-- Create continuous aggregates for building water yearly metrics
+CREATE MATERIALIZED VIEW f_eco_water_building_1y
+WITH (timescaledb.continuous) AS
+SELECT time_bucket(INTERVAL '1 year', time) AS time,
+       building_id,
+       park_id,
+       type,
+       sum(water_consumption) as water_consumption
+FROM f_eco_water_meter_1h
+GROUP BY time_bucket(INTERVAL '1 year', time), building_id, park_id, type
+WITH NO DATA;
 
 -- Create hypertable for gateway hourly metrics
 CREATE TABLE f_eco_gateway_1h (
@@ -508,6 +609,11 @@ VALUES
 ('98CC4D151C54', 'admin', 'admin', '98CC4D151C54', '配电网关', '配电网关_B-AL-05-1_98CC4D151C54', '20000000000709', 'B栋_五层', md5('B栋_五层'), md5('B栋'), md5('教科院'), 1);
 
 
+-- Insert water meters
+INSERT INTO o_eco_water_meter (id, created_by, updated_by, model_name, dev_name, channel_no, cm_code, location, building_id, park_id, type)
+VALUES
+('30002050', 'admin', 'admin', '水表', 'A座高区水表', '30002050', '24000000000001', 'A栋', md5('A栋'), md5('教科院'), 2),
+('3000205C', 'admin', 'admin', '水表', 'A座低区水表', '3000205C', '24000000000002', 'A栋', md5('A栋'), md5('教科院'), 1);
 
 
 
@@ -519,10 +625,16 @@ VALUES
 
 -- +goose Down
 -- +goose StatementBegin
+DROP MATERIALIZED VIEW IF EXISTS f_eco_building_water_1h;
+DROP MATERIALIZED VIEW IF EXISTS f_eco_building_water_1d;
+DROP MATERIALIZED VIEW IF EXISTS f_eco_building_water_1m;
+DROP MATERIALIZED VIEW IF EXISTS f_eco_building_water_1y;
 DROP MATERIALIZED VIEW IF EXISTS f_eco_park_water_1m;
 DROP MATERIALIZED VIEW IF EXISTS f_eco_park_water_1y;
 DROP MATERIALIZED VIEW IF EXISTS f_eco_park_water_1d;
-DROP TABLE IF EXISTS f_eco_park_water_1h;
+DROP MATERIALIZED VIEW IF EXISTS f_eco_park_water_1h;
+DROP TABLE IF EXISTS f_eco_water_meter_1h cascade;
+
 DROP MATERIALIZED VIEW IF EXISTS v_eco_park_1d;
 DROP MATERIALIZED VIEW IF EXISTS v_eco_park_1m;
 DROP MATERIALIZED VIEW IF EXISTS v_eco_park_1y;
@@ -539,6 +651,7 @@ DROP MATERIALIZED VIEW IF EXISTS f_eco_gateway_1y;
 DROP MATERIALIZED VIEW IF EXISTS f_eco_gateway_1m;
 DROP MATERIALIZED VIEW IF EXISTS f_eco_gateway_1d;
 DROP TABLE IF EXISTS f_eco_gateway_1h cascade;
+DROP TABLE IF EXISTS o_eco_water_meter cascade;
 DROP TABLE IF EXISTS o_eco_gateway cascade;
 DROP TABLE IF EXISTS o_eco_floor cascade;
 DROP TABLE IF EXISTS o_eco_building cascade;

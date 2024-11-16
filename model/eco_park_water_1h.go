@@ -18,36 +18,43 @@ DB Table Details
 
 
 Table: f_eco_park_water_1h
-[ 0] id                                             VARCHAR(32)          null: false  primary: true   isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[ 1] time                                           TIMESTAMP            null: false  primary: true   isArray: false  auto: false  col: TIMESTAMP       len: -1      default: []
-[ 2] park_id                                        VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
-[ 3] water_consumption                              NUMERIC              null: false  primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
+[ 0] time                                           TIMESTAMP            null: true   primary: false  isArray: false  auto: false  col: TIMESTAMP       len: -1      default: []
+[ 1] park_id                                        VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
+[ 2] type                                           INT4                 null: true   primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[ 3] water_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "id": "ttSOyNQGHdZDcdaNFOmIdcGJG",    "time": 53,    "park_id": "ZdmLyKVDsVVmrGqihsYGlPmYp",    "water_consumption": 0.8183260153519903}
+{    "time": 83,    "park_id": "JsLcNfaJCrdcMELBekUXLnNDD",    "type": 73,    "water_consumption": 0.03996450499047604}
+
+
+Comments
+-------------------------------------
+[ 0] Warning table: f_eco_park_water_1h does not have a primary key defined, setting col position 1 time as primary key
+Warning table: f_eco_park_water_1h primary key column time is nullable column, setting it as NOT NULL
+
 
 
 
 */
 
 var (
-	Eco_park_water_1h_FIELD_NAME_id = "id"
-
 	Eco_park_water_1h_FIELD_NAME_time = "time"
 
 	Eco_park_water_1h_FIELD_NAME_park_id = "park_id"
+
+	Eco_park_water_1h_FIELD_NAME_type = "type"
 
 	Eco_park_water_1h_FIELD_NAME_water_consumption = "water_consumption"
 )
 
 // Eco_park_water_1h struct is a row record of the f_eco_park_water_1h table in the  database
 type Eco_park_water_1h struct {
-	ID               string           `json:"id"`                //id
-	Time             common.LocalTime `json:"time"`              //时间
-	ParkID           string           `json:"park_id"`           //园区ID
-	WaterConsumption float64          `json:"water_consumption"` //用水量(m³)
+	Time             common.LocalTime `json:"time"`              //time
+	ParkID           string           `json:"park_id"`           //park_id
+	Type             int32            `json:"type"`              //type
+	WaterConsumption float64          `json:"water_consumption"` //water_consumption
 
 }
 
@@ -56,31 +63,12 @@ var Eco_park_water_1hTableInfo = &TableInfo{
 	Columns: []*ColumnInfo{
 
 		&ColumnInfo{
-			Index:              0,
-			Name:               "id",
-			Comment:            `id`,
-			Notes:              ``,
-			Nullable:           false,
-			DatabaseTypeName:   "VARCHAR",
-			DatabaseTypePretty: "VARCHAR(32)",
-			IsPrimaryKey:       true,
-			IsAutoIncrement:    false,
-			IsArray:            false,
-			ColumnType:         "VARCHAR",
-			ColumnLength:       32,
-			GoFieldName:        "ID",
-			GoFieldType:        "string",
-			JSONFieldName:      "id",
-			ProtobufFieldName:  "id",
-			ProtobufType:       "string",
-			ProtobufPos:        1,
-		},
-
-		&ColumnInfo{
-			Index:              1,
-			Name:               "time",
-			Comment:            `时间`,
-			Notes:              ``,
+			Index:   0,
+			Name:    "time",
+			Comment: `time`,
+			Notes: `Warning table: f_eco_park_water_1h does not have a primary key defined, setting col position 1 time as primary key
+Warning table: f_eco_park_water_1h primary key column time is nullable column, setting it as NOT NULL
+`,
 			Nullable:           false,
 			DatabaseTypeName:   "TIMESTAMP",
 			DatabaseTypePretty: "TIMESTAMP",
@@ -94,15 +82,15 @@ var Eco_park_water_1hTableInfo = &TableInfo{
 			JSONFieldName:      "time",
 			ProtobufFieldName:  "time",
 			ProtobufType:       "uint64",
-			ProtobufPos:        2,
+			ProtobufPos:        1,
 		},
 
 		&ColumnInfo{
-			Index:              2,
+			Index:              1,
 			Name:               "park_id",
-			Comment:            `园区ID`,
+			Comment:            `park_id`,
 			Notes:              ``,
-			Nullable:           false,
+			Nullable:           true,
 			DatabaseTypeName:   "VARCHAR",
 			DatabaseTypePretty: "VARCHAR(32)",
 			IsPrimaryKey:       false,
@@ -115,15 +103,36 @@ var Eco_park_water_1hTableInfo = &TableInfo{
 			JSONFieldName:      "park_id",
 			ProtobufFieldName:  "park_id",
 			ProtobufType:       "string",
+			ProtobufPos:        2,
+		},
+
+		&ColumnInfo{
+			Index:              2,
+			Name:               "type",
+			Comment:            `type`,
+			Notes:              ``,
+			Nullable:           true,
+			DatabaseTypeName:   "INT4",
+			DatabaseTypePretty: "INT4",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "INT4",
+			ColumnLength:       -1,
+			GoFieldName:        "Type",
+			GoFieldType:        "int32",
+			JSONFieldName:      "type",
+			ProtobufFieldName:  "type",
+			ProtobufType:       "int32",
 			ProtobufPos:        3,
 		},
 
 		&ColumnInfo{
 			Index:              3,
 			Name:               "water_consumption",
-			Comment:            `用水量(m³)`,
+			Comment:            `water_consumption`,
 			Notes:              ``,
-			Nullable:           false,
+			Nullable:           true,
 			DatabaseTypeName:   "NUMERIC",
 			DatabaseTypePretty: "NUMERIC",
 			IsPrimaryKey:       false,
