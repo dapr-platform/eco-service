@@ -246,7 +246,9 @@ func getParkDataWithTimeOffset(period string, queryTime time.Time, years, months
 
 	whereClause := ""
 	if len(gatewayType) > 0 && gatewayType[0] > 0 {
-		whereClause = fmt.Sprintf("&type=%d", gatewayType[0])
+		whereClause = fmt.Sprintf("&type=%d&_order=time", gatewayType[0])
+	} else {
+		whereClause = "&_order=time"
 	}
 
 	switch period {
@@ -554,12 +556,7 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 		sortedData = append(sortedData, keyValue{k, v})
 	}
 
-	// Sort by time (second part of key after "_")
-	sort.Slice(sortedData, func(i, j int) bool {
-		time1 := strings.Split(sortedData[i].key, "_")[1]
-		time2 := strings.Split(sortedData[j].key, "_")[1]
-		return time1 < time2
-	})
+	
 	result := fillSortedData(sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
 
 	return result, nil
@@ -574,7 +571,9 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 
 	whereClause := ""
 	if len(gatewayType) > 0 && gatewayType[0] > 0 {
-		whereClause = fmt.Sprintf("&type=%d", gatewayType[0])
+		whereClause = fmt.Sprintf("&type=%d&_order=time", gatewayType[0])
+	} else {
+		whereClause = "&_order=time"
 	}
 
 	switch period {
@@ -628,9 +627,9 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	case PERIOD_HOUR:
 		timeFormat = "15"
 	case PERIOD_DAY:
-		timeFormat = "01-02"
+		timeFormat = "02"
 	case PERIOD_MONTH:
-		timeFormat = "2006-01"
+		timeFormat = "01"
 	case PERIOD_YEAR:
 		timeFormat = "2006"
 	}
@@ -639,7 +638,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	case PERIOD_HOUR:
 		for _, v := range data.([]model.Eco_park_water_1h) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
-			if len(gatewayType) > 0 && gatewayType[0] > 0 {
+			if len(gatewayType) > 0 && gatewayType[0] == 0 {
 				parkPowerMap[key] += v.WaterConsumption
 			} else {
 				parkPowerMap[key] = v.WaterConsumption
@@ -648,7 +647,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	case PERIOD_DAY:
 		for _, v := range data.([]model.Eco_park_water_1d) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
-			if len(gatewayType) > 0 && gatewayType[0] > 0 {
+			if len(gatewayType) > 0 && gatewayType[0] == 0 {
 				parkPowerMap[key] += v.WaterConsumption
 			} else {
 				parkPowerMap[key] = v.WaterConsumption
@@ -657,7 +656,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	case PERIOD_MONTH:
 		for _, v := range data.([]model.Eco_park_water_1m) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
-			if len(gatewayType) > 0 && gatewayType[0] > 0 {
+			if len(gatewayType) > 0 && gatewayType[0] == 0 {
 				parkPowerMap[key] += v.WaterConsumption
 			} else {
 				parkPowerMap[key] = v.WaterConsumption
@@ -666,7 +665,7 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	case PERIOD_YEAR:
 		for _, v := range data.([]model.Eco_park_water_1y) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
-			if len(gatewayType) > 0 && gatewayType[0] > 0 {
+			if len(gatewayType) > 0 && gatewayType[0] == 0 {
 				parkPowerMap[key] += v.WaterConsumption
 			} else {
 				parkPowerMap[key] = v.WaterConsumption
@@ -681,12 +680,6 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 		sortedData = append(sortedData, keyValue{k, v})
 	}
 
-	// Sort by time (second part of key after "_")
-	sort.Slice(sortedData, func(i, j int) bool {
-		time1 := strings.Split(sortedData[i].key, "_")[1]
-		time2 := strings.Split(sortedData[j].key, "_")[1]
-		return time1 < time2
-	})
 	result = fillSortedData(sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
 
 	return result, nil
@@ -701,6 +694,9 @@ func getParkInfo() (*model.Ecpark, error) {
 	)
 	if err != nil {
 		return nil, err
+	}
+	if park == nil {
+		return nil, fmt.Errorf("park not found")
 	}
 	return park, nil
 }
