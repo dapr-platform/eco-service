@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	CARBON_FACTOR = 0.581  // 碳排放系数
+	CARBON_FACTOR = 0.604  // 碳排放系数
 	COAL_FACTOR   = 0.1229 // 标准煤系数
 )
 
