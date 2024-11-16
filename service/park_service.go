@@ -5,17 +5,27 @@ import (
 	"eco-service/entity"
 	"eco-service/model"
 	"fmt"
+	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/dapr-platform/common"
 )
 
-const (
-	CARBON_FACTOR = 0.61   // 碳排放系数
-	COAL_FACTOR   = 0.1229 // 标准煤系数
+var (
+	CARBON_FACTOR = 0.272   // 碳排放系数
+	COAL_FACTOR   = 0.4 // 标准煤系数
 )
+func init() {
+	if v := os.Getenv("CARBON_FACTOR"); v != "" {
+		CARBON_FACTOR, _ = strconv.ParseFloat(v, 64)
+	}
+	if v := os.Getenv("COAL_FACTOR"); v != "" {
+		COAL_FACTOR, _ = strconv.ParseFloat(v, 64)
+	}
+}
 
 type keyValue struct {
 	key   string
