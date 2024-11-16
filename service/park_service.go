@@ -15,9 +15,10 @@ import (
 )
 
 var (
-	CARBON_FACTOR = 0.272   // 碳排放系数
-	COAL_FACTOR   = 0.4 // 标准煤系数
+	CARBON_FACTOR = 0.272 // 碳排放系数
+	COAL_FACTOR   = 0.4   // 标准煤系数
 )
+
 func init() {
 	if v := os.Getenv("CARBON_FACTOR"); v != "" {
 		CARBON_FACTOR, _ = strconv.ParseFloat(v, 64)
@@ -522,10 +523,16 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 	}
 	calcTimeFormat := "2006-01-02T15:04:05"
 	common.Logger.Debugf("getParkDataWithTimeRange data: %+v", data)
+	var keys []string
+	var keyMap map[string]bool
 	switch period {
 	case PERIOD_HOUR:
 		for _, v := range data.([]model.Eco_park_1h) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
 			if len(gatewayType) > 0 && gatewayType[0] == 0 {
 				parkPowerMap[key] += v.PowerConsumption
 			} else {
@@ -535,6 +542,10 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 	case PERIOD_DAY:
 		for _, v := range data.([]model.Eco_park_1d) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
 			if len(gatewayType) > 0 && gatewayType[0] == 0 {
 				parkPowerMap[key] += v.PowerConsumption
 			} else {
@@ -544,6 +555,10 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 	case PERIOD_MONTH:
 		for _, v := range data.([]model.Eco_park_1m) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
 			if len(gatewayType) > 0 && gatewayType[0] == 0 {
 				parkPowerMap[key] += v.PowerConsumption
 			} else {
@@ -553,6 +568,10 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 	case PERIOD_YEAR:
 		for _, v := range data.([]model.Eco_park_1y) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
 			if len(gatewayType) > 0 && gatewayType[0] == 0 {
 				parkPowerMap[key] += v.PowerConsumption
 			} else {
@@ -562,11 +581,10 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 	}
 
 	var sortedData []keyValue
-	for k, v := range parkPowerMap {
-		sortedData = append(sortedData, keyValue{k, v})
+	for _, k := range keys {
+		sortedData = append(sortedData, keyValue{k, parkPowerMap[k]})
 	}
 
-	
 	result := fillSortedData(sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
 
 	return result, nil
@@ -644,10 +662,16 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 		timeFormat = "2006"
 	}
 	calcTimeFormat := "2006-01-02T15:04:05"
+	var keys []string
+	var keyMap map[string]bool
 	switch period {
 	case PERIOD_HOUR:
 		for _, v := range data.([]model.Eco_park_water_1h) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
 			if len(gatewayType) > 0 && gatewayType[0] == 0 {
 				parkPowerMap[key] += v.WaterConsumption
 			} else {
@@ -657,6 +681,10 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	case PERIOD_DAY:
 		for _, v := range data.([]model.Eco_park_water_1d) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
 			if len(gatewayType) > 0 && gatewayType[0] == 0 {
 				parkPowerMap[key] += v.WaterConsumption
 			} else {
@@ -666,6 +694,10 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	case PERIOD_MONTH:
 		for _, v := range data.([]model.Eco_park_water_1m) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
 			if len(gatewayType) > 0 && gatewayType[0] == 0 {
 				parkPowerMap[key] += v.WaterConsumption
 			} else {
@@ -675,6 +707,10 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	case PERIOD_YEAR:
 		for _, v := range data.([]model.Eco_park_water_1y) {
 			key := fmt.Sprintf("%s_%s", v.ParkID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
 			if len(gatewayType) > 0 && gatewayType[0] == 0 {
 				parkPowerMap[key] += v.WaterConsumption
 			} else {
@@ -684,10 +720,9 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 	}
 
 	// Convert map to slice and sort by time
-
 	var sortedData []keyValue
-	for k, v := range parkPowerMap {
-		sortedData = append(sortedData, keyValue{k, v})
+	for _, k := range keys {
+		sortedData = append(sortedData, keyValue{k, parkPowerMap[k]})
 	}
 
 	result = fillSortedData(sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
@@ -717,9 +752,7 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 		sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
 
 	common.Logger.Debugf("sortedData %v", sortedData)
-	// 创建一个map来去重
-	uniqueLabels := make(map[string]entity.LabelData)
-
+	
 	// 创建map用于快速查找值
 	valueMap := make(map[string]float64)
 	var parkID string
@@ -749,6 +782,8 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 		}
 	}
 
+	result := make([]entity.LabelData, 0)
+	
 	// 生成连续的时间点
 	var current time.Time
 	switch period {
@@ -760,11 +795,11 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 			label := current.Format(timeFormat)
 			value := valueMap[timeStr]
 
-			uniqueLabels[label] = entity.LabelData{
+			result = append(result, entity.LabelData{
 				Id:    parkID,
 				Label: label,
 				Value: value,
-			}
+			})
 			current = current.Add(time.Hour)
 		}
 	case PERIOD_DAY:
@@ -775,11 +810,11 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 			label := current.Format(timeFormat)
 			value := valueMap[timeStr]
 
-			uniqueLabels[label] = entity.LabelData{
+			result = append(result, entity.LabelData{
 				Id:    parkID,
 				Label: label,
 				Value: value,
-			}
+			})
 			current = current.AddDate(0, 0, 1)
 		}
 	case PERIOD_MONTH:
@@ -790,11 +825,11 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 			label := current.Format(timeFormat)
 			value := valueMap[timeStr]
 
-			uniqueLabels[label] = entity.LabelData{
+			result = append(result, entity.LabelData{
 				Id:    parkID,
 				Label: label,
 				Value: value,
-			}
+			})
 			current = current.AddDate(0, 1, 0)
 		}
 	case PERIOD_YEAR:
@@ -805,28 +840,17 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 			label := current.Format(timeFormat)
 			value := valueMap[timeStr]
 
-			uniqueLabels[label] = entity.LabelData{
+			result = append(result, entity.LabelData{
 				Id:    parkID,
 				Label: label,
 				Value: value,
-			}
+			})
 			current = current.AddDate(1, 0, 0)
 		}
 	default:
 		common.Logger.Errorf("Unsupported period: %s", period)
 		return nil
 	}
-
-	// 转换为有序切片
-	result := make([]entity.LabelData, 0, len(uniqueLabels))
-	for _, data := range uniqueLabels {
-		result = append(result, data)
-	}
-
-	// 按label排序
-	sort.Slice(result, func(i, j int) bool {
-		return result[i].Label < result[j].Label
-	})
 
 	common.Logger.Debugf("fillSortedData output data: %+v", result)
 	return result
