@@ -6,7 +6,6 @@ import (
 	"eco-service/model"
 	"fmt"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -15,8 +14,8 @@ import (
 )
 
 var (
-	CARBON_FACTOR = 0.272 // 碳排放系数
-	COAL_FACTOR   = 0.4   // 标准煤系数
+	CARBON_FACTOR = 0.581  // 碳排放系数
+	COAL_FACTOR   = 0.1229 // 标准煤系数
 )
 
 func init() {
@@ -752,7 +751,7 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 		sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
 
 	common.Logger.Debugf("sortedData %v", sortedData)
-	
+
 	// 创建map用于快速查找值
 	valueMap := make(map[string]float64)
 	var parkID string
@@ -783,7 +782,7 @@ func fillSortedData(sortedData []keyValue, period string, startTime time.Time, e
 	}
 
 	result := make([]entity.LabelData, 0)
-	
+
 	// 生成连续的时间点
 	var current time.Time
 	switch period {
