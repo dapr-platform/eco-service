@@ -369,7 +369,7 @@ func ManuFillParkWaterHourStats(month, value string) error {
 					WaterConsumption: hourlyValues[hour],
 				}
 
-				err := common.DbUpsert(context.Background(), common.GetDaprClient(), waterData, model.Eco_park_water_1hTableInfo.Name, model.Eco_park_water_1h_FIELD_NAME_id)
+				err := common.DbUpsert(context.Background(), common.GetDaprClient(), waterData, model.Eco_park_water_1hTableInfo.Name, model.Eco_water_meter_1h_FIELD_NAME_id)
 				if err != nil {
 					return errors.Wrapf(err, "Failed to insert hour stats for %s", timestamp.Format("2006-01-02 15:04:05"))
 				}
