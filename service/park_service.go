@@ -522,8 +522,8 @@ func getParkDataWithTimeRange(period string, startTime time.Time, endTime time.T
 	}
 	calcTimeFormat := "2006-01-02T15:04:05"
 	common.Logger.Debugf("getParkDataWithTimeRange data: %+v", data)
-	var keys []string
-	var keyMap map[string]bool
+	keys := []string{}
+	keyMap := make(map[string]bool)
 	switch period {
 	case PERIOD_HOUR:
 		for _, v := range data.([]model.Eco_park_1h) {
@@ -661,8 +661,8 @@ func getParkWaterDataWithTimeRange(period string, startTime time.Time, endTime t
 		timeFormat = "2006"
 	}
 	calcTimeFormat := "2006-01-02T15:04:05"
-	var keys []string
-	var keyMap map[string]bool
+	var keys =[]string{}
+	var keyMap = make(map[string]bool)
 	switch period {
 	case PERIOD_HOUR:
 		for _, v := range data.([]model.Eco_park_water_1h) {
