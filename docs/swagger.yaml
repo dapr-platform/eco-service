@@ -2163,15 +2163,6 @@ paths:
   /manu_collect_water_data:
     get:
       description: Manually collect water data
-      parameters:
-      - description: Start time (2024-01-01)
-        in: query
-        name: start
-        type: string
-      - description: End time (2024-01-01)
-        in: query
-        name: end
-        type: string
       produces:
       - application/json
       responses:
@@ -2208,11 +2199,15 @@ paths:
       - Manually
   /manu_fill_park_water_hour_stats:
     get:
-      description: Manually fill park water hour stats
       parameters:
-      - description: month
+      - description: start
         in: query
-        name: month
+        name: start
+        required: true
+        type: string
+      - description: end
+        in: query
+        name: end
         required: true
         type: string
       - description: value
@@ -2220,14 +2215,9 @@ paths:
         name: value
         required: true
         type: string
-      produces:
-      - application/json
       responses:
         "200":
           description: success
           schema:
             $ref: '#/definitions/common.Response'
-      summary: Manually fill park water hour stats
-      tags:
-      - Manually
 swagger: "2.0"
