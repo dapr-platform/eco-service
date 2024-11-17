@@ -39,7 +39,7 @@ func ForceRefreshContinuousAggregateHandler(w http.ResponseWriter, r *http.Reque
 // @Description Manually fill park water hour stats
 // @Tags Manually
 // @Produce  json
-
+// @Param cm_code query string true "cm_code"
 // @Param start query string true "start"
 // @Param end query string true "end"
 // @Param value query string true "value"
