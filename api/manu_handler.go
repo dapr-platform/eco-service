@@ -119,8 +119,6 @@ func ManuCollectHandler(w http.ResponseWriter, r *http.Request) {
 // @Description Manually collect water data
 // @Tags Manually
 // @Produce  json
-// @Param start query string false "Start time (2024-01-01)"
-// @Param end query string false "End time (2024-01-01)"
 // @Success 200 {object} common.Response "success"
 // @Router /manu_collect_water_data [get]
 func ManuCollectWaterDataHandler(w http.ResponseWriter, r *http.Request) {

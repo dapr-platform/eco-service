@@ -157,15 +157,22 @@ func CheckCollectData(start, end string, collectType int) ([]map[string]interfac
 
 // 收集水表实时数据
 func CollectWaterMeterRealData() error {
+	common.Logger.Info("Starting water meter real-time data collection")
+	
 	waterMeters, err := GetAllWaterMeters()
 	if err != nil {
 		return errors.Wrap(err, "Failed to get water meters")
 	}
 
+	common.Logger.Infof("Found %d water meters to collect data from", len(waterMeters))
+
 	// Get current time rounded to hour
 	now := time.Now().Truncate(time.Hour)
+	common.Logger.Infof("Collecting data for time: %s", now.Format("2006-01-02 15:04:05"))
 
 	for _, meter := range waterMeters {
+		common.Logger.Debugf("Processing water meter: %s (ID: %s)", meter.CmCode, meter.ID)
+		
 		// Get real-time data for each water meter
 		resp, err := client.GetRealDataByCmCode[client.WaterMeterData](meter.CmCode)
 		if err != nil {
@@ -184,7 +191,9 @@ func CollectWaterMeterRealData() error {
 		initial := false
 		if meter.TotalValue == 0 {
 			initial = true
+			common.Logger.Infof("Initial data collection for meter %s, setting baseline value to %.2f", meter.CmCode, currentCumFlow)
 		}
+		
 		// Update meter's cumulative flow
 		meter.TotalValue = currentCumFlow
 		if err := common.DbUpsert[model.Ecwater_meter](context.Background(), common.GetDaprClient(), meter,
@@ -192,9 +201,12 @@ func CollectWaterMeterRealData() error {
 			common.Logger.Errorf("Failed to update meter %s: %v", meter.CmCode, err)
 			continue
 		}
+		common.Logger.Debugf("Updated cumulative flow for meter %s to %.2f", meter.CmCode, currentCumFlow)
+		
 		if initial {
 			continue
 		}
+		
 		// Insert hourly usage into 1h table
 		hourData := model.Eco_water_meter_1h{
 			ID:               fmt.Sprintf("%x", md5.Sum([]byte(meter.ID+"_"+now.Format("2006010215")))),
@@ -213,7 +225,8 @@ func CollectWaterMeterRealData() error {
 
 		common.Logger.Infof("Successfully collected data for meter %s: hourly usage %.2f", meter.CmCode, hourlyUsage)
 	}
-
+	
+	common.Logger.Info("Completed water meter real-time data collection")
 	return nil
 }
 
@@ -527,6 +540,9 @@ func DebugGetBoxHourStats(mac string, year string, month string, day string) (ma
 	box, err := common.DbGetOne[model.Ecgateway](context.Background(), common.GetDaprClient(), model.EcgatewayTableInfo.Name, "mac_addr="+mac)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to get gateway %s", mac)
+	}
+	if box == nil {
+		return nil, errors.New("gateway not found")
 	}
 	reqBody := map[string]string{
 		"projectCode": box.ProjectCode,

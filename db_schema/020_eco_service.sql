@@ -553,6 +553,10 @@ VALUES
 (md5('H栋_一层'), 'admin', 'admin', '一层', md5('H栋'), md5('教科院'), 1),
 (md5('H栋_二层'), 'admin', 'admin', '二层', md5('H栋'), md5('教科院'), 2);
 
+INSERT INTO o_eco_floor (id, created_by, updated_by, floor_name, building_id, park_id, index)
+VALUES
+(md5('C栋_五层'), 'admin', 'admin', '五层', md5('C栋'), md5('教科院'), 5),
+(md5('C栋_六层'), 'admin', 'admin', '六层', md5('C栋'), md5('教科院'), 6);
 -- Insert gateways
 INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type)
 VALUES
@@ -607,6 +611,21 @@ VALUES
 ('98CC4D15298C', 'admin', 'admin', '98CC4D15298C', '配电网关', '配电网关_B-AL-03-1_98CC4D15298C', '20000000000707', 'B栋_三层', md5('B栋_三层'), md5('B栋'), md5('教科院'), 1),
 ('98CC4D150BD4', 'admin', 'admin', '98CC4D150BD4', '配电网关', '配电网关_A-AL-02-1_98CC4D150BD4', '20000000000708', 'A栋_二层', md5('A栋_二层'), md5('A栋'), md5('教科院'), 1),
 ('98CC4D151C54', 'admin', 'admin', '98CC4D151C54', '配电网关', '配电网关_B-AL-05-1_98CC4D151C54', '20000000000709', 'B栋_五层', md5('B栋_五层'), md5('B栋'), md5('教科院'), 1);
+
+INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type)
+VALUES
+('98CC4D151E02', 'admin', 'admin', '98CC4D151E02', '配电网关', '配电网关_C-AL-05-1_98CC4D151E02', '21000000000416', 'C栋_五层', md5('C栋_五层'), md5('C栋'), md5('教科院'), 1),
+('98CC4D151DD6', 'admin', 'admin', '98CC4D151DD6', '配电网关', '配电网关_C-AL-06-1_98CC4D151DD6', '21000000000445', 'C栋_六层', md5('C栋_六层'), md5('C栋'), md5('教科院'), 1);
+
+UPDATE o_eco_gateway 
+SET location = 'H栋_一层',
+    floor_id = md5('H栋_一层')
+WHERE id = '98CC4D1528E4';
+
+UPDATE o_eco_gateway 
+SET location = 'E栋_一层',
+    floor_id = md5('E栋_一层')
+WHERE id = '98CC4D150A3C';
 
 
 -- Insert water meters
