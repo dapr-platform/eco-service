@@ -289,15 +289,24 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 
 	return nil
 }
-
 // 手动填充园区水表小时数据
-func ManuFillParkWaterHourStats(month, value string) error {
-	common.Logger.Infof("Starting ManuFillParkWaterHourStats for month: %s, value: %s", month, value)
+func ManuFillParkWaterHourStats(cmCode, start, end, value string) error {
+	common.Logger.Infof("Starting ManuFillParkWaterHourStats for start: %s, end: %s, value: %s", start, end, value)
 
 	// Parse month string to time
-	startTime, err := time.Parse("2006-01", month)
+	startTime, err := time.Parse("2006-01-02", start)
 	if err != nil {
-		return errors.Wrap(err, "Failed to parse month")
+		return errors.Wrap(err, "Failed to parse start")
+	}
+
+	endTime, err := time.Parse("2006-01-02", end)
+	if err != nil {
+		return errors.Wrap(err, "Failed to parse end")
+	}
+
+	// 验证开始时间不能大于结束时间
+	if startTime.After(endTime) {
+		return errors.New("Start time cannot be after end time")
 	}
 
 	// Parse value to float64
@@ -306,22 +315,49 @@ func ManuFillParkWaterHourStats(month, value string) error {
 		return errors.Wrap(err, "Failed to parse value")
 	}
 
+	// 验证值必须大于0
+	if totalValue <= 0 {
+		return errors.New("Value must be greater than 0")
+	}
+	
 	common.Logger.Infof("Parsed inputs - Start time: %s, Total value: %.2f", startTime.Format("2006-01"), totalValue)
 
 	waterMeters, err := GetAllWaterMeters()
 	if err != nil {
 		return errors.Wrap(err, "Failed to get water meters")
 	}
+	if len(waterMeters) == 0 {
+		return errors.New("No water meters found")
+	}
+
+	// 验证cmCode不能为空
+	if cmCode == "" {
+		return errors.New("CM code cannot be empty")
+	}
+
+	var waterMeter *model.Ecwater_meter
+	for _, meter := range waterMeters {
+		if meter.CmCode == cmCode {
+			waterMeter = &meter
+			break
+		}
+	}
+	if waterMeter == nil {
+		return errors.New("Water meter not found")
+	}
 
 	// Calculate days in month
-	endTime := startTime.AddDate(0, 1, 0)
-	totalDays := int(endTime.Sub(startTime).Hours()) / 24
+	totalDays := int(endTime.Sub(startTime).Hours()) / 24 + 1 // 修复日期计算,加1包含结束日期
 
 	common.Logger.Infof("Generating daily values for %d days", totalDays)
 
 	// First generate daily values that sum to total
 	dailyValues := make([]float64, totalDays)
 	var dailyTotal float64
+
+	// 使用固定种子以保证可重复性
+	rand.Seed(uint64(time.Now().UnixNano()))
+
 
 	// Generate random daily values
 	for i := 0; i < totalDays; i++ {
@@ -333,7 +369,7 @@ func ManuFillParkWaterHourStats(month, value string) error {
 
 	// Normalize daily values to sum to total
 	for i := range dailyValues {
-		dailyValues[i] = (dailyValues[i] / dailyTotal) * totalValue / float64(len(waterMeters))
+		dailyValues[i] = (dailyValues[i] / dailyTotal) * totalValue // 移除除以水表数量,因为是单个水表
 	}
 
 	// For each day in the month
@@ -377,20 +413,20 @@ func ManuFillParkWaterHourStats(month, value string) error {
 		// Insert hourly values into database
 		for hour := 0; hour < 24; hour++ {
 			timestamp := time.Date(currentDate.Year(), currentDate.Month(), currentDate.Day(), hour, 0, 0, 0, time.Local)
-			for _, waterMeter := range waterMeters {
-				waterData := model.Eco_water_meter_1h{
-					ID:               fmt.Sprintf("%x", md5.Sum([]byte(waterMeter.ID+"_"+timestamp.Format("2006010215")))),
-					Time:             common.LocalTime(timestamp),
-					ParkID:           waterMeter.ParkID,
-					WaterMeterID:     waterMeter.ID,
-					BuildingID:       waterMeter.BuildingID,
-					WaterConsumption: hourlyValues[hour],
-				}
+			
+			waterData := model.Eco_water_meter_1h{
+				ID:               fmt.Sprintf("%x", md5.Sum([]byte(waterMeter.ID+"_"+timestamp.Format("2006010215")))),
+				Time:             common.LocalTime(timestamp),
+				ParkID:           waterMeter.ParkID,
+				WaterMeterID:     waterMeter.ID,
+				BuildingID:       waterMeter.BuildingID,
+				Type:            waterMeter.Type, // 添加缺失的Type字段
+				WaterConsumption: hourlyValues[hour],
+			}
 
-				err := common.DbUpsert(context.Background(), common.GetDaprClient(), waterData, model.Eco_park_water_1hTableInfo.Name, model.Eco_water_meter_1h_FIELD_NAME_id)
-				if err != nil {
-					return errors.Wrapf(err, "Failed to insert hour stats for %s", timestamp.Format("2006-01-02 15:04:05"))
-				}
+			err := common.DbUpsert(context.Background(), common.GetDaprClient(), waterData, model.Eco_water_meter_1hTableInfo.Name, model.Eco_water_meter_1h_FIELD_NAME_id)
+			if err != nil {
+				return errors.Wrapf(err, "Failed to insert hour stats for %s", timestamp.Format("2006-01-02 15:04:05"))
 			}
 		}
 

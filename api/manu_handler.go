@@ -39,13 +39,15 @@ func ForceRefreshContinuousAggregateHandler(w http.ResponseWriter, r *http.Reque
 // @Description Manually fill park water hour stats
 // @Tags Manually
 // @Produce  json
-// @Param month query string true "month"
+
+// @Param start query string true "start"
+// @Param end query string true "end"
 // @Param value query string true "value"
 // @Success 200 {object} common.Response "success"
 // @Router /manu_fill_park_water_hour_stats [get]
 func ManuFillParkWaterHourStatsHandler(w http.ResponseWriter, r *http.Request) {
 	go func() {
-		err := service.ManuFillParkWaterHourStats(r.URL.Query().Get("month"), r.URL.Query().Get("value"))
+		err := service.ManuFillParkWaterHourStats(r.URL.Query().Get("cm_code"), r.URL.Query().Get("start"), r.URL.Query().Get("end"), r.URL.Query().Get("value"))
 		if err != nil {
 			common.Logger.Error("手动收集数据失败," + err.Error())
 			common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
