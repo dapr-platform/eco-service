@@ -3170,7 +3170,22 @@ const docTemplate = `{
         },
         "/manu_fill_park_water_hour_stats": {
             "get": {
+                "description": "Manually fill park water hour stats",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manually"
+                ],
+                "summary": "Manually fill park water hour stats",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "cm_code",
+                        "name": "cm_code",
+                        "in": "query",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "start",
