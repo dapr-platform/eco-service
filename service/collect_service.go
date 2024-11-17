@@ -197,6 +197,8 @@ func CollectWaterMeterRealData() error {
 		
 		// Update meter's cumulative flow
 		meter.TotalValue = currentCumFlow
+		common.Logger.Debugf("Attempting to update meter %s with data: %+v", meter.CmCode, meter)
+
 		if err := common.DbUpsert[model.Ecwater_meter](context.Background(), common.GetDaprClient(), meter,
 			model.Ecwater_meterTableInfo.Name, model.Ecwater_meter_FIELD_NAME_id); err != nil {
 			common.Logger.Errorf("Failed to update meter %s: %v", meter.CmCode, err)
