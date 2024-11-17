@@ -358,7 +358,6 @@ func ManuFillParkWaterHourStats(cmCode, start, end, value string) error {
 	// 使用固定种子以保证可重复性
 	rand.Seed(uint64(time.Now().UnixNano()))
 
-
 	// Generate random daily values
 	for i := 0; i < totalDays; i++ {
 		// Random factor between 0.8 and 1.2
@@ -369,7 +368,7 @@ func ManuFillParkWaterHourStats(cmCode, start, end, value string) error {
 
 	// Normalize daily values to sum to total
 	for i := range dailyValues {
-		dailyValues[i] = (dailyValues[i] / dailyTotal) * totalValue // 移除除以水表数量,因为是单个水表
+		dailyValues[i] = (dailyValues[i] / dailyTotal) * totalValue
 	}
 
 	// For each day in the month
@@ -386,19 +385,30 @@ func ManuFillParkWaterHourStats(cmCode, start, end, value string) error {
 		for hour := 0; hour < 24; hour++ {
 			var baseFactor float64
 			if isWeekend {
-				baseFactor = 0.8 + (rand.Float64() * 0.4) // 0.8-1.2 for weekends
+				switch {
+				case hour >= 7 && hour < 10: // 早高峰
+					baseFactor = 1.5 + (rand.Float64() * 0.3) // 1.5-1.8
+				case hour >= 11 && hour < 14: // 午高峰
+					baseFactor = 1.3 + (rand.Float64() * 0.3) // 1.3-1.6
+				case hour >= 17 && hour < 20: // 晚高峰
+					baseFactor = 1.4 + (rand.Float64() * 0.3) // 1.4-1.7
+				case hour >= 23 || hour < 6: // 深夜
+					baseFactor = 0.2 + (rand.Float64() * 0.2) // 0.2-0.4
+				default: // 其他时段
+					baseFactor = 0.8 + (rand.Float64() * 0.3) // 0.8-1.1
+				}
 			} else {
 				switch {
-				case hour < 6: // Night (0-5)
-					baseFactor = 0.2 + (rand.Float64() * 0.2) // 0.2-0.4
-				case hour < 9: // Morning ramp-up (6-8)
-					baseFactor = 0.6 + (rand.Float64() * 0.4) // 0.6-1.0
-				case hour < 18: // Working hours (9-17)
-					baseFactor = 1.3 + (rand.Float64() * 0.4) // 1.3-1.7
-				case hour < 22: // Evening (18-21)
-					baseFactor = 0.8 + (rand.Float64() * 0.4) // 0.8-1.2
-				default: // Late night (22-23)
-					baseFactor = 0.3 + (rand.Float64() * 0.4) // 0.3-0.7
+				case hour >= 6 && hour < 9: // 早高峰
+					baseFactor = 1.8 + (rand.Float64() * 0.4) // 1.8-2.2
+				case hour >= 11 && hour < 14: // 午高峰
+					baseFactor = 1.5 + (rand.Float64() * 0.3) // 1.5-1.8
+				case hour >= 17 && hour < 20: // 晚高峰
+					baseFactor = 1.6 + (rand.Float64() * 0.3) // 1.6-1.9
+				case hour >= 23 || hour < 5: // 深夜
+					baseFactor = 0.1 + (rand.Float64() * 0.2) // 0.1-0.3
+				default: // 其他时段
+					baseFactor = 0.7 + (rand.Float64() * 0.3) // 0.7-1.0
 				}
 			}
 			hourlyValues[hour] = baseFactor
@@ -420,7 +430,7 @@ func ManuFillParkWaterHourStats(cmCode, start, end, value string) error {
 				ParkID:           waterMeter.ParkID,
 				WaterMeterID:     waterMeter.ID,
 				BuildingID:       waterMeter.BuildingID,
-				Type:            waterMeter.Type, // 添加缺失的Type字段
+				Type:            waterMeter.Type,
 				WaterConsumption: hourlyValues[hour],
 			}
 
