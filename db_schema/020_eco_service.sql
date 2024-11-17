@@ -553,10 +553,20 @@ VALUES
 (md5('H栋_一层'), 'admin', 'admin', '一层', md5('H栋'), md5('教科院'), 1),
 (md5('H栋_二层'), 'admin', 'admin', '二层', md5('H栋'), md5('教科院'), 2);
 
+
 INSERT INTO o_eco_floor (id, created_by, updated_by, floor_name, building_id, park_id, index)
 VALUES
 (md5('C栋_五层'), 'admin', 'admin', '五层', md5('C栋'), md5('教科院'), 5),
 (md5('C栋_六层'), 'admin', 'admin', '六层', md5('C栋'), md5('教科院'), 6);
+
+update o_eco_floor set floor_name = '整栋' where id = md5('E栋_一层');
+update o_eco_floor set floor_name = '整栋' where id = md5('G栋_一层');
+update o_eco_floor set floor_name = '整栋' where id = md5('H栋_一层');
+
+delete from o_eco_floor where id = md5('E栋_二层');
+delete from o_eco_floor where id = md5('G栋_二层');
+delete from o_eco_floor where id = md5('H栋_二层');
+
 -- Insert gateways
 INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type)
 VALUES

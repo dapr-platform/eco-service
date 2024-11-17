@@ -33,6 +33,7 @@ var gatewayNeedRefreshContinuousAggregateMap = map[string]string{
 	"f_eco_park_1y":     "year",
 }
 var waterNeedRefreshContinuousAggregateMap = map[string]string{
+	"f_eco_park_water_1h": "hour",
 	"f_eco_park_water_1d": "day",
 	"f_eco_park_water_1m": "month",
 	"f_eco_park_water_1y": "year",
@@ -225,7 +226,9 @@ func CollectWaterMeterRealData() error {
 
 		common.Logger.Infof("Successfully collected data for meter %s: hourly usage %.2f", meter.CmCode, hourlyUsage)
 	}
-	
+	if err := refreshContinuousAggregate(now, waterNeedRefreshContinuousAggregateMap); err != nil {
+		return errors.Wrap(err, "Failed to refresh continuous aggregates")
+	}
 	common.Logger.Info("Completed water meter real-time data collection")
 	return nil
 }
