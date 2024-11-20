@@ -228,7 +228,7 @@ func CollectWaterMeterRealData() error {
 
 		common.Logger.Infof("Successfully collected data for meter %s: hourly usage %.2f", meter.CmCode, hourlyUsage)
 	}
-	if err := refreshContinuousAggregate(now, waterNeedRefreshContinuousAggregateMap); err != nil {
+	if err := refreshContinuousAggregateFull(waterNeedRefreshContinuousAggregateMap); err != nil {
 		return errors.Wrap(err, "Failed to refresh continuous aggregates")
 	}
 	common.Logger.Info("Completed water meter real-time data collection")
@@ -468,6 +468,9 @@ func ManuFillGatewayHourStats(month, value string) error {
 		return errors.Wrap(err, "Failed to parse value")
 	}
 
+	// Round totalValue to 2 decimal places
+	totalValue = float64(int64(totalValue*100)) / 100
+
 	common.Logger.Infof("Parsed inputs - Start time: %s, Total value: %.2f", startTime.Format("2006-01"), totalValue)
 
 	// Get all gateways
@@ -500,10 +503,14 @@ func ManuFillGatewayHourStats(month, value string) error {
 		dailyTotal += factor
 	}
 
-	// Normalize daily values to sum to total
-	for i := range dailyValues {
-		dailyValues[i] = (dailyValues[i] / dailyTotal) * totalValue
+	// Normalize daily values to sum to total and round to 2 decimal places
+	var sumDailyValues float64
+	for i := range dailyValues[:len(dailyValues)-1] {
+		dailyValues[i] = float64(int64((dailyValues[i]/dailyTotal)*totalValue*100)) / 100
+		sumDailyValues += dailyValues[i]
 	}
+	// Last day takes the remaining value to ensure exact total
+	dailyValues[len(dailyValues)-1] = float64(int64((totalValue-sumDailyValues)*100)) / 100
 
 	common.Logger.Infof("Generated daily values - First day: %.2f, Last day: %.2f", dailyValues[0], dailyValues[len(dailyValues)-1])
 
@@ -540,16 +547,22 @@ func ManuFillGatewayHourStats(month, value string) error {
 			hourlyTotal += baseFactor
 		}
 
-		// Normalize hourly values to sum to daily value
-		for hour := 0; hour < 24; hour++ {
-			hourlyValues[hour] = (hourlyValues[hour] / hourlyTotal) * dailyValue
+		// Normalize hourly values to sum to daily value and round to 2 decimal places
+		var sumHourlyValues float64
+		for hour := 0; hour < 23; hour++ {
+			hourlyValues[hour] = float64(int64((hourlyValues[hour]/hourlyTotal)*dailyValue*100)) / 100
+			sumHourlyValues += hourlyValues[hour]
+		}
+		// Last hour takes the remaining value to ensure exact daily total
+		hourlyValues[23] = float64(int64((dailyValue-sumHourlyValues)*100)) / 100
 
-			// Save stats for this hour
+		// Save stats for this hour
+		for hour := 0; hour < 24; hour++ {
 			var hourlyStats []model.Eco_gateway_1h
 			currentTime := time.Date(currentDay.Year(), currentDay.Month(), currentDay.Day(), hour, 0, 0, 0, currentDay.Location())
 
 			// Divide hourly value among gateways
-			hourValue := hourlyValues[hour] / float64(len(gateways))
+			hourValue := float64(int64((hourlyValues[hour]/float64(len(gateways)))*100)) / 100
 
 			common.Logger.Debugf("Hour %02d:00 - Value per gateway: %.4f", hour, hourValue)
 
@@ -962,7 +975,6 @@ func refreshContinuousAggregateFull(refreshDefineMap map[string]string) error {
 
 func refreshContinuousAggregate(collectTime time.Time, refreshDefineMap map[string]string) error {
 	common.Logger.Infof("Starting continuous aggregate refresh for time: %s", collectTime.Format("2006-01-02 15:04:05"))
-
 	for tableName, refreshType := range refreshDefineMap {
 		startTime := collectTime
 		endTime := startTime
