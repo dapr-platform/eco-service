@@ -561,12 +561,19 @@ func ManuFillGatewayHourStats(month, value string) error {
 			var hourlyStats []model.Eco_gateway_1h
 			currentTime := time.Date(currentDay.Year(), currentDay.Month(), currentDay.Day(), hour, 0, 0, 0, currentDay.Location())
 
-			// Divide hourly value among gateways
-			hourValue := float64(int64((hourlyValues[hour]/float64(len(gateways)))*100)) / 100
+			// Calculate value per gateway, ensuring total matches input
+			valuePerGateway := float64(int64((hourlyValues[hour]/float64(len(gateways)))*100)) / 100
+			remainingValue := hourlyValues[hour] - (valuePerGateway * float64(len(gateways)-1))
+			
+			common.Logger.Debugf("Hour %02d:00 - Total value: %.4f, Per gateway: %.4f, Last gateway: %.4f", 
+				hour, hourlyValues[hour], valuePerGateway, remainingValue)
 
-			common.Logger.Debugf("Hour %02d:00 - Value per gateway: %.4f", hour, hourValue)
-
-			for _, gateway := range gateways {
+			for i, gateway := range gateways {
+				value := valuePerGateway
+				if i == len(gateways)-1 {
+					value = remainingValue // Last gateway gets remaining value
+				}
+				
 				stat := model.Eco_gateway_1h{
 					ID:               gateway.ID + "_" + currentTime.Format("2006010215"),
 					Time:             common.LocalTime(currentTime),
@@ -575,7 +582,7 @@ func ManuFillGatewayHourStats(month, value string) error {
 					BuildingID:       gateway.BuildingID,
 					Type:             gateway.Type,
 					ParkID:           gateway.ParkID,
-					PowerConsumption: hourValue,
+					PowerConsumption: value,
 				}
 				hourlyStats = append(hourlyStats, stat)
 			}
