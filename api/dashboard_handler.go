@@ -42,7 +42,9 @@ func getQueryTime(period string, queryTimeStr string) (time.Time, error) {
 func InitDashboardRoute(r chi.Router) {
 	r.Get(common.BASE_CONTEXT+"/dashboard/building-power-consumption", BuildingPowerConsumptionHandler)
 	r.Get(common.BASE_CONTEXT+"/dashboard/building-type-power-consumption", BuildingTypePowerConsumptionHandler)
+	r.Get(common.BASE_CONTEXT+"/dashboard/building-type-power-consumption-range", BuildingTypePowerConsumptionRangeHandler)
 	r.Get(common.BASE_CONTEXT+"/dashboard/building-floor-power-consumption", BuildingFloorPowerConsumptionHandler)
+	r.Get(common.BASE_CONTEXT+"/dashboard/building-floor-power-consumption-range", BuildingFloorPowerConsumptionRangeHandler)
 	r.Get(common.BASE_CONTEXT+"/dashboard/park-carbon-emission", ParkCarbonEmissionHandler)
 	r.Get(common.BASE_CONTEXT+"/dashboard/park-standard-coal-emission", ParkStandardCoalEmissionHandler)
 	r.Get(common.BASE_CONTEXT+"/dashboard/park-power-consumption", ParkPowerConsumptionHandler)
@@ -117,6 +119,49 @@ func BuildingTypePowerConsumptionHandler(w http.ResponseWriter, r *http.Request)
 	common.HttpResult(w, common.OK.WithData(data))
 }
 
+// @Summary 建筑细分用电量范围
+// @Description 建筑细分用电量范围，根据粒度,和分类获取所有建筑的用电量。分类为1:照明，2:动力,0:全部
+// @Tags Dashboard
+// @Param period query string true "period, day/month/year"
+// @Param query_time query string false "query_time,格式2024-01-01/2024-01/2024,不传则默认当天/当月/当年"
+// @Param building_id query string false "building_id,不传则查询所有建筑"
+// @Param type query string false "type"
+// @Produce  json
+// @Success 200 {object} common.Response{data=[]entity.LabelData} "objects array"
+// @Failure 500 {object} common.Response ""
+// @Router /dashboard/building-type-power-consumption-range [get]
+func BuildingTypePowerConsumptionRangeHandler(w http.ResponseWriter, r *http.Request) {
+	period := r.URL.Query().Get("period")
+	if period == "" {
+		common.HttpResult(w, common.ErrParam.AppendMsg("period is required"))
+		return
+	}
+	queryTime, err := getQueryTime(period, r.URL.Query().Get("query_time"))
+	if err != nil {
+		common.HttpResult(w, common.ErrParam.AppendMsg(err.Error()))
+		return
+	}
+
+	buildingId := r.URL.Query().Get("building_id")
+	typeStr := r.URL.Query().Get("type")
+	if typeStr == "" {
+		common.HttpResult(w, common.ErrParam.AppendMsg("type is required"))
+		return
+	}
+	typeInt, err := strconv.Atoi(typeStr)
+	if err != nil {
+		common.HttpResult(w, common.ErrParam.AppendMsg("type is invalid"))
+		return
+	}
+
+	data, err := service.GetBuildingPowerConsumptionWithTimeRange(period, queryTime, buildingId, typeInt)
+	if err != nil {
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
+	}
+	common.HttpResult(w, common.OK.WithData(data))
+}
+
 // @Summary 建筑楼层用电量
 // @Description 建筑楼层用电量，根据粒度获取建筑所有楼层的用电量
 // @Tags Dashboard
@@ -144,6 +189,50 @@ func BuildingFloorPowerConsumptionHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 	data, err := service.GetBuildingFloorsPowerConsumption(buildingId, period, queryTime, 0)
+	if err != nil {
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
+	}
+	common.HttpResult(w, common.OK.WithData(data))
+}
+
+// @Summary 建筑楼层用电量范围
+// @Description 建筑楼层用电量范围，根据粒度获取建筑所有楼层的用电量
+// @Tags Dashboard
+// @Param period query string true "period, hour/day/month/year"
+// @Param floor_id query string true "floor_id"
+// @Param query_time query string false "query_time,格式2024-01-01/2024-01/2024,不传则默认当天/当月/当年"
+// @Param type query string false "type,0:全部,1:照明,2:动力"
+// @Produce  json
+// @Success 200 {object} common.Response{data=[]entity.LabelData} "objects array"
+// @Failure 500 {object} common.Response ""
+// @Router /dashboard/building-floor-power-consumption-range [get]
+func BuildingFloorPowerConsumptionRangeHandler(w http.ResponseWriter, r *http.Request) {
+	period := r.URL.Query().Get("period")
+	if period == "" {
+		common.HttpResult(w, common.ErrParam.AppendMsg("period is required"))
+		return
+	}
+	floorId := r.URL.Query().Get("floor_id")
+	if floorId == "" {
+		common.HttpResult(w, common.ErrParam.AppendMsg("floor_id is required"))
+		return
+	}
+	queryTime, err := getQueryTime(period, r.URL.Query().Get("query_time"))
+	if err != nil {
+		common.HttpResult(w, common.ErrParam.AppendMsg(err.Error()))
+		return
+	}
+	typeStr := r.URL.Query().Get("type")
+	if typeStr == "" {
+		typeStr = "0"
+	}
+	typeInt, err := strconv.Atoi(typeStr)
+	if err != nil {
+		common.HttpResult(w, common.ErrParam.AppendMsg("type is invalid"))
+		return
+	}
+	data, err := service.GetFloorPowerConsumptionWithTimeRange(period, queryTime, floorId, typeInt)
 	if err != nil {
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
 		return

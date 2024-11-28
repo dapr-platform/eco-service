@@ -121,6 +121,75 @@ const docTemplate = `{
                 }
             }
         },
+        "/dashboard/building-floor-power-consumption-range": {
+            "get": {
+                "description": "建筑楼层用电量范围，根据粒度获取建筑所有楼层的用电量",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "建筑楼层用电量范围",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "period, hour/day/month/year",
+                        "name": "period",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "floor_id",
+                        "name": "floor_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "query_time,格式2024-01-01/2024-01/2024,不传则默认当天/当月/当年",
+                        "name": "query_time",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "type,0:全部,1:照明,2:动力",
+                        "name": "type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "objects array",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/entity.LabelData"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/dashboard/building-power-consumption": {
             "get": {
                 "description": "建筑用电量，根据粒度获取所有建筑的用电量",
@@ -207,6 +276,74 @@ const docTemplate = `{
                         "name": "type",
                         "in": "query",
                         "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "objects array",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/common.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/entity.LabelData"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/dashboard/building-type-power-consumption-range": {
+            "get": {
+                "description": "建筑细分用电量范围，根据粒度,和分类获取所有建筑的用电量。分类为1:照明，2:动力,0:全部",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "建筑细分用电量范围",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "period, day/month/year",
+                        "name": "period",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "query_time,格式2024-01-01/2024-01/2024,不传则默认当天/当月/当年",
+                        "name": "query_time",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "building_id,不传则查询所有建筑",
+                        "name": "building_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "type",
+                        "name": "type",
+                        "in": "query"
                     }
                 ],
                 "responses": {

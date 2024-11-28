@@ -28,6 +28,8 @@ var (
 )
 
 type BuildingDataGetter func(time.Time) ([]entity.LabelData, error)
+type BuildingRangeDataFetcher func(period string, startTime, endTime time.Time, buildingId string, gatewayType int) ([]entity.LabelData, error)
+type FloorRangeDataFetcher func(period string, startTime, endTime time.Time, floorId string, gatewayType int) ([]entity.LabelData, error)
 
 func GetBuildingFloorsPowerConsumption(buildingID string, period string, queryTime time.Time, gatewayType int) ([]entity.LabelData, error) {
 	getters := map[string]BuildingDataGetter{
@@ -63,6 +65,453 @@ func GetBuildingsPowerConsumption(period string, queryTime time.Time, gatewayTyp
 	return nil, fmt.Errorf("unsupported period: %s", period)
 }
 
+func GetBuildingPowerConsumptionWithTimeRange(period string, queryTime time.Time,  buildingID string, gatewayType int) ([]entity.LabelData, error) {
+
+	var startTime, endTime time.Time
+	switch period {
+	case PERIOD_DAY:
+		startTime = time.Date(queryTime.Year(), queryTime.Month(), queryTime.Day(), 0, 0, 0, 0, queryTime.Location())
+		endTime = startTime.AddDate(0, 0, 1)
+		return getBuildingRangeData(PERIOD_HOUR, startTime, endTime, buildingID, gatewayType, getBuildingDataWithTimeRange)
+	case PERIOD_MONTH:
+		startTime = time.Date(queryTime.Year(), queryTime.Month(), 1, 0, 0, 0, 0, queryTime.Location())
+		endTime = startTime.AddDate(0, 1, 0)
+		return getBuildingRangeData(PERIOD_DAY, startTime, endTime, buildingID, gatewayType, getBuildingDataWithTimeRange)
+	case PERIOD_YEAR:
+		startTime = time.Date(queryTime.Year(), 1, 1, 0, 0, 0, 0, queryTime.Location())
+		endTime = startTime.AddDate(1, 0, 0)
+		return getBuildingRangeData(PERIOD_MONTH, startTime, endTime, buildingID, gatewayType, getBuildingDataWithTimeRange)
+	default:
+		return nil, fmt.Errorf("unsupported period: %s", period)
+	}
+}
+
+func GetFloorPowerConsumptionWithTimeRange(period string, queryTime time.Time,  floorID string, gatewayType int) ([]entity.LabelData, error) {
+
+	var startTime, endTime time.Time
+	switch period {
+	case PERIOD_DAY:
+		startTime = time.Date(queryTime.Year(), queryTime.Month(), queryTime.Day(), 0, 0, 0, 0, queryTime.Location())
+		endTime = startTime.AddDate(0, 0, 1)
+		return getFloorRangeData(PERIOD_HOUR, startTime, endTime, floorID, gatewayType, getFloorDataWithTimeRange)
+	case PERIOD_MONTH:
+		startTime = time.Date(queryTime.Year(), queryTime.Month(), 1, 0, 0, 0, 0, queryTime.Location())
+		endTime = startTime.AddDate(0, 1, 0)
+		return getFloorRangeData(PERIOD_DAY, startTime, endTime, floorID, gatewayType, getFloorDataWithTimeRange)
+	case PERIOD_YEAR:
+		startTime = time.Date(queryTime.Year(), 1, 1, 0, 0, 0, 0, queryTime.Location())
+		endTime = startTime.AddDate(1, 0, 0)
+		return getFloorRangeData(PERIOD_MONTH, startTime, endTime, floorID, gatewayType, getFloorDataWithTimeRange)
+	default:
+		return nil, fmt.Errorf("unsupported period: %s", period)
+	}
+}
+
+
+// 通用的时间范围数据获取函数
+func getBuildingRangeData(period string, startTime, endTime time.Time, buildingId string, gatewayType int, fetcher BuildingRangeDataFetcher) ([]entity.LabelData, error) {
+	common.Logger.Debugf("Getting range data: period=%s, startTime=%v, endTime=%v, gatewayType=%d", period, startTime, endTime, gatewayType)
+	current, err := fetcher(period, startTime, endTime, buildingId, gatewayType)
+	if err != nil {
+		return nil, err
+	}
+
+	var hbStartTime, hbEndTime, tbStartTime, tbEndTime time.Time
+	var getHb, getTb bool
+
+	switch period {
+	case PERIOD_HOUR:
+		hbStartTime = startTime.Add(-1 * time.Hour)
+		hbEndTime = endTime.Add(-1 * time.Hour)
+		tbStartTime = startTime.AddDate(0, 0, -1)
+		tbEndTime = endTime.AddDate(0, 0, -1)
+		getHb, getTb = true, true
+	case PERIOD_DAY:
+		hbStartTime = startTime.AddDate(0, 0, -1)
+		hbEndTime = endTime.AddDate(0, 0, -1)
+		tbStartTime = startTime.AddDate(0, -1, 0)
+		tbEndTime = endTime.AddDate(0, -1, 0)
+		getHb, getTb = true, true
+	case PERIOD_MONTH:
+		hbStartTime = startTime.AddDate(0, -1, 0)
+		hbEndTime = endTime.AddDate(0, -1, 0)
+		tbStartTime = startTime.AddDate(-1, 0, 0)
+		tbEndTime = endTime.AddDate(-1, 0, 0)
+		getHb, getTb = true, true
+	case PERIOD_YEAR:
+		tbStartTime = startTime.AddDate(-1, 0, 0)
+		tbEndTime = endTime.AddDate(-1, 0, 0)
+		getHb, getTb = false, true
+	}
+
+	var hb, tb []entity.LabelData
+	if getHb {
+		common.Logger.Debugf("Getting HB data for range: startTime=%v, endTime=%v", hbStartTime, hbEndTime)
+		hb, err = fetcher(period, hbStartTime, hbEndTime, buildingId, gatewayType)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if getTb {
+		common.Logger.Debugf("Getting TB data for range: startTime=%v, endTime=%v", tbStartTime, tbEndTime)
+		tb, err = fetcher(period, tbStartTime, tbEndTime, buildingId, gatewayType)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	calculateRatios(current, hb, tb)
+	return current, nil
+}
+
+// 通用的时间范围数据获取函数
+func getFloorRangeData(period string, startTime, endTime time.Time, floorId string, gatewayType int, fetcher FloorRangeDataFetcher) ([]entity.LabelData, error) {
+	common.Logger.Debugf("Getting range data: period=%s, startTime=%v, endTime=%v, gatewayType=%d", period, startTime, endTime, gatewayType)
+	current, err := fetcher(period, startTime, endTime, floorId, gatewayType)
+	if err != nil {
+		return nil, err
+	}
+
+	var hbStartTime, hbEndTime, tbStartTime, tbEndTime time.Time
+	var getHb, getTb bool
+
+	switch period {
+	case PERIOD_HOUR:
+		hbStartTime = startTime.Add(-1 * time.Hour)
+		hbEndTime = endTime.Add(-1 * time.Hour)
+		tbStartTime = startTime.AddDate(0, 0, -1)
+		tbEndTime = endTime.AddDate(0, 0, -1)
+		getHb, getTb = true, true
+	case PERIOD_DAY:
+		hbStartTime = startTime.AddDate(0, 0, -1)
+		hbEndTime = endTime.AddDate(0, 0, -1)
+		tbStartTime = startTime.AddDate(0, -1, 0)
+		tbEndTime = endTime.AddDate(0, -1, 0)
+		getHb, getTb = true, true
+	case PERIOD_MONTH:
+		hbStartTime = startTime.AddDate(0, -1, 0)
+		hbEndTime = endTime.AddDate(0, -1, 0)
+		tbStartTime = startTime.AddDate(-1, 0, 0)
+		tbEndTime = endTime.AddDate(-1, 0, 0)
+		getHb, getTb = true, true
+	case PERIOD_YEAR:
+		tbStartTime = startTime.AddDate(-1, 0, 0)
+		tbEndTime = endTime.AddDate(-1, 0, 0)
+		getHb, getTb = false, true
+	}
+
+	var hb, tb []entity.LabelData
+	if getHb {
+		common.Logger.Debugf("Getting HB data for range: startTime=%v, endTime=%v", hbStartTime, hbEndTime)
+		hb, err = fetcher(period, hbStartTime, hbEndTime, floorId, gatewayType)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if getTb {
+		common.Logger.Debugf("Getting TB data for range: startTime=%v, endTime=%v", tbStartTime, tbEndTime)
+		tb, err = fetcher(period, tbStartTime, tbEndTime, floorId, gatewayType)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	calculateRatios(current, hb, tb)
+	return current, nil
+}
+
+func getBuildingDataWithTimeRange(period string, startTime time.Time, endTime time.Time, buildingId string, gatewayType int) ([]entity.LabelData, error) {
+	var data interface{}
+	var err error
+	var tableName string
+
+	common.Logger.Debugf("Getting park data with time range: period=%s, startTime=%v, endTime=%v", period, startTime, endTime)
+
+	whereClause := ""
+	if gatewayType > 0 {
+		whereClause = fmt.Sprintf("&type=%d", gatewayType)
+	}
+	if buildingId != "" {
+		whereClause += fmt.Sprintf("&building_id=%s", buildingId)
+	}
+
+	switch period {
+	case PERIOD_HOUR:
+		tableName = model.Eco_building_1hTableInfo.Name
+		param := fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T15:00:00"), endTime.Format("2006-01-02T15:00:00"), whereClause)
+		data, err = common.DbQuery[model.Eco_building_1h](
+			context.Background(),
+			common.GetDaprClient(),
+			tableName,
+			param,
+		)
+		common.Logger.Debugf("table=%s, param=%s", tableName, param)
+	case PERIOD_DAY:
+		param := fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause)
+		tableName = model.Eco_building_1dTableInfo.Name
+		data, err = common.DbQuery[model.Eco_building_1d](
+			context.Background(),
+			common.GetDaprClient(),
+			tableName,
+			param,
+		)
+		common.Logger.Debugf("table=%s, param=%s", tableName, param)
+	case PERIOD_MONTH:
+		param := fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause)
+		tableName = model.Eco_building_1mTableInfo.Name
+		data, err = common.DbQuery[model.Eco_building_1m](
+			context.Background(),
+			common.GetDaprClient(),
+			tableName,
+			param,
+		)
+		common.Logger.Debugf("table=%s, param=%s", tableName, param)
+	case PERIOD_YEAR:
+		param := fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause)
+		tableName = model.Eco_building_1yTableInfo.Name
+		data, err = common.DbQuery[model.Eco_building_1y](
+			context.Background(),
+			common.GetDaprClient(),
+			tableName,
+			param,
+		)
+		common.Logger.Debugf("table=%s, param=%s", tableName, param)
+	default:
+		return nil, fmt.Errorf("unsupported period: %s", period)
+	}
+
+	if err != nil {
+		common.Logger.Debugf("Query error: %v", err)
+		return nil, err
+	}
+
+	parkPowerMap := make(map[string]float64)
+	var timeFormat string
+
+	switch period {
+	case PERIOD_HOUR:
+		timeFormat = "15"
+	case PERIOD_DAY:
+		timeFormat = "02"
+	case PERIOD_MONTH:
+		timeFormat = "01"
+	case PERIOD_YEAR:
+		timeFormat = "2006"
+	}
+	calcTimeFormat := "2006-01-02T15:04:05"
+	common.Logger.Debugf("getParkDataWithTimeRange data: %+v", data)
+	keys := []string{}
+	keyMap := make(map[string]bool)
+	switch period {
+	case PERIOD_HOUR:
+		for _, v := range data.([]model.Eco_building_1h) {
+			key := fmt.Sprintf("%s_%s", v.BuildingID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
+			if gatewayType == 0 {
+				parkPowerMap[key] += v.PowerConsumption
+			} else {
+				parkPowerMap[key] = v.PowerConsumption
+			}
+		}
+	case PERIOD_DAY:
+		for _, v := range data.([]model.Eco_building_1d) {
+			key := fmt.Sprintf("%s_%s", v.BuildingID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
+			if gatewayType == 0 {
+				parkPowerMap[key] += v.PowerConsumption
+			} else {
+				parkPowerMap[key] = v.PowerConsumption
+			}
+		}
+	case PERIOD_MONTH:
+		for _, v := range data.([]model.Eco_building_1m) {
+			key := fmt.Sprintf("%s_%s", v.BuildingID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
+			if gatewayType == 0 {
+				parkPowerMap[key] += v.PowerConsumption
+			} else {
+				parkPowerMap[key] = v.PowerConsumption
+			}
+		}
+	case PERIOD_YEAR:
+		for _, v := range data.([]model.Eco_building_1y) {
+			key := fmt.Sprintf("%s_%s", v.BuildingID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
+			if gatewayType == 0 {
+				parkPowerMap[key] += v.PowerConsumption
+			} else {
+				parkPowerMap[key] = v.PowerConsumption
+			}
+		}
+	}
+
+	var sortedData []keyValue
+	for _, k := range keys {
+		sortedData = append(sortedData, keyValue{k, parkPowerMap[k]})
+	}
+
+	result := fillSortedData(sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
+
+	return result, nil
+}
+func getFloorDataWithTimeRange(period string, startTime time.Time, endTime time.Time, floorId string, gatewayType int) ([]entity.LabelData, error) {
+	var data interface{}
+	var err error
+	var tableName string
+
+	common.Logger.Debugf("Getting park data with time range: period=%s, startTime=%v, endTime=%v", period, startTime, endTime)
+
+	whereClause := ""
+	if gatewayType > 0 {
+		whereClause = fmt.Sprintf("&type=%d", gatewayType)
+	}
+	if floorId != "" {
+		whereClause += fmt.Sprintf("&floor_id=%s", floorId)
+	}
+
+	switch period {
+	case PERIOD_HOUR:
+		tableName = model.Eco_floor_1hTableInfo.Name
+		param := fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T15:00:00"), endTime.Format("2006-01-02T15:00:00"), whereClause)
+		data, err = common.DbQuery[model.Eco_floor_1h](
+			context.Background(),
+			common.GetDaprClient(),
+			tableName,
+			param,
+		)
+		common.Logger.Debugf("table=%s, param=%s", tableName, param)
+	case PERIOD_DAY:
+		param := fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause)
+		tableName = model.Eco_floor_1dTableInfo.Name
+		data, err = common.DbQuery[model.Eco_floor_1d](
+			context.Background(),
+			common.GetDaprClient(),
+			tableName,
+			param,
+		)
+		common.Logger.Debugf("table=%s, param=%s", tableName, param)
+	case PERIOD_MONTH:
+		param := fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause)
+		tableName = model.Eco_floor_1mTableInfo.Name
+		data, err = common.DbQuery[model.Eco_floor_1m](
+			context.Background(),
+			common.GetDaprClient(),
+			tableName,
+			param,
+		)
+		common.Logger.Debugf("table=%s, param=%s", tableName, param)
+	case PERIOD_YEAR:
+		param := fmt.Sprintf("time=$gte.%s&time=$lt.%s%s", startTime.Format("2006-01-02T00:00:00"), endTime.Format("2006-01-02T00:00:00"), whereClause)
+		tableName = model.Eco_floor_1yTableInfo.Name
+		data, err = common.DbQuery[model.Eco_floor_1y](
+			context.Background(),
+			common.GetDaprClient(),
+			tableName,
+			param,
+		)
+		common.Logger.Debugf("table=%s, param=%s", tableName, param)
+	default:
+		return nil, fmt.Errorf("unsupported period: %s", period)
+	}
+
+	if err != nil {
+		common.Logger.Debugf("Query error: %v", err)
+		return nil, err
+	}
+
+	parkPowerMap := make(map[string]float64)
+	var timeFormat string
+
+	switch period {
+	case PERIOD_HOUR:
+		timeFormat = "15"
+	case PERIOD_DAY:
+		timeFormat = "02"
+	case PERIOD_MONTH:
+		timeFormat = "01"
+	case PERIOD_YEAR:
+		timeFormat = "2006"
+	}
+	calcTimeFormat := "2006-01-02T15:04:05"
+	common.Logger.Debugf("getParkDataWithTimeRange data: %+v", data)
+	keys := []string{}
+	keyMap := make(map[string]bool)
+	switch period {
+	case PERIOD_HOUR:
+		for _, v := range data.([]model.Eco_floor_1h) {
+			key := fmt.Sprintf("%s_%s", v.FloorID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
+			if gatewayType == 0 {
+				parkPowerMap[key] += v.PowerConsumption
+			} else {
+				parkPowerMap[key] = v.PowerConsumption
+			}
+		}
+	case PERIOD_DAY:
+		for _, v := range data.([]model.Eco_floor_1d) {
+			key := fmt.Sprintf("%s_%s", v.FloorID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
+			if gatewayType == 0 {
+				parkPowerMap[key] += v.PowerConsumption
+			} else {
+				parkPowerMap[key] = v.PowerConsumption
+			}
+		}
+	case PERIOD_MONTH:
+		for _, v := range data.([]model.Eco_floor_1m) {
+			key := fmt.Sprintf("%s_%s", v.FloorID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
+			if gatewayType == 0 {
+				parkPowerMap[key] += v.PowerConsumption
+			} else {
+				parkPowerMap[key] = v.PowerConsumption
+			}
+		}
+	case PERIOD_YEAR:
+		for _, v := range data.([]model.Eco_floor_1y) {
+			key := fmt.Sprintf("%s_%s", v.FloorID, time.Time(v.Time).Format(calcTimeFormat))
+			if _, ok := keyMap[key]; !ok {
+				keys = append(keys, key)
+				keyMap[key] = true
+			}
+			if gatewayType == 0 {
+				parkPowerMap[key] += v.PowerConsumption
+			} else {
+				parkPowerMap[key] = v.PowerConsumption
+			}
+		}
+	}
+
+	var sortedData []keyValue
+	for _, k := range keys {
+		sortedData = append(sortedData, keyValue{k, parkPowerMap[k]})
+	}
+
+	result := fillSortedData(sortedData, period, startTime, endTime, calcTimeFormat, timeFormat)
+
+	return result, nil
+}
 func getBuildingDataWithTimeOffset(period string, queryTime time.Time, years, months, days int, gatewayType int) ([]entity.LabelData, error) {
 	var data interface{}
 	var err error
