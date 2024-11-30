@@ -9,6 +9,8 @@ github.com/dapr-platform/common v0.0.0-20241114070226-7e9fb4fbec68 h1:26hocUmI41
 github.com/dapr-platform/common v0.0.0-20241114070226-7e9fb4fbec68/go.mod h1:bvLwDx2IWA2rv9gngEm5I1C5iSkVzPA2t/ozjN/5s34=
 github.com/dapr-platform/common v0.0.0-20241115052626-caeef7d7942b h1:jzVrDvIiSIKbL3xo5Rez5DuKm3l2IFMHRiqXaK1wyUY=
 github.com/dapr-platform/common v0.0.0-20241115052626-caeef7d7942b/go.mod h1:bvLwDx2IWA2rv9gngEm5I1C5iSkVzPA2t/ozjN/5s34=
+github.com/dapr-platform/common v1.0.0-20241129-1 h1:m3XVPvnWFRfpMEonC8bDxe7HP11Z3Lvh55yFdWEgxjM=
+github.com/dapr-platform/common v1.0.0-20241129-1/go.mod h1:n4eOSWTax7yQK4845OmCXW4qiBvPZ4v6ZrsYdH/uIpM=
 github.com/dapr/dapr v1.14.4 h1:OEyAFvpW4AK+MWyX5xp9zVLiC+oY/5ziDzh16F+aoWU=
 github.com/dapr/dapr v1.14.4/go.mod h1:pZGJvUGT4IDhEuWVXBvJ73TkPnLAW34SDagth7G3f8w=
 github.com/dapr/go-sdk v1.11.0 h1:clANpOQd6MsfvSa6snaX8MVk6eRx26Vsj5GxGdQ6mpE=
@@ -125,6 +127,8 @@ golang.org/x/tools v0.22.0 h1:gqSGLZqv+AI9lIQzniJ0nZDRG5GBPsSi+DRNHWNz6yA=
 golang.org/x/tools v0.22.0/go.mod h1:aCwcsjqvq7Yqt6TNyX7QMU2enbQ/Gt0bo6krSeEri+c=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20241113202542-65e8d215514f h1:C1QccEa9kUwvMgEUORqQD9S17QesQijxjZ84sO82mfo=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20241113202542-65e8d215514f/go.mod h1:GX3210XPVPUjJbTUbvwI8f2IpZDMZuPJWDzDuebbviI=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20241118233622-e639e219e697 h1:LWZqQOEjDyONlF1H6afSWpAL/znlREo2tHfLoe+8LMA=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20241118233622-e639e219e697/go.mod h1:5uTbfoYQed2U9p3KIj2/Zzm02PYhndfdmML0qC3q3FU=
 google.golang.org/grpc v1.68.0 h1:aHQeeJbo8zAkAa3pRzrVjZlbz6uSfeOXlJNQM0RAbz0=
 google.golang.org/grpc v1.68.0/go.mod h1:fmSPC5AsjSBCK54MyHRx48kpOti1/jRfOlwEWywNjWA=
 google.golang.org/protobuf v1.35.1 h1:m3LfL6/Ca+fqnjnlqQXNpFPABW1UD7mjh8KO2mKFytA=
