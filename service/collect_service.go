@@ -21,11 +21,11 @@ var gatewayNeedRefreshContinuousAggregateMap = map[string]string{
 	"f_eco_gateway_1d":  "day",
 	"f_eco_gateway_1m":  "month",
 	"f_eco_gateway_1y":  "year",
-	"f_eco_gateway_1h":  "hour",
 	"f_eco_floor_1d":    "day",
 	"f_eco_floor_1m":    "month",
 	"f_eco_floor_1y":    "year",
 	"f_eco_floor_1h":    "hour",
+	"f_eco_building_1h": "hour",
 	"f_eco_building_1d": "day",
 	"f_eco_building_1m": "month",
 	"f_eco_building_1y": "year",
@@ -161,7 +161,7 @@ func CheckCollectData(start, end string, collectType int) ([]map[string]interfac
 // 收集水表实时数据
 func CollectWaterMeterRealData() error {
 	common.Logger.Info("Starting water meter real-time data collection")
-	
+
 	waterMeters, err := GetAllWaterMeters()
 	if err != nil {
 		return errors.Wrap(err, "Failed to get water meters")
@@ -175,7 +175,7 @@ func CollectWaterMeterRealData() error {
 
 	for _, meter := range waterMeters {
 		common.Logger.Debugf("Processing water meter: %s (ID: %s)", meter.CmCode, meter.ID)
-		
+
 		// Get real-time data for each water meter
 		resp, err := client.GetRealDataByCmCode[client.WaterMeterData](meter.CmCode)
 		if err != nil {
@@ -196,7 +196,7 @@ func CollectWaterMeterRealData() error {
 			initial = true
 			common.Logger.Infof("Initial data collection for meter %s, setting baseline value to %.2f", meter.CmCode, currentCumFlow)
 		}
-		
+
 		// Update meter's cumulative flow
 		meter.TotalValue = currentCumFlow
 		common.Logger.Debugf("Attempting to update meter %s with data: %+v", meter.CmCode, meter)
@@ -207,11 +207,11 @@ func CollectWaterMeterRealData() error {
 			continue
 		}
 		common.Logger.Debugf("Updated cumulative flow for meter %s to %.2f", meter.CmCode, currentCumFlow)
-		
+
 		if initial {
 			continue
 		}
-		
+
 		// Insert hourly usage into 1h table
 		hourData := model.Eco_water_meter_1h{
 			ID:               fmt.Sprintf("%x", md5.Sum([]byte(meter.ID+"_"+now.Format("2006010215")))),
@@ -291,6 +291,7 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 
 	return nil
 }
+
 // 手动填充园区水表小时数据
 func ManuFillParkWaterHourStats(cmCode, start, end, value string) error {
 	common.Logger.Infof("Starting ManuFillParkWaterHourStats for start: %s, end: %s, value: %s", start, end, value)
@@ -321,7 +322,7 @@ func ManuFillParkWaterHourStats(cmCode, start, end, value string) error {
 	if totalValue <= 0 {
 		return errors.New("Value must be greater than 0")
 	}
-	
+
 	common.Logger.Infof("Parsed inputs - Start time: %s, Total value: %.2f", startTime.Format("2006-01"), totalValue)
 
 	waterMeters, err := GetAllWaterMeters()
@@ -349,7 +350,7 @@ func ManuFillParkWaterHourStats(cmCode, start, end, value string) error {
 	}
 
 	// Calculate days in month
-	totalDays := int(endTime.Sub(startTime).Hours()) / 24 + 1 // 修复日期计算,加1包含结束日期
+	totalDays := int(endTime.Sub(startTime).Hours())/24 + 1 // 修复日期计算,加1包含结束日期
 
 	common.Logger.Infof("Generating daily values for %d days", totalDays)
 
@@ -425,14 +426,14 @@ func ManuFillParkWaterHourStats(cmCode, start, end, value string) error {
 		// Insert hourly values into database
 		for hour := 0; hour < 24; hour++ {
 			timestamp := time.Date(currentDate.Year(), currentDate.Month(), currentDate.Day(), hour, 0, 0, 0, time.Local)
-			
+
 			waterData := model.Eco_water_meter_1h{
 				ID:               fmt.Sprintf("%x", md5.Sum([]byte(waterMeter.ID+"_"+timestamp.Format("2006010215")))),
 				Time:             common.LocalTime(timestamp),
 				ParkID:           waterMeter.ParkID,
 				WaterMeterID:     waterMeter.ID,
 				BuildingID:       waterMeter.BuildingID,
-				Type:            waterMeter.Type,
+				Type:             waterMeter.Type,
 				WaterConsumption: hourlyValues[hour],
 			}
 
@@ -566,8 +567,8 @@ func ManuFillGatewayHourStats(month, value string) error {
 			// Calculate value per gateway, ensuring total matches input
 			valuePerGateway := float64(int64((hourlyValues[hour]/float64(len(gateways)))*100)) / 100
 			remainingValue := hourlyValues[hour] - (valuePerGateway * float64(len(gateways)-1))
-			
-			common.Logger.Debugf("Hour %02d:00 - Total value: %.4f, Per gateway: %.4f, Last gateway: %.4f", 
+
+			common.Logger.Debugf("Hour %02d:00 - Total value: %.4f, Per gateway: %.4f, Last gateway: %.4f",
 				hour, hourlyValues[hour], valuePerGateway, remainingValue)
 
 			for i, gateway := range gateways {
@@ -575,7 +576,7 @@ func ManuFillGatewayHourStats(month, value string) error {
 				if i == len(gateways)-1 {
 					value = remainingValue // Last gateway gets remaining value
 				}
-				
+
 				stat := model.Eco_gateway_1h{
 					ID:               gateway.ID + "_" + currentTime.Format("2006010215"),
 					Time:             common.LocalTime(currentTime),
