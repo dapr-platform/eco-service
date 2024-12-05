@@ -490,6 +490,13 @@ func ManuFillGatewayHourStats(month, value string) error {
 	if err != nil {
 		return errors.Wrap(err, "Failed to get gateways")
 	}
+	buildingGateways := []model.Ecgateway{}
+	for _, gateway := range gateways {
+		if gateway.Level == 1 {
+			buildingGateways = append(buildingGateways, gateway)
+		}
+	}
+	gateways = buildingGateways
 
 	if len(gateways) == 0 {
 		return errors.New("No gateways found")
