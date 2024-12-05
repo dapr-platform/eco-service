@@ -600,6 +600,7 @@ func ManuFillGatewayHourStats(month, value string) error {
 					FloorID:          gateway.FloorID,
 					BuildingID:       gateway.BuildingID,
 					Type:             gateway.Type,
+					Level:            gateway.Level,
 					ParkID:           gateway.ParkID,
 					PowerConsumption: value,
 				}

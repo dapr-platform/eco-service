@@ -327,6 +327,8 @@ COMMENT ON COLUMN f_eco_gateway_1h.type IS '网关类型(1:AL,2:AP)';
 COMMENT ON COLUMN f_eco_gateway_1h.level IS '层级(0:园区,1:楼栋,2:楼层)';
 COMMENT ON COLUMN f_eco_gateway_1h.power_consumption IS '用电量(kWh)';
 
+CREATE INDEX idx_gateway_1h_level ON f_eco_gateway_1h(level, time DESC);
+
 -- Create continuous aggregates for gateway daily metrics
 CREATE MATERIALIZED VIEW f_eco_gateway_1d
 WITH (timescaledb.continuous) AS
@@ -381,7 +383,7 @@ SELECT time_bucket(INTERVAL '1 hour', time) AS time,
        park_id,
        type,
        sum(power_consumption) as power_consumption
-FROM f_eco_gateway_1h
+FROM f_eco_gateway_1h where level=2
 GROUP BY time_bucket(INTERVAL '1 hour', time), floor_id, building_id, park_id, type, level
 WITH NO DATA;
 
