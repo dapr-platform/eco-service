@@ -26,7 +26,7 @@ Table: f_eco_park_1y
 
 JSON Sample
 -------------------------------------
-{    "time": 46,    "park_id": "AvCNvsPYLRQwswVlPPtaIiqfe",    "type": 92,    "power_consumption": 0.8091859042973838}
+{    "time": 31,    "park_id": "nYAalKfbJicvvOiQlweZMkkAM",    "type": 16,    "power_consumption": 0.15409287935868446}
 
 
 Comments
@@ -51,10 +51,13 @@ var (
 
 // Eco_park_1y struct is a row record of the f_eco_park_1y table in the  database
 type Eco_park_1y struct {
-	Time             common.LocalTime `json:"time"`              //time
-	ParkID           string           `json:"park_id"`           //park_id
-	Type             int32            `json:"type"`              //type
-	PowerConsumption float64          `json:"power_consumption"` //power_consumption
+	Time common.LocalTime `json:"time"` //time
+
+	ParkID string `json:"park_id"` //park_id
+
+	Type int32 `json:"type"` //type
+
+	PowerConsumption float64 `json:"power_consumption"` //power_consumption
 
 }
 

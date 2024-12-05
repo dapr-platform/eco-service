@@ -777,6 +777,7 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 								FloorID:          gateway.FloorID,
 								BuildingID:       gateway.BuildingID,
 								Type:             gateway.Type,
+								Level:            gateway.Level,
 								ParkID:           gateway.ParkID,
 								PowerConsumption: getTotalElectricity(stats, addr),
 							}
@@ -920,6 +921,7 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 							BuildingID:       gateway.BuildingID,
 							ParkID:           gateway.ParkID,
 							Type:             gateway.Type,
+							Level:            gateway.Level,
 							PowerConsumption: getTotalElectricity(stats, addr),
 						}}
 

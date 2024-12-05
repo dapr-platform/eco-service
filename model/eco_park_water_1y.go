@@ -26,7 +26,7 @@ Table: f_eco_park_water_1y
 
 JSON Sample
 -------------------------------------
-{    "time": 46,    "park_id": "DKRhvHHcCKXtjiORAUMlrpqeh",    "type": 69,    "water_consumption": 0.7636568433237264}
+{    "time": 86,    "park_id": "FsyArpdFQVnWYMkhtVHsTYPAa",    "type": 8,    "water_consumption": 0.9117556329655563}
 
 
 Comments
@@ -51,10 +51,13 @@ var (
 
 // Eco_park_water_1y struct is a row record of the f_eco_park_water_1y table in the  database
 type Eco_park_water_1y struct {
-	Time             common.LocalTime `json:"time"`              //time
-	ParkID           string           `json:"park_id"`           //park_id
-	Type             int32            `json:"type"`              //type
-	WaterConsumption float64          `json:"water_consumption"` //water_consumption
+	Time common.LocalTime `json:"time"` //time
+
+	ParkID string `json:"park_id"` //park_id
+
+	Type int32 `json:"type"` //type
+
+	WaterConsumption float64 `json:"water_consumption"` //water_consumption
 
 }
 

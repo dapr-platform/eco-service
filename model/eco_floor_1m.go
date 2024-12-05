@@ -28,7 +28,7 @@ Table: f_eco_floor_1m
 
 JSON Sample
 -------------------------------------
-{    "time": 18,    "floor_id": "GsFBGpUJLjpLkWLcwnTQAxqNC",    "building_id": "JrxelwVQfXoqMaJMdnBtliKJy",    "park_id": "YJMgldDTOEtDhCaFaWcbgcXUm",    "type": 47,    "power_consumption": 0.544176895822428}
+{    "time": 41,    "floor_id": "qxchhBoiEKaXbwTwjWJPuMEoV",    "building_id": "gwEUbHbZAFnulhPcaCTxTjnUm",    "park_id": "frxChwGSWijOGbgXcLRCWkYej",    "type": 70,    "power_consumption": 0.16713012726056983}
 
 
 Comments
@@ -57,12 +57,17 @@ var (
 
 // Eco_floor_1m struct is a row record of the f_eco_floor_1m table in the  database
 type Eco_floor_1m struct {
-	Time             common.LocalTime `json:"time"`              //time
-	FloorID          string           `json:"floor_id"`          //floor_id
-	BuildingID       string           `json:"building_id"`       //building_id
-	ParkID           string           `json:"park_id"`           //park_id
-	Type             int32            `json:"type"`              //type
-	PowerConsumption float64          `json:"power_consumption"` //power_consumption
+	Time common.LocalTime `json:"time"` //time
+
+	FloorID string `json:"floor_id"` //floor_id
+
+	BuildingID string `json:"building_id"` //building_id
+
+	ParkID string `json:"park_id"` //park_id
+
+	Type int32 `json:"type"` //type
+
+	PowerConsumption float64 `json:"power_consumption"` //power_consumption
 
 }
 

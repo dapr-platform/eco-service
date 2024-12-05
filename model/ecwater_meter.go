@@ -36,7 +36,7 @@ Table: o_eco_water_meter
 
 JSON Sample
 -------------------------------------
-{    "id": "VDMnlIhDgwxIyOeXVYdsJkTAD",    "created_by": "UXEwNUwQLiUyacjfUGguprAKm",    "created_time": 80,    "updated_by": "BPouLJvxaCerKcCemtBpHEZdO",    "updated_time": 18,    "model_name": "AxqYZksyrAtCRVtGwlXOAZLtg",    "dev_name": "cPtnIbUDsYdwZoyvCFrgwSxKU",    "channel_no": "AsxDbidQfWGThUOIntElclRMm",    "cm_code": "HHdYkjDNXWqIdNFHHnlheNgdT",    "location": "fcUrxVmbRrflqLKoNZjyNauOK",    "building_id": "epHprgVqQKpKMoSNShaVaONOs",    "park_id": "hJjmoQOMtDLCCESWoqYLfnUDj",    "type": 90,    "total_value": 0.2291149496328443}
+{    "id": "wxaMSVOCsvpjCUGCOAwbFTnNG",    "created_by": "ITWHsqGOSUnXriuKmUtEbHmwQ",    "created_time": 21,    "updated_by": "VxCjjXncoXtRgeSMOAyjiceek",    "updated_time": 34,    "model_name": "OkLkASpZkiadtowqwbEbNhfmZ",    "dev_name": "HENRZOUGclPlGHFlAVyuSFdAB",    "channel_no": "ZvpVvhLrTmDvqOKZgeaNTAUiH",    "cm_code": "nvUxELdsoadvYVtqkuETmFRxD",    "location": "phEdnoTBlCUPVtDtGDGSSrlrw",    "building_id": "RtOoVPUFppRqkdVulGjrXEXYN",    "park_id": "vewueTKBqwWicsiLZLoSqLVqZ",    "type": 15,    "total_value": 0.630864729775042}
 
 
 

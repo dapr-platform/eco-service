@@ -27,7 +27,7 @@ Table: f_eco_building_1d
 
 JSON Sample
 -------------------------------------
-{    "time": 93,    "building_id": "lncFQTQewZAclLeLxBeMOyRmC",    "park_id": "mndvYQGZSkgNdmEjHENaaZFRB",    "type": 12,    "power_consumption": 0.35230438877429837}
+{    "time": 95,    "building_id": "itMopbvDRVrtcQnbMGuGbZnrc",    "park_id": "UdrkZMefSVmoPrPEwmvWVvbPZ",    "type": 93,    "power_consumption": 0.3794671559046762}
 
 
 Comments
@@ -54,11 +54,15 @@ var (
 
 // Eco_building_1d struct is a row record of the f_eco_building_1d table in the  database
 type Eco_building_1d struct {
-	Time             common.LocalTime `json:"time"`              //time
-	BuildingID       string           `json:"building_id"`       //building_id
-	ParkID           string           `json:"park_id"`           //park_id
-	Type             int32            `json:"type"`              //type
-	PowerConsumption float64          `json:"power_consumption"` //power_consumption
+	Time common.LocalTime `json:"time"` //time
+
+	BuildingID string `json:"building_id"` //building_id
+
+	ParkID string `json:"park_id"` //park_id
+
+	Type int32 `json:"type"` //type
+
+	PowerConsumption float64 `json:"power_consumption"` //power_consumption
 
 }
 

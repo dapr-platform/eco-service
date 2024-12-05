@@ -24,12 +24,13 @@ Table: f_eco_gateway_1y
 [ 3] building_id                                    VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 4] park_id                                        VARCHAR(32)          null: true   primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 5] type                                           INT4                 null: true   primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
-[ 6] power_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
+[ 6] level                                          INT4                 null: true   primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[ 7] power_consumption                              NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "time": 37,    "gateway_id": "UuifmkVBSxIDtgLDMQdRusRHv",    "floor_id": "mQQWSUwpfreKIEBDjKhtmLSgu",    "building_id": "ClKgbgqebSfLAvVyVxRYYSbjy",    "park_id": "BuEwgkWBYalaZXcGyZTBGgksH",    "type": 29,    "power_consumption": 0.8413386631404552}
+{    "time": 66,    "gateway_id": "aQsADuhkwCAteQSsJMwEdWKyW",    "floor_id": "DARrksrGcAJZZNDDJGPqREPYX",    "building_id": "qNJHTJllCcartVtnVuNeeqWQK",    "park_id": "RFcORURFYXZIdldYmsMZqGhEb",    "type": 63,    "level": 58,    "power_consumption": 0.1611651748470879}
 
 
 Comments
@@ -55,18 +56,28 @@ var (
 
 	Eco_gateway_1y_FIELD_NAME_type = "type"
 
+	Eco_gateway_1y_FIELD_NAME_level = "level"
+
 	Eco_gateway_1y_FIELD_NAME_power_consumption = "power_consumption"
 )
 
 // Eco_gateway_1y struct is a row record of the f_eco_gateway_1y table in the  database
 type Eco_gateway_1y struct {
-	Time             common.LocalTime `json:"time"`              //time
-	GatewayID        string           `json:"gateway_id"`        //gateway_id
-	FloorID          string           `json:"floor_id"`          //floor_id
-	BuildingID       string           `json:"building_id"`       //building_id
-	ParkID           string           `json:"park_id"`           //park_id
-	Type             int32            `json:"type"`              //type
-	PowerConsumption float64          `json:"power_consumption"` //power_consumption
+	Time common.LocalTime `json:"time"` //time
+
+	GatewayID string `json:"gateway_id"` //gateway_id
+
+	FloorID string `json:"floor_id"` //floor_id
+
+	BuildingID string `json:"building_id"` //building_id
+
+	ParkID string `json:"park_id"` //park_id
+
+	Type int32 `json:"type"` //type
+
+	Level int32 `json:"level"` //level
+
+	PowerConsumption float64 `json:"power_consumption"` //power_consumption
 
 }
 
@@ -204,6 +215,27 @@ Warning table: f_eco_gateway_1y primary key column time is nullable column, sett
 
 		&ColumnInfo{
 			Index:              6,
+			Name:               "level",
+			Comment:            `level`,
+			Notes:              ``,
+			Nullable:           true,
+			DatabaseTypeName:   "INT4",
+			DatabaseTypePretty: "INT4",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "INT4",
+			ColumnLength:       -1,
+			GoFieldName:        "Level",
+			GoFieldType:        "int32",
+			JSONFieldName:      "level",
+			ProtobufFieldName:  "level",
+			ProtobufType:       "int32",
+			ProtobufPos:        7,
+		},
+
+		&ColumnInfo{
+			Index:              7,
 			Name:               "power_consumption",
 			Comment:            `power_consumption`,
 			Notes:              ``,
@@ -220,7 +252,7 @@ Warning table: f_eco_gateway_1y primary key column time is nullable column, sett
 			JSONFieldName:      "power_consumption",
 			ProtobufFieldName:  "power_consumption",
 			ProtobufType:       "float",
-			ProtobufPos:        7,
+			ProtobufPos:        8,
 		},
 	},
 }

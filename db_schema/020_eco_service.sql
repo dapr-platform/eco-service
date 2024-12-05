@@ -29,7 +29,7 @@ CREATE TABLE o_eco_building (
     index INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (park_id) REFERENCES o_eco_park(id)
 );
-ALTER TABLE o_eco_building ADD CONSTRAINT uk_eco_building_name UNIQUE(building_name);
+ALTER TABLE o_eco_building ADD CONSTRAINT uk_eco_building_name_park UNIQUE(building_name, park_id);
 COMMENT ON TABLE o_eco_building IS '楼栋信息表';
 COMMENT ON COLUMN o_eco_building.id IS '主键ID';
 COMMENT ON COLUMN o_eco_building.building_name IS '楼栋名称';
@@ -77,13 +77,12 @@ CREATE TABLE o_eco_gateway (
     cm_code VARCHAR(64) NOT NULL,
     project_code VARCHAR(64) NOT NULL DEFAULT '',
     location VARCHAR(128) NOT NULL,
-    floor_id VARCHAR(32) NOT NULL,
-    building_id VARCHAR(32) NOT NULL,
-    park_id VARCHAR(32) NOT NULL,
+    floor_id VARCHAR(32) NOT NULL DEFAULT '',
+    building_id VARCHAR(32) NOT NULL DEFAULT '',
+    park_id VARCHAR(32) NOT NULL DEFAULT '',
     type INTEGER NOT NULL,
-    FOREIGN KEY (floor_id) REFERENCES o_eco_floor(id),
-    FOREIGN KEY (building_id) REFERENCES o_eco_building(id),
-    FOREIGN KEY (park_id) REFERENCES o_eco_park(id)
+    level INTEGER NOT NULL DEFAULT 0,
+    collect_type INTEGER NOT NULL DEFAULT 0
 );
 ALTER TABLE o_eco_gateway ADD CONSTRAINT uk_eco_gateway_mac_addr UNIQUE(mac_addr);
 COMMENT ON TABLE o_eco_gateway IS '配电网关信息表';
@@ -102,8 +101,8 @@ COMMENT ON COLUMN o_eco_gateway.floor_id IS '楼层ID';
 COMMENT ON COLUMN o_eco_gateway.building_id IS '楼栋ID';
 COMMENT ON COLUMN o_eco_gateway.park_id IS '园区ID';
 COMMENT ON COLUMN o_eco_gateway.type IS '网关类型(1:AL,2:AP)';
-ALTER TABLE o_eco_gateway ADD COLUMN collect_type INTEGER NOT NULL DEFAULT 0;
 COMMENT ON COLUMN o_eco_gateway.collect_type IS '采集类型(0:配电平台,1:IOT)';
+COMMENT ON COLUMN o_eco_gateway.level IS '层级(0:园区,1:楼栋,2:楼层)';
 
 CREATE TABLE o_eco_water_meter (
     id VARCHAR(32) PRIMARY KEY,
@@ -301,10 +300,11 @@ CREATE TABLE f_eco_gateway_1h (
     id VARCHAR(32),
     time TIMESTAMP NOT NULL,
     gateway_id VARCHAR(32) NOT NULL,
-    floor_id VARCHAR(32) NOT NULL,
-    building_id VARCHAR(32) NOT NULL,
-    park_id VARCHAR(32) NOT NULL,
+    floor_id VARCHAR(32) NOT NULL DEFAULT '',
+    building_id VARCHAR(32) NOT NULL DEFAULT '',
+    park_id VARCHAR(32) NOT NULL DEFAULT '',
     type INTEGER NOT NULL,
+    level INTEGER NOT NULL DEFAULT 0,
     power_consumption DECIMAL(20,2) NOT NULL,
     FOREIGN KEY (gateway_id) REFERENCES o_eco_gateway(id),
     FOREIGN KEY (floor_id) REFERENCES o_eco_floor(id),
@@ -324,6 +324,7 @@ COMMENT ON COLUMN f_eco_gateway_1h.floor_id IS '楼层ID';
 COMMENT ON COLUMN f_eco_gateway_1h.building_id IS '楼栋ID';
 COMMENT ON COLUMN f_eco_gateway_1h.park_id IS '园区ID';
 COMMENT ON COLUMN f_eco_gateway_1h.type IS '网关类型(1:AL,2:AP)';
+COMMENT ON COLUMN f_eco_gateway_1h.level IS '层级(0:园区,1:楼栋,2:楼层)';
 COMMENT ON COLUMN f_eco_gateway_1h.power_consumption IS '用电量(kWh)';
 
 -- Create continuous aggregates for gateway daily metrics
@@ -335,9 +336,10 @@ SELECT time_bucket(INTERVAL '1 day', time) AS time,
        building_id,
        park_id,
        type,
+       level,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket(INTERVAL '1 day', time), gateway_id, floor_id, building_id, park_id, type
+GROUP BY time_bucket(INTERVAL '1 day', time), gateway_id, floor_id, building_id, park_id, type, level
 WITH NO DATA;
 
 -- Create continuous aggregates for gateway monthly metrics
@@ -349,9 +351,10 @@ SELECT time_bucket(INTERVAL '1 month', time) AS time,
        building_id,
        park_id,
        type,
+       level,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket(INTERVAL '1 month', time), gateway_id, floor_id, building_id, park_id, type
+GROUP BY time_bucket(INTERVAL '1 month', time), gateway_id, floor_id, building_id, park_id, type, level
 WITH NO DATA;
 
 -- Create continuous aggregates for gateway yearly metrics
@@ -362,10 +365,11 @@ SELECT time_bucket(INTERVAL '1 year', time) AS time,
        floor_id,
        building_id,
        park_id,
-       type,
+       type,    
+       level,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket(INTERVAL '1 year', time), gateway_id, floor_id, building_id, park_id, type
+GROUP BY time_bucket(INTERVAL '1 year', time), gateway_id, floor_id, building_id, park_id, type, level
 WITH NO DATA;
 
 -- Create continuous aggregates for floor hourly metrics
@@ -378,7 +382,7 @@ SELECT time_bucket(INTERVAL '1 hour', time) AS time,
        type,
        sum(power_consumption) as power_consumption
 FROM f_eco_gateway_1h
-GROUP BY time_bucket(INTERVAL '1 hour', time), floor_id, building_id, park_id, type
+GROUP BY time_bucket(INTERVAL '1 hour', time), floor_id, building_id, park_id, type, level
 WITH NO DATA;
 
 -- Create continuous aggregates for floor daily metrics
@@ -390,7 +394,7 @@ SELECT time_bucket(INTERVAL '1 day', time) AS time,
        park_id,
        type,
        sum(power_consumption) as power_consumption
-FROM f_eco_gateway_1h
+FROM f_eco_gateway_1h where level=2
 GROUP BY time_bucket(INTERVAL '1 day', time), floor_id, building_id, park_id, type
 WITH NO DATA;
 
@@ -403,7 +407,7 @@ SELECT time_bucket(INTERVAL '1 month', time) AS time,
        park_id,
        type,
        sum(power_consumption) as power_consumption
-FROM f_eco_gateway_1h
+FROM f_eco_gateway_1h where level=2
 GROUP BY time_bucket(INTERVAL '1 month', time), floor_id, building_id, park_id, type
 WITH NO DATA;
 
@@ -416,7 +420,7 @@ SELECT time_bucket(INTERVAL '1 year', time) AS time,
        park_id,
        type,
        sum(power_consumption) as power_consumption
-FROM f_eco_gateway_1h
+FROM f_eco_gateway_1h where level=2
 GROUP BY time_bucket(INTERVAL '1 year', time), floor_id, building_id, park_id, type
 WITH NO DATA;
 
@@ -428,7 +432,7 @@ SELECT time_bucket(INTERVAL '1 hour', time) AS time,
        park_id,
        type,
        sum(power_consumption) as power_consumption
-FROM f_eco_gateway_1h
+FROM f_eco_gateway_1h where level=1
 GROUP BY time_bucket(INTERVAL '1 hour', time), building_id, park_id, type
 WITH NO DATA;
 
@@ -440,7 +444,7 @@ SELECT time_bucket(INTERVAL '1 day', time) AS time,
        park_id,
        type,
        sum(power_consumption) as power_consumption
-FROM f_eco_gateway_1h
+FROM f_eco_gateway_1h where level=1
 GROUP BY time_bucket(INTERVAL '1 day', time), building_id, park_id, type
 WITH NO DATA;
 
@@ -452,7 +456,7 @@ SELECT time_bucket(INTERVAL '1 month', time) AS time,
        park_id,
        type,
        sum(power_consumption) as power_consumption
-FROM f_eco_gateway_1h
+FROM f_eco_gateway_1h where level=1
 GROUP BY time_bucket(INTERVAL '1 month', time), building_id, park_id, type
 WITH NO DATA;
 
@@ -464,7 +468,7 @@ SELECT time_bucket(INTERVAL '1 year', time) AS time,
        park_id,
        type,
        sum(power_consumption) as power_consumption
-FROM f_eco_gateway_1h
+FROM f_eco_gateway_1h where level=1
 GROUP BY time_bucket(INTERVAL '1 year', time), building_id, park_id, type
 WITH NO DATA;
 
@@ -475,7 +479,7 @@ SELECT time_bucket(INTERVAL '1 hour', time) AS time,
        park_id,
        type,
        sum(power_consumption) as power_consumption
-FROM f_eco_gateway_1h
+FROM f_eco_gateway_1h where level=1
 GROUP BY time_bucket(INTERVAL '1 hour', time), park_id, type
 WITH NO DATA;
 
@@ -487,7 +491,7 @@ SELECT time_bucket(INTERVAL '1 day', time) AS time,
        park_id,
        type,
        sum(power_consumption) as power_consumption
-FROM f_eco_gateway_1h
+FROM f_eco_gateway_1h where level=1
 GROUP BY time_bucket(INTERVAL '1 day', time), park_id, type
 WITH NO DATA;
 
@@ -498,7 +502,7 @@ SELECT time_bucket(INTERVAL '1 month', time) AS time,
        park_id,
        type,
        sum(power_consumption) as power_consumption
-FROM f_eco_gateway_1h
+FROM f_eco_gateway_1h where level=1
 GROUP BY time_bucket(INTERVAL '1 month', time), park_id, type
 WITH NO DATA;
 
@@ -509,7 +513,7 @@ SELECT time_bucket(INTERVAL '1 year', time) AS time,
        park_id,
        type,
        sum(power_consumption) as power_consumption
-FROM f_eco_gateway_1h
+FROM f_eco_gateway_1h where level=1
 GROUP BY time_bucket(INTERVAL '1 year', time), park_id, type
 WITH NO DATA;
 
@@ -526,7 +530,9 @@ VALUES
 (md5('C栋'), 'admin', 'admin', 'C栋', md5('教科院'), 3),
 (md5('E栋'), 'admin', 'admin', 'E栋', md5('教科院'), 4),
 (md5('G栋'), 'admin', 'admin', 'G栋', md5('教科院'), 5),
-(md5('H栋'), 'admin', 'admin', 'H栋', md5('教科院'), 6);
+(md5('H栋'), 'admin', 'admin', 'H栋', md5('教科院'), 6),
+(md5('功能厅'), 'admin', 'admin', '功能厅', md5('教科院'), 7),
+(md5('充电桩'), 'admin', 'admin', '充电桩', md5('教科院'), 8);
 
 -- Insert floors
 INSERT INTO o_eco_floor (id, created_by, updated_by, floor_name, building_id, park_id, index)
@@ -550,80 +556,56 @@ VALUES
 (md5('C栋_五层'), 'admin', 'admin', '五层', md5('C栋'), md5('教科院'), 5),
 (md5('C栋_六层'), 'admin', 'admin', '六层', md5('C栋'), md5('教科院'), 6),
 (md5('C栋_七层'), 'admin', 'admin', '七层', md5('C栋'), md5('教科院'), 7),
-(md5('E栋_一层'), 'admin', 'admin', '一层', md5('E栋'), md5('教科院'), 1),
-(md5('G栋_一层'), 'admin', 'admin', '一层', md5('G栋'), md5('教科院'), 1),
-(md5('H栋_一层'), 'admin', 'admin', '一层', md5('H栋'), md5('教科院'), 1);
+(md5('E栋'), 'admin', 'admin', '整栋', md5('E栋'), md5('教科院'), 1),
+(md5('G栋'), 'admin', 'admin', '整栋', md5('G栋'), md5('教科院'), 1),
+(md5('H栋'), 'admin', 'admin', '整栋', md5('H栋'), md5('教科院'), 1),
+(md5('功能厅'), 'admin', 'admin', '整栋', md5('功能厅'), md5('教科院'), 1),
+(md5('充电桩'), 'admin', 'admin', '整栋', md5('充电桩'), md5('教科院'), 1);
 
 
-update o_eco_floor set floor_name = '整栋' where id = md5('E栋_一层');
-update o_eco_floor set floor_name = '整栋' where id = md5('G栋_一层');
-update o_eco_floor set floor_name = '整栋' where id = md5('H栋_一层');
 
 
 
 -- Insert gateways
-INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type)
+INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type,level)
 VALUES
-('98CC4D151E44', 'admin', 'admin', '98CC4D151E44', '配电网关', '配电网关_B-AL-04-1_98CC4D151E44', '20000000000416', 'B栋_四层', md5('B栋_四层'), md5('B栋'), md5('教科院'), 1),
-('98CC4D152976', 'admin', 'admin', '98CC4D152976', '配电网关', '配电网关_B-AL-04-2_98CC4D152976', '20000000000445', 'B栋_四层', md5('B栋_四层'), md5('B栋'), md5('教科院'), 1),
-('98CC4D152988', 'admin', 'admin', '98CC4D152988', '配电网关', '配电网关_B-AL-05-2_98CC4D152988', '20000000000458', 'B栋_五层', md5('B栋_五层'), md5('B栋'), md5('教科院'), 1),
-('98CC4D151D8C', 'admin', 'admin', '98CC4D151D8C', '配电网关', '配电网关_A-AL-05-1_98CC4D151D8C', '20000000000246', 'A栋_五层', md5('A栋_五层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D151D88', 'admin', 'admin', '98CC4D151D88', '配电网关', '配电网关_A-AL-01_98CC4D151D88', '20000000000036', 'A栋_一层', md5('A栋_一层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D151F92', 'admin', 'admin', '98CC4D151F92', '配电网关', '配电网关_B-AL-06-2_98CC4D151F92', '20000000000471', 'B栋_六层', md5('B栋_六层'), md5('B栋'), md5('教科院'), 1),
-('98CC4D150BC8', 'admin', 'admin', '98CC4D150BC8', '配电网关', '配电网关_A-AL-01-3_98CC4D150BC8', '20000000000096', 'A栋_一层', md5('A栋_一层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D151DF8', 'admin', 'admin', '98CC4D151DF8', '配电网关', '配电网关_A-AL-01-2_98CC4D151DF8', '20000000000112', 'A栋_一层', md5('A栋_一层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D1528BA', 'admin', 'admin', '98CC4D1528BA', '配电网关', '配电网关_A-AL-02-2_98CC4D1528BA', '20000000000133', 'A栋_二层', md5('A栋_二层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D151DD0', 'admin', 'admin', '98CC4D151DD0', '配电网关', '配电网关_A-AL-03-1_98CC4D151DD0', '20000000000162', 'A栋_三层', md5('A栋_三层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D151E0C', 'admin', 'admin', '98CC4D151E0C', '配电网关', '配电网关_A-AL-05-2_98CC4D151E0C', '20000000000275', 'A栋_五层', md5('A栋_五层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D151F3E', 'admin', 'admin', '98CC4D151F3E', '配电网关', '配电网关_A-AL-03-2_98CC4D151F3E', '20000000000191', 'A栋_三层', md5('A栋_三层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D151F46', 'admin', 'admin', '98CC4D151F46', '配电网关', '配电网关_C-AL-01-1_98CC4D151F46', '20000000000484', 'C栋_一层', md5('C栋_一层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D151D9E', 'admin', 'admin', '98CC4D151D9E', '配电网关', '配电网关_A-AL-04-1_98CC4D151D9E', '20000000000217', 'A栋_四层', md5('A栋_四层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D151D84', 'admin', 'admin', '98CC4D151D84', '配电网关', '配电网关_A-AL-06-2_98CC4D151D84', '20000000000298', 'A栋_六层', md5('A栋_六层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D151C58', 'admin', 'admin', '98CC4D151C58', '配电网关', '配电网关_C-AL-02-1_98CC4D151C58', '20000000000513', 'C栋_二层', md5('C栋_二层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D1528C4', 'admin', 'admin', '98CC4D1528C4', '配电网关', '配电网关_B-AL-01-1_98CC4D1528C4', '20000000000321', 'B栋_一层', md5('B栋_一层'), md5('B栋'), md5('教科院'), 1),
-('98CC4D151D68', 'admin', 'admin', '98CC4D151D68', '配电网关', '配电网关_B-AL-01-2_98CC4D151D68', '20000000000350', 'B栋_一层', md5('B栋_一层'), md5('B栋'), md5('教科院'), 1),
-('98CC4D152AD8', 'admin', 'admin', '98CC4D152AD8', '配电网关', '配电网关_B-AL-02-1_98CC4D152AD8', '20000000000368', 'B栋_二层', md5('B栋_二层'), md5('B栋'), md5('教科院'), 1),
-('98CC4D145C24', 'admin', 'admin', '98CC4D145C24', '配电网关', '配电网关_B-AL-02-2_98CC4D145C24', '20000000000397', 'B栋_二层', md5('B栋_二层'), md5('B栋'), md5('教科院'), 1),
-('98CC4D151E30', 'admin', 'admin', '98CC4D151E30', '配电网关', '配电网关_C-AL-02-2_98CC4D151E30', '20000000000542', 'C栋_二层', md5('C栋_二层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D151DA0', 'admin', 'admin', '98CC4D151DA0', '配电网关', '配电网关_C-AL-03-1_98CC4D151DA0', '20000000000560', 'C栋_三层', md5('C栋_三层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D151D7A', 'admin', 'admin', '98CC4D151D7A', '配电网关', '配电网关_C-AL-03-2_98CC4D151D7A', '20000000000589', 'C栋_三层', md5('C栋_三层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D151DD8', 'admin', 'admin', '98CC4D151DD8', '配电网关', '配电网关_C-AL-04-1_98CC4D151DD8', '20000000000605', 'C栋_四层', md5('C栋_四层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D152922', 'admin', 'admin', '98CC4D152922', '配电网关', '配电网关_C-AL-04-2_98CC4D152922', '20000000000634', 'C栋_四层', md5('C栋_四层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D152986', 'admin', 'admin', '98CC4D152986', '配电网关', '配电网关_C-AL-06-2_98CC4D152986', '20000000000643', 'C栋_六层', md5('C栋_六层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D1528E4', 'admin', 'admin', '98CC4D1528E4', '配电网关', '配电网关_E-AP-02_98CC4D1528E4', '20000000000662', 'H栋_一层', md5('H栋_一层'), md5('H栋'), md5('教科院'), 2),
-('98CC4D150E66', 'admin', 'admin', '98CC4D150E66', '配电网关', '配电网关_E-AL-01_98CC4D150E66', '20000000000661', 'E栋_一层', md5('E栋_一层'), md5('E栋'), md5('教科院'), 1),
-('98CC4D149A06', 'admin', 'admin', '98CC4D149A06', '配电网关', '配电网关_C-AL-01_98CC4D149A06', '20000000000660', 'C栋_一层', md5('C栋_一层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D151E00', 'admin', 'admin', '98CC4D151E00', '配电网关', '配电网关_C-AP-02_98CC4D151E00', '20000000000664', 'C栋_二层', md5('C栋_二层'), md5('C栋'), md5('教科院'), 2),
-('98CC4D152928', 'admin', 'admin', '98CC4D152928', '配电网关', '配电网关_A-AL-03_98CC4D152928', '20000000000663', 'A栋_三层', md5('A栋_三层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D151E04', 'admin', 'admin', '98CC4D151E04', '配电网关', '配电网关_A-AP-02_98CC4D151E04', '20000000000659', 'A栋_二层', md5('A栋_二层'), md5('A栋'), md5('教科院'), 2),
-('98CC4D152AC8', 'admin', 'admin', '98CC4D152AC8', '配电网关', '配电网关_B-AL-02_98CC4D152AC8', '20000000000656', 'B栋_二层', md5('B栋_二层'), md5('B栋'), md5('教科院'), 1),
-('98CC4D152AE4', 'admin', 'admin', '98CC4D152AE4', '配电网关', '配电网关_A-AP-01_98CC4D152AE4', '20000000000654', 'A栋_一层', md5('A栋_一层'), md5('A栋'), md5('教科院'), 2),
-('98CC4D151DF2', 'admin', 'admin', '98CC4D151DF2', '配电网关', '配电网关_B-AP-02_98CC4D151DF2', '20000000000653', 'B栋_二层', md5('B栋_二层'), md5('B栋'), md5('教科院'), 2),
-('98CC4D1528E2', 'admin', 'admin', '98CC4D1528E2', '配电网关', '配电网关_A-AL-02_98CC4D1528E2', '20000000000665', 'A栋_二层', md5('A栋_二层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D151D3A', 'admin', 'admin', '98CC4D151D3A', '配电网关', '配电网关_C-AL-02_98CC4D151D3A', '20000000000658', 'C栋_二层', md5('C栋_二层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D150E1A', 'admin', 'admin', '98CC4D150E1A', '配电网关', '配电网关_B-AP-01_98CC4D150E1A', '20000000000652', 'B栋_一层', md5('B栋_一层'), md5('B栋'), md5('教科院'), 2),
-('98CC4D151C56', 'admin', 'admin', '98CC4D151C56', '配电网关', '配电网关_C-AP-01_98CC4D151C56', '20000000000666', 'C栋_一层', md5('C栋_一层'), md5('C栋'), md5('教科院'), 2),
-('98CC4D152990', 'admin', 'admin', '98CC4D152990', '配电网关', '配电网关_B-AL-01_98CC4D152990', '20000000000655', 'B栋_一层', md5('B栋_一层'), md5('B栋'), md5('教科院'), 1),
-('98CC4D150A00', 'admin', 'admin', '98CC4D150A00', '配电网关', '配电网关_A-AL-01_98CC4D150A00', '20000000000668', 'A栋_一层', md5('A栋_一层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D149A0C', 'admin', 'admin', '98CC4D149A0C', '配电网关', '配电网关_E-AP-01_98CC4D149A0C', '20000000000667', 'H栋_一层', md5('H栋_一层'), md5('H栋'), md5('教科院'), 2),
-('98CC4D15209A', 'admin', 'admin', '98CC4D15209A', '配电网关', '配电网关_C-AL-07-1_98CC4D15209A', '20000000000703', 'C栋_七层', md5('C栋_七层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D15236A', 'admin', 'admin', '98CC4D15236A', '配电网关', '配电网关_C-AL-07-2_98CC4D15236A', '20000000000704', 'C栋_七层', md5('C栋_七层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D149A0A', 'admin', 'admin', '98CC4D149A0A', '配电网关', '配电网关_A-AL-06-1_98CC4D149A0A', '20000000000705', 'A栋_六层', md5('A栋_六层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D1524AA', 'admin', 'admin', '98CC4D1524AA', '配电网关', '配电网关_A-AL-04-2_98CC4D1524AA', '20000000000706', 'A栋_四层', md5('A栋_四层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D15298C', 'admin', 'admin', '98CC4D15298C', '配电网关', '配电网关_B-AL-03-1_98CC4D15298C', '20000000000707', 'B栋_三层', md5('B栋_三层'), md5('B栋'), md5('教科院'), 1),
-('98CC4D150BD4', 'admin', 'admin', '98CC4D150BD4', '配电网关', '配电网关_A-AL-02-1_98CC4D150BD4', '20000000000708', 'A栋_二层', md5('A栋_二层'), md5('A栋'), md5('教科院'), 1),
-('98CC4D151C54', 'admin', 'admin', '98CC4D151C54', '配电网关', '配电网关_B-AL-05-1_98CC4D151C54', '20000000000709', 'B栋_五层', md5('B栋_五层'), md5('B栋'), md5('教科院'), 1);
+('98CC4D150A00', 'admin', 'admin', '98CC4D150A00', '配电网关', '配电网关_A-AL-01_98CC4D150A00', '20000000000668', 'A栋', '', md5('A栋'), md5('教科院'), 1, 1),
+('98CC4D1528E2', 'admin', 'admin', '98CC4D1528E2', '配电网关', '配电网关_A-AL-02_98CC4D1528E2', '20000000000665', 'A栋', '', md5('A栋'), md5('教科院'), 1, 1),
+('98CC4D152928', 'admin', 'admin', '98CC4D152928', '配电网关', '配电网关_A-AL-03_98CC4D152928', '20000000000663', 'A栋', '', md5('A栋'), md5('教科院'), 1, 1),
+('98CC4D152AE4', 'admin', 'admin', '98CC4D152AE4', '配电网关', '配电网关_A-AP-01_98CC4D152AE4', '20000000000654', 'A栋', '', md5('A栋'), md5('教科院'), 2, 1),
+('98CC4D151E04', 'admin', 'admin', '98CC4D151E04', '配电网关', '配电网关_A-AP-02_98CC4D151E04', '20000000000659', 'A栋', '', md5('A栋'), md5('教科院'), 2, 1),
+('98CC4D152990', 'admin', 'admin', '98CC4D152990', '配电网关', '配电网关_B-AL-01_98CC4D152990', '20000000000655', 'B栋', '', md5('B栋'), md5('教科院'), 1, 1),
+('98CC4D152AC8', 'admin', 'admin', '98CC4D152AC8', '配电网关', '配电网关_B-AL-02_98CC4D152AC8', '20000000000656', 'B栋', '', md5('B栋'), md5('教科院'), 1, 1),
+('98CC4D150E1A', 'admin', 'admin', '98CC4D150E1A', '配电网关', '配电网关_B-AP-01_98CC4D150E1A', '20000000000652', 'B栋', '', md5('B栋'), md5('教科院'), 2, 1),
+('98CC4D151DF2', 'admin', 'admin', '98CC4D151DF2', '配电网关', '配电网关_B-AP-02_98CC4D151DF2', '20000000000653', 'B栋', '', md5('B栋'), md5('教科院'), 2, 1),
+('98CC4D149A06', 'admin', 'admin', '98CC4D149A06', '配电网关', '配电网关_C-AL-01_98CC4D149A06', '20000000000660', 'C栋', '', md5('C栋'), md5('教科院'), 1, 1),
+('98CC4D151D3A', 'admin', 'admin', '98CC4D151D3A', '配电网关', '配电网关_C-AL-02_98CC4D151D3A', '20000000000658', 'C栋', '', md5('C栋'), md5('教科院'), 1, 1),
+('98CC4D151C56', 'admin', 'admin', '98CC4D151C56', '配电网关', '配电网关_C-AP-01_98CC4D151C56', '20000000000666', 'C栋', '', md5('C栋'), md5('教科院'), 2, 1),
+('98CC4D151E00', 'admin', 'admin', '98CC4D151E00', '配电网关', '配电网关_C-AP-02_98CC4D151E00', '20000000000664', 'C栋', '', md5('C栋'), md5('教科院'), 2, 1),
+('98CC4D150E66', 'admin', 'admin', '98CC4D150E66', '配电网关', '配电网关_E-AL-01_98CC4D150E66', '20000000000661', 'E栋', '', md5('E栋'), md5('教科院'), 1, 1),
+('98CC4D150A3C_1', 'admin', 'admin', '98CC4D150A3C_1', '配电网关', '配电网关_E-AL-02_98CC4D150A3C_1', '20000000000657', 'E栋', '', md5('E栋'), md5('教科院'), 1, 1),
+('98CC4D150A3C_2', 'admin', 'admin', '98CC4D150A3C_2', '配电网关', '配电网关_E-AL-02_98CC4D150A3C_2', '20000000000657', 'G栋', '', md5('G栋'), md5('教科院'), 1, 1),
+('98CC4D149A0C', 'admin', 'admin', '98CC4D149A0C', '配电网关', '配电网关_E-AP-01_98CC4D149A0C', '20000000000667', 'H栋', '', md5('H栋'), md5('教科院'), 2, 1),
+('98CC4D1528E4', 'admin', 'admin', '98CC4D1528E4', '配电网关', '配电网关_E-AP-02_98CC4D1528E4', '20000000000662', 'H栋', '', md5('H栋'), md5('教科院'), 2, 1),
+('98CC4D151D88', 'admin', 'admin', '98CC4D151D88', '配电网关', '配电网关_A-AL-01_98CC4D151D88', '20000000000036', 'A栋_一层', md5('A栋_一层'), md5('A栋'), md5('教科院'), 1,2),
+('98CC4D150BD4', 'admin', 'admin', '98CC4D150BD4', '配电网关', '配电网关_A-AL-02-1_98CC4D150BD4', '20000000000708', 'A栋_二层', md5('A栋_二层'), md5('A栋'), md5('教科院'), 1, 2),
+('98CC4D151DD0', 'admin', 'admin', '98CC4D151DD0', '配电网关', '配电网关_A-AL-03-1_98CC4D151DD0', '20000000000162', 'A栋_三层', md5('A栋_三层'), md5('A栋'), md5('教科院'), 1, 2),
+('98CC4D151D9E', 'admin', 'admin', '98CC4D151D9E', '配电网关', '配电网关_A-AL-04-1_98CC4D151D9E', '20000000000217', 'A栋_四层', md5('A栋_四层'), md5('A栋'), md5('教科院'), 1, 2),
+('98CC4D151D8C', 'admin', 'admin', '98CC4D151D8C', '配电网关', '配电网关_A-AL-05-1_98CC4D151D8C', '20000000000246', 'A栋_五层', md5('A栋_五层'), md5('A栋'), md5('教科院'), 1, 2),
+('98CC4D149A0A', 'admin', 'admin', '98CC4D149A0A', '配电网关', '配电网关_A-AL-06-1_98CC4D149A0A', '20000000000705', 'A栋_六层', md5('A栋_六层'), md5('A栋'), md5('教科院'), 1, 2),
+('98CC4D1528C4', 'admin', 'admin', '98CC4D1528C4', '配电网关', '配电网关_B-AL-01-1_98CC4D1528C4', '20000000000321', 'B栋_一层', md5('B栋_一层'), md5('B栋'), md5('教科院'), 1, 2),
+('98CC4D152AD8', 'admin', 'admin', '98CC4D152AD8', '配电网关', '配电网关_B-AL-02-1_98CC4D152AD8', '20000000000368', 'B栋_二层', md5('B栋_二层'), md5('B栋'), md5('教科院'), 1, 2),
+('98CC4D15298C', 'admin', 'admin', '98CC4D15298C', '配电网关', '配电网关_B-AL-03-1_98CC4D15298C', '20000000000707', 'B栋_三层', md5('B栋_三层'), md5('B栋'), md5('教科院'), 1, 2),
+('98CC4D151E44', 'admin', 'admin', '98CC4D151E44', '配电网关', '配电网关_B-AL-04-1_98CC4D151E44', '20000000000416', 'B栋_四层', md5('B栋_四层'), md5('B栋'), md5('教科院'), 1, 2),
+('98CC4D151C54', 'admin', 'admin', '98CC4D151C54', '配电网关', '配电网关_B-AL-05-1_98CC4D151C54', '20000000000709', 'B栋_五层', md5('B栋_五层'), md5('B栋'), md5('教科院'), 1, 2),
+('98CC4D151F48', 'admin', 'admin', '98CC4D151F48', '配电网关', '配电网关_B-AL-06-1_98CC4D151F48', '20000000000710', 'B栋_六层', md5('B栋_六层'), md5('B栋'), md5('教科院'), 1, 2),
+('98CC4D151F46', 'admin', 'admin', '98CC4D151F46', '配电网关', '配电网关_C-AL-01-1_98CC4D151F46', '20000000000484', 'C栋_一层', md5('C栋_一层'), md5('C栋'), md5('教科院'), 1, 2),
+('98CC4D151C58', 'admin', 'admin', '98CC4D151C58', '配电网关', '配电网关_C-AL-02-1_98CC4D151C58', '20000000000513', 'C栋_二层', md5('C栋_二层'), md5('C栋'), md5('教科院'), 1, 2),
+('98CC4D151DA0', 'admin', 'admin', '98CC4D151DA0', '配电网关', '配电网关_C-AL-03-1_98CC4D151DA0', '20000000000560', 'C栋_三层', md5('C栋_三层'), md5('C栋'), md5('教科院'), 1, 2),
+('98CC4D151DD8', 'admin', 'admin', '98CC4D151DD8', '配电网关', '配电网关_C-AL-04-1_98CC4D151DD8', '20000000000605', 'C栋_四层', md5('C栋_四层'), md5('C栋'), md5('教科院'), 1, 2),
+('98CC4D151E02', 'admin', 'admin', '98CC4D151E02', '配电网关', '配电网关_C-AL-05-1_98CC4D151E02', '21000000000416', 'C栋_五层', md5('C栋_五层'), md5('C栋'), md5('教科院'), 1, 2),
+('98CC4D151DD6', 'admin', 'admin', '98CC4D151DD6', '配电网关', '配电网关_C-AL-06-1_98CC4D151DD6', '21000000000445', 'C栋_六层', md5('C栋_六层'), md5('C栋'), md5('教科院'), 1, 2);
 
-INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type)
-VALUES
-('98CC4D151E02', 'admin', 'admin', '98CC4D151E02', '配电网关', '配电网关_C-AL-05-1_98CC4D151E02', '21000000000416', 'C栋_五层', md5('C栋_五层'), md5('C栋'), md5('教科院'), 1),
-('98CC4D151DD6', 'admin', 'admin', '98CC4D151DD6', '配电网关', '配电网关_C-AL-06-1_98CC4D151DD6', '21000000000445', 'C栋_六层', md5('C栋_六层'), md5('C栋'), md5('教科院'), 1);
-
-
-INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type)
-VALUES
-('98CC4D150A3C_1', 'admin', 'admin', '98CC4D150A3C_1', '配电网关', '配电网关_E-AL-02_98CC4D150A3C_1', '20000000000657', 'E栋_一层', md5('E栋_一层'), md5('E栋'), md5('教科院'), 1),
-('98CC4D150A3C_2', 'admin', 'admin', '98CC4D150A3C_2', '配电网关', '配电网关_E-AL-02_98CC4D150A3C_2', '21000000000657', 'G栋_一层', md5('G栋_一层'), md5('G栋'), md5('教科院'), 1),
 
 -- Insert water meters
 INSERT INTO o_eco_water_meter (id, created_by, updated_by, model_name, dev_name, channel_no, cm_code, location, building_id, park_id, type)
@@ -651,9 +633,10 @@ DROP MATERIALIZED VIEW IF EXISTS f_eco_park_water_1d;
 DROP MATERIALIZED VIEW IF EXISTS f_eco_park_water_1h;
 DROP TABLE IF EXISTS f_eco_water_meter_1h cascade;
 
-DROP MATERIALIZED VIEW IF EXISTS v_eco_park_1d;
-DROP MATERIALIZED VIEW IF EXISTS v_eco_park_1m;
-DROP MATERIALIZED VIEW IF EXISTS v_eco_park_1y;
+DROP MATERIALIZED VIEW IF EXISTS f_eco_park_1h;
+DROP MATERIALIZED VIEW IF EXISTS f_eco_park_1d;
+DROP MATERIALIZED VIEW IF EXISTS f_eco_park_1m;
+DROP MATERIALIZED VIEW IF EXISTS f_eco_park_1y;
 DROP FUNCTION IF EXISTS generate_gateway_test_data;
 DROP MATERIALIZED VIEW IF EXISTS f_eco_building_1y;
 DROP MATERIALIZED VIEW IF EXISTS f_eco_building_1m;

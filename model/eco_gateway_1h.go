@@ -25,12 +25,13 @@ Table: f_eco_gateway_1h
 [ 4] building_id                                    VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 5] park_id                                        VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [ 6] type                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
-[ 7] power_consumption                              NUMERIC              null: false  primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
+[ 7] level                                          INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: [0]
+[ 8] power_consumption                              NUMERIC              null: false  primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: []
 
 
 JSON Sample
 -------------------------------------
-{    "id": "hEhMAZqiWphpMXwyMioMjdNtV",    "time": 59,    "gateway_id": "OXJWESSXWwnWanerpFOJRgBfq",    "floor_id": "CUSnlGaGXepkmWwbMiGcdtXgt",    "building_id": "dIutVJIviAbqZbANQpAsDOFYZ",    "park_id": "HqhcGyVGcBixEpQfYJbIIsKoF",    "type": 28,    "power_consumption": 0.8274018293176452}
+{    "id": "oUDDWZMApPvqfIZZbWaGjRtaR",    "time": 65,    "gateway_id": "gNVtkidlNvRwrTkaWPJehAQMc",    "floor_id": "KGqCckhsBDGlPhIorTADbldEH",    "building_id": "cHBAnBukkiKaJwiWtnRWksDjC",    "park_id": "KbSyLxiLKiyiRGvVrBbjaKqGh",    "type": 17,    "level": 60,    "power_consumption": 0.5619764192296001}
 
 
 
@@ -51,19 +52,30 @@ var (
 
 	Eco_gateway_1h_FIELD_NAME_type = "type"
 
+	Eco_gateway_1h_FIELD_NAME_level = "level"
+
 	Eco_gateway_1h_FIELD_NAME_power_consumption = "power_consumption"
 )
 
 // Eco_gateway_1h struct is a row record of the f_eco_gateway_1h table in the  database
 type Eco_gateway_1h struct {
-	ID               string           `json:"id"`                //id
-	Time             common.LocalTime `json:"time"`              //时间
-	GatewayID        string           `json:"gateway_id"`        //网关ID
-	FloorID          string           `json:"floor_id"`          //楼层ID
-	BuildingID       string           `json:"building_id"`       //楼栋ID
-	ParkID           string           `json:"park_id"`           //园区ID
-	Type             int32            `json:"type"`              //网关类型(1:AL,2:AP)
-	PowerConsumption float64          `json:"power_consumption"` //用电量(kWh)
+	ID string `json:"id"` //id
+
+	Time common.LocalTime `json:"time"` //时间
+
+	GatewayID string `json:"gateway_id"` //网关ID
+
+	FloorID string `json:"floor_id"` //楼层ID
+
+	BuildingID string `json:"building_id"` //楼栋ID
+
+	ParkID string `json:"park_id"` //园区ID
+
+	Type int32 `json:"type"` //网关类型(1:AL,2:AP)
+
+	Level int32 `json:"level"` //层级(0:园区,1:楼栋,2:楼层)
+
+	PowerConsumption float64 `json:"power_consumption"` //用电量(kWh)
 
 }
 
@@ -220,6 +232,27 @@ var Eco_gateway_1hTableInfo = &TableInfo{
 
 		&ColumnInfo{
 			Index:              7,
+			Name:               "level",
+			Comment:            `层级(0:园区,1:楼栋,2:楼层)`,
+			Notes:              ``,
+			Nullable:           false,
+			DatabaseTypeName:   "INT4",
+			DatabaseTypePretty: "INT4",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "INT4",
+			ColumnLength:       -1,
+			GoFieldName:        "Level",
+			GoFieldType:        "int32",
+			JSONFieldName:      "level",
+			ProtobufFieldName:  "level",
+			ProtobufType:       "int32",
+			ProtobufPos:        8,
+		},
+
+		&ColumnInfo{
+			Index:              8,
 			Name:               "power_consumption",
 			Comment:            `用电量(kWh)`,
 			Notes:              ``,
@@ -236,7 +269,7 @@ var Eco_gateway_1hTableInfo = &TableInfo{
 			JSONFieldName:      "power_consumption",
 			ProtobufFieldName:  "power_consumption",
 			ProtobufType:       "float",
-			ProtobufPos:        8,
+			ProtobufPos:        9,
 		},
 	},
 }

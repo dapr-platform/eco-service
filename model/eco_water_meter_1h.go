@@ -29,7 +29,7 @@ Table: f_eco_water_meter_1h
 
 JSON Sample
 -------------------------------------
-{    "id": "GFPHkaseqHkveTlhxJgDSNjwE",    "time": 55,    "water_meter_id": "NQYoFtkpEgJPYbTlvTlwUpHuW",    "building_id": "rryUjWgOniZyBqqKbGcPynehr",    "park_id": "mXKurxyhgEuKDwZbNNugtuqmP",    "type": 0,    "water_consumption": 0.21503290081053947}
+{    "id": "fepdMCqDHbobCZGGEdFFAWwNb",    "time": 15,    "water_meter_id": "BklDyFyTHwHWSobfaMjDCGrJd",    "building_id": "UlpQbNejnLFBIshIPiUdDayUt",    "park_id": "oFUlvtsyicoFilhBTvqqbEncC",    "type": 10,    "water_consumption": 0.15737821969245672}
 
 
 
@@ -53,13 +53,19 @@ var (
 
 // Eco_water_meter_1h struct is a row record of the f_eco_water_meter_1h table in the  database
 type Eco_water_meter_1h struct {
-	ID               string           `json:"id"`                //id
-	Time             common.LocalTime `json:"time"`              //time
-	WaterMeterID     string           `json:"water_meter_id"`    //water_meter_id
-	BuildingID       string           `json:"building_id"`       //building_id
-	ParkID           string           `json:"park_id"`           //park_id
-	Type             int32            `json:"type"`              //type
-	WaterConsumption float64          `json:"water_consumption"` //water_consumption
+	ID string `json:"id"` //id
+
+	Time common.LocalTime `json:"time"` //time
+
+	WaterMeterID string `json:"water_meter_id"` //water_meter_id
+
+	BuildingID string `json:"building_id"` //building_id
+
+	ParkID string `json:"park_id"` //park_id
+
+	Type int32 `json:"type"` //type
+
+	WaterConsumption float64 `json:"water_consumption"` //water_consumption
 
 }
 
