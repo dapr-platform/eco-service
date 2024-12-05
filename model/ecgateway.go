@@ -33,11 +33,12 @@ Table: o_eco_gateway
 [12] building_id                                    VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [13] park_id                                        VARCHAR(32)          null: false  primary: false  isArray: false  auto: false  col: VARCHAR         len: 32      default: []
 [14] type                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
+[15] collect_type                                   INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: [0]
 
 
 JSON Sample
 -------------------------------------
-{    "id": "tUYhSDiHDZSSHFvTpipriPOoQ",    "created_by": "FuZYAbiLVRjbNKEIlBeGQRWXA",    "created_time": 73,    "updated_by": "itlbqlroEsEEbLcrkyAdpKrpX",    "updated_time": 33,    "model_name": "HmEkVEubCVEapSVNqlfZHDvVC",    "dev_name": "SxTbSNGdbtSsgivxAMiheHkHi",    "mac_addr": "CpNLvDFViGGEHQtJxwIraKWDM",    "cm_code": "UGtQnUqhOiUQJaVQWiFQdnCtm",    "project_code": "NiBCcKGPOcTCabYIxseQEkAEa",    "location": "ivEgtLGxKZDxvaRLIqCbahnlY",    "floor_id": "BwpXykbbBqBLRHiADVLyZBFss",    "building_id": "rRwBGLtaqAJtOQIQhgHbtLQIY",    "park_id": "iYocCgCrZpsDBaQckBdpYrMCj",    "type": 83}
+{    "id": "pPWudZvZMDgQhJbEQhgdwebhL",    "created_by": "kfCeDUcDRCKGAwfCZiMWVpRZo",    "created_time": 9,    "updated_by": "RiZaFTnBmOUXGhXptfydgNuLL",    "updated_time": 6,    "model_name": "KOUFuOtgJFBjgspHCErcCtEoS",    "dev_name": "EhkcBKbIFgdNhACjHWAJFOYUS",    "mac_addr": "biAvjFRUeVgymbhNWTRpwVQfJ",    "cm_code": "xPqdiNlyQQwPulDnDDllgqiUP",    "project_code": "EpPdChiHRusnhfWeErRdnbJZU",    "location": "stCFSmbhCoFogErkbOrHqWqgi",    "floor_id": "cRwqfDqrbSxnwoLwmSQddNonB",    "building_id": "HTmJIregGVXnOKySlFXIFqyRc",    "park_id": "afwMvKZBdUThqERncAqBuixSR",    "type": 22,    "collect_type": 43}
 
 
 
@@ -73,25 +74,43 @@ var (
 	Ecgateway_FIELD_NAME_park_id = "park_id"
 
 	Ecgateway_FIELD_NAME_type = "type"
+
+	Ecgateway_FIELD_NAME_collect_type = "collect_type"
 )
 
 // Ecgateway struct is a row record of the o_eco_gateway table in the  database
 type Ecgateway struct {
-	ID          string           `json:"id"`           //主键ID
-	CreatedBy   string           `json:"created_by"`   //创建人
+	ID string `json:"id"` //主键ID
+
+	CreatedBy string `json:"created_by"` //创建人
+
 	CreatedTime common.LocalTime `json:"created_time"` //创建时间
-	UpdatedBy   string           `json:"updated_by"`   //更新人
+
+	UpdatedBy string `json:"updated_by"` //更新人
+
 	UpdatedTime common.LocalTime `json:"updated_time"` //更新时间
-	ModelName   string           `json:"model_name"`   //型号名称
-	DevName     string           `json:"dev_name"`     //设备名称
-	MacAddr     string           `json:"mac_addr"`     //MAC地址
-	CmCode      string           `json:"cm_code"`      //通信码
-	ProjectCode string           `json:"project_code"` //项目编码
-	Location    string           `json:"location"`     //组织名称
-	FloorID     string           `json:"floor_id"`     //楼层ID
-	BuildingID  string           `json:"building_id"`  //楼栋ID
-	ParkID      string           `json:"park_id"`      //园区ID
-	Type        int32            `json:"type"`         //网关类型(1:AL,2:AP)
+
+	ModelName string `json:"model_name"` //型号名称
+
+	DevName string `json:"dev_name"` //设备名称
+
+	MacAddr string `json:"mac_addr"` //MAC地址
+
+	CmCode string `json:"cm_code"` //通信码
+
+	ProjectCode string `json:"project_code"` //项目编码
+
+	Location string `json:"location"` //组织名称
+
+	FloorID string `json:"floor_id"` //楼层ID
+
+	BuildingID string `json:"building_id"` //楼栋ID
+
+	ParkID string `json:"park_id"` //园区ID
+
+	Type int32 `json:"type"` //网关类型(1:AL,2:AP)
+
+	CollectType int32 `json:"collect_type"` //采集类型(0:配电平台,1:IOT)
 
 }
 
@@ -412,6 +431,27 @@ var EcgatewayTableInfo = &TableInfo{
 			ProtobufFieldName:  "type",
 			ProtobufType:       "int32",
 			ProtobufPos:        15,
+		},
+
+		&ColumnInfo{
+			Index:              15,
+			Name:               "collect_type",
+			Comment:            `采集类型(0:配电平台,1:IOT)`,
+			Notes:              ``,
+			Nullable:           false,
+			DatabaseTypeName:   "INT4",
+			DatabaseTypePretty: "INT4",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "INT4",
+			ColumnLength:       -1,
+			GoFieldName:        "CollectType",
+			GoFieldType:        "int32",
+			JSONFieldName:      "collect_type",
+			ProtobufFieldName:  "collect_type",
+			ProtobufType:       "int32",
+			ProtobufPos:        16,
 		},
 	},
 }

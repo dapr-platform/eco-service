@@ -30,7 +30,7 @@ Table: o_eco_building
 
 JSON Sample
 -------------------------------------
-{    "id": "iwtkEGmEHsabtiAFhPaVEsTOY",    "created_by": "VXTdQvMkukkEDHKQOgOrByLQL",    "created_time": 59,    "updated_by": "jcNfrRrABBpbeyInWCvbJcSre",    "updated_time": 14,    "building_name": "uZbmjeiDnVDtoERThXFvvNMJv",    "park_id": "BQyaQCcnBjvlJwwssugSqAtPc",    "index": 49}
+{    "id": "rbnJwkVgOMwMakWwbJHETJFsu",    "created_by": "bdFcYtTPJjqEPgiXtsZiREnkg",    "created_time": 49,    "updated_by": "FPjVhMvAknNPZWNNCwpBiJqUU",    "updated_time": 78,    "building_name": "LXsRmAAYHBOhByPNbbkYJbqEj",    "park_id": "UcwOOiQIaYraxtgRgoxNayuYe",    "index": 52}
 
 
 
@@ -56,14 +56,21 @@ var (
 
 // Ecbuilding struct is a row record of the o_eco_building table in the  database
 type Ecbuilding struct {
-	ID           string           `json:"id"`            //主键ID
-	CreatedBy    string           `json:"created_by"`    //创建人
-	CreatedTime  common.LocalTime `json:"created_time"`  //创建时间
-	UpdatedBy    string           `json:"updated_by"`    //更新人
-	UpdatedTime  common.LocalTime `json:"updated_time"`  //更新时间
-	BuildingName string           `json:"building_name"` //楼栋名称
-	ParkID       string           `json:"park_id"`       //园区ID
-	Index        int32            `json:"index"`         //排序索引
+	ID string `json:"id"` //主键ID
+
+	CreatedBy string `json:"created_by"` //创建人
+
+	CreatedTime common.LocalTime `json:"created_time"` //创建时间
+
+	UpdatedBy string `json:"updated_by"` //更新人
+
+	UpdatedTime common.LocalTime `json:"updated_time"` //更新时间
+
+	BuildingName string `json:"building_name"` //楼栋名称
+
+	ParkID string `json:"park_id"` //园区ID
+
+	Index int32 `json:"index"` //排序索引
 
 }
 

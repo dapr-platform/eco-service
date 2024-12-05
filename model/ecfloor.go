@@ -31,7 +31,7 @@ Table: o_eco_floor
 
 JSON Sample
 -------------------------------------
-{    "id": "rSrNOyOZnBVXtKdSkgWWkvYhi",    "created_by": "skDugQvRXSpqCRKsLXVySHpgQ",    "created_time": 84,    "updated_by": "xfMcumrDnBvbUCQOFMOWVvOdu",    "updated_time": 5,    "floor_name": "LHMfsmyFoHQarXLIhjKjxSQqW",    "building_id": "gFhkpFeRuYHjSFxeNpTloGXDn",    "park_id": "jPJBXUJFUZDAcaXctqBmQWuWf",    "index": 41}
+{    "id": "tuvuGCdqDkFLBrLCmpopUItkI",    "created_by": "IJDYNTVReNvmxILRBwGPlCnXI",    "created_time": 71,    "updated_by": "MsFyYfpbjGsJNTsCYVuFVrwdH",    "updated_time": 28,    "floor_name": "WRdMSVItpwqODseCLuYHvBSIM",    "building_id": "KpWWCIVaWtOdttPacpFCkdrfE",    "park_id": "KGXYAOjtrgGLNfqbMrkHAspKg",    "index": 72}
 
 
 
@@ -59,15 +59,23 @@ var (
 
 // Ecfloor struct is a row record of the o_eco_floor table in the  database
 type Ecfloor struct {
-	ID          string           `json:"id"`           //主键ID
-	CreatedBy   string           `json:"created_by"`   //创建人
+	ID string `json:"id"` //主键ID
+
+	CreatedBy string `json:"created_by"` //创建人
+
 	CreatedTime common.LocalTime `json:"created_time"` //创建时间
-	UpdatedBy   string           `json:"updated_by"`   //更新人
+
+	UpdatedBy string `json:"updated_by"` //更新人
+
 	UpdatedTime common.LocalTime `json:"updated_time"` //更新时间
-	FloorName   string           `json:"floor_name"`   //楼层名称
-	BuildingID  string           `json:"building_id"`  //楼栋ID
-	ParkID      string           `json:"park_id"`      //园区ID
-	Index       int32            `json:"index"`        //排序索引
+
+	FloorName string `json:"floor_name"` //楼层名称
+
+	BuildingID string `json:"building_id"` //楼栋ID
+
+	ParkID string `json:"park_id"` //园区ID
+
+	Index int32 `json:"index"` //排序索引
 
 }
 

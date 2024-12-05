@@ -744,6 +744,9 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 				if strings.HasSuffix(gateway.MacAddr, "_1") {
 					macAddr = strings.TrimSuffix(gateway.MacAddr, "_1")
 					addr = 1
+				} else if strings.HasSuffix(gateway.MacAddr, "_2") {
+					macAddr = strings.TrimSuffix(gateway.MacAddr, "_2")
+					addr = 2
 				} else {
 					macAddr = gateway.MacAddr
 				}
@@ -1027,7 +1030,8 @@ func refreshContinuousAggregate(collectTime time.Time, refreshDefineMap map[stri
 }
 
 func GetAllEcgateways() ([]model.Ecgateway, error) {
-	datas, err := common.DbQuery[model.Ecgateway](context.Background(), common.GetDaprClient(), model.EcgatewayTableInfo.Name, "")
+	qstr := model.Ecgateway_FIELD_NAME_collect_type + "=0"
+	datas, err := common.DbQuery[model.Ecgateway](context.Background(), common.GetDaprClient(), model.EcgatewayTableInfo.Name, qstr)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to query gateways")
 	}

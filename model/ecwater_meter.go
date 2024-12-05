@@ -36,7 +36,7 @@ Table: o_eco_water_meter
 
 JSON Sample
 -------------------------------------
-{    "id": "VjLPaDJPstiOUVZtBailQldJX",    "created_by": "OGntAsJBLbJmCAdjGBgnuAVvT",    "created_time": 56,    "updated_by": "NrGnvrpxIFqsAYSAnDlbICMBw",    "updated_time": 52,    "model_name": "gCpLVlQQmXPqBxtMablrQnfEB",    "dev_name": "gZHrcyewyyhjnnlsycrIxMDNc",    "channel_no": "exewMlSGoBkWkQyLbIhkmXWNh",    "cm_code": "eaTVGytRsrXDHGuHMWvXRNVmv",    "location": "JASgoSrWtQlMGZcjwVsZZHDky",    "building_id": "tZjRUMAHNSlFxVHFtgcXkxYle",    "park_id": "QvatRmCiCoivVbECFpERWSijn",    "type": 97,    "total_value": 0.05923150839295331}
+{    "id": "jTSbrwlJhFlaTopogWlnVoDVw",    "created_by": "yRrBPEWHPomLNHmZVHkMQhiLW",    "created_time": 70,    "updated_by": "wLwjcOdbeuebwexrTBGlVmqbq",    "updated_time": 55,    "model_name": "qKYODMIkAwxVobuVBfkyJeGHC",    "dev_name": "wWhLleduZgMwAUbBcRhLDdrNV",    "channel_no": "NQbNDoxobbLUOqNyDFBfWyjuq",    "cm_code": "MKNSJtBCXtAPOuIBOFYebhuAw",    "location": "TJpitwXKRgPdcxRCXdJxMNYyM",    "building_id": "NhqAkQKJfyfPifxoKqrIsXAUs",    "park_id": "RYfKTbPJHsIEBSXMamBJqpGrT",    "type": 81,    "total_value": 0.5168010617691216}
 
 
 
@@ -74,20 +74,33 @@ var (
 
 // Ecwater_meter struct is a row record of the o_eco_water_meter table in the  database
 type Ecwater_meter struct {
-	ID          string           `json:"id"`           //主键ID
-	CreatedBy   string           `json:"created_by"`   //创建人
+	ID string `json:"id"` //主键ID
+
+	CreatedBy string `json:"created_by"` //创建人
+
 	CreatedTime common.LocalTime `json:"created_time"` //创建时间
-	UpdatedBy   string           `json:"updated_by"`   //更新人
+
+	UpdatedBy string `json:"updated_by"` //更新人
+
 	UpdatedTime common.LocalTime `json:"updated_time"` //更新时间
-	ModelName   string           `json:"model_name"`   //型号名称
-	DevName     string           `json:"dev_name"`     //dev_name
-	ChannelNo   string           `json:"channel_no"`   //通道号
-	CmCode      string           `json:"cm_code"`      //通信码
-	Location    string           `json:"location"`     //组织名称
-	BuildingID  string           `json:"building_id"`  //楼栋ID
-	ParkID      string           `json:"park_id"`      //园区ID
-	Type        int32            `json:"type"`         //水表类型(1:低区,2:高区)
-	TotalValue  float64          `json:"total_value"`  //总用水量
+
+	ModelName string `json:"model_name"` //型号名称
+
+	DevName string `json:"dev_name"` //dev_name
+
+	ChannelNo string `json:"channel_no"` //通道号
+
+	CmCode string `json:"cm_code"` //通信码
+
+	Location string `json:"location"` //组织名称
+
+	BuildingID string `json:"building_id"` //楼栋ID
+
+	ParkID string `json:"park_id"` //园区ID
+
+	Type int32 `json:"type"` //水表类型(1:低区,2:高区)
+
+	TotalValue float64 `json:"total_value"` //总用水量
 
 }
 

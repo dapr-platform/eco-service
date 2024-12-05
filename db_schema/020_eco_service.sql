@@ -102,6 +102,8 @@ COMMENT ON COLUMN o_eco_gateway.floor_id IS '楼层ID';
 COMMENT ON COLUMN o_eco_gateway.building_id IS '楼栋ID';
 COMMENT ON COLUMN o_eco_gateway.park_id IS '园区ID';
 COMMENT ON COLUMN o_eco_gateway.type IS '网关类型(1:AL,2:AP)';
+ALTER TABLE o_eco_gateway ADD COLUMN collect_type INTEGER NOT NULL DEFAULT 0;
+COMMENT ON COLUMN o_eco_gateway.collect_type IS '采集类型(0:配电平台,1:IOT)';
 
 CREATE TABLE o_eco_water_meter (
     id VARCHAR(32) PRIMARY KEY,

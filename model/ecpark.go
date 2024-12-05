@@ -28,7 +28,7 @@ Table: o_eco_park
 
 JSON Sample
 -------------------------------------
-{    "id": "twrmspZcXUEEIdTENyrxNljTk",    "created_by": "CRrcleOxaBoDGVNNURbaAPFor",    "created_time": 65,    "updated_by": "opNVqbsZoQwWbkBONgoZevwtv",    "updated_time": 25,    "park_name": "pyUqbpQDEHXWOiFuWrmZSndNb"}
+{    "id": "TBaYtPOkTuaTbHqgsVGclrxbe",    "created_by": "EuFtoiCIvagmdfJmgPaPkcRaQ",    "created_time": 60,    "updated_by": "NkSxHVvGrtjQtYeFIfkOuvwCb",    "updated_time": 34,    "park_name": "tZOqbqchwsntGSxtPwuGpwwaW"}
 
 
 
@@ -50,12 +50,17 @@ var (
 
 // Ecpark struct is a row record of the o_eco_park table in the  database
 type Ecpark struct {
-	ID          string           `json:"id"`           //主键ID
-	CreatedBy   string           `json:"created_by"`   //创建人
+	ID string `json:"id"` //主键ID
+
+	CreatedBy string `json:"created_by"` //创建人
+
 	CreatedTime common.LocalTime `json:"created_time"` //创建时间
-	UpdatedBy   string           `json:"updated_by"`   //更新人
+
+	UpdatedBy string `json:"updated_by"` //更新人
+
 	UpdatedTime common.LocalTime `json:"updated_time"` //更新时间
-	ParkName    string           `json:"park_name"`    //园区名称
+
+	ParkName string `json:"park_name"` //园区名称
 
 }
 
