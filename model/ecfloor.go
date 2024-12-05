@@ -31,7 +31,7 @@ Table: o_eco_floor
 
 JSON Sample
 -------------------------------------
-{    "id": "tuvuGCdqDkFLBrLCmpopUItkI",    "created_by": "IJDYNTVReNvmxILRBwGPlCnXI",    "created_time": 71,    "updated_by": "MsFyYfpbjGsJNTsCYVuFVrwdH",    "updated_time": 28,    "floor_name": "WRdMSVItpwqODseCLuYHvBSIM",    "building_id": "KpWWCIVaWtOdttPacpFCkdrfE",    "park_id": "KGXYAOjtrgGLNfqbMrkHAspKg",    "index": 72}
+{    "id": "KnSOxiEJClsAoisALeioQDfLM",    "created_by": "QoHTvPIWOeZQjCmThPHTtUHed",    "created_time": 81,    "updated_by": "oVKndODNeCPcLgnTysmuOxErs",    "updated_time": 7,    "floor_name": "lFWPVlAwxgBYrLpgHijJPSBJV",    "building_id": "GIlPYumJRQiOADRfIaInMNePI",    "park_id": "ykQRlwBVxyPoroFgyPMCvbrkv",    "index": 70}
 
 
 

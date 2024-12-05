@@ -592,8 +592,6 @@ VALUES
 ('98CC4D152986', 'admin', 'admin', '98CC4D152986', '配电网关', '配电网关_C-AL-06-2_98CC4D152986', '20000000000643', 'C栋_六层', md5('C栋_六层'), md5('C栋'), md5('教科院'), 1),
 ('98CC4D1528E4', 'admin', 'admin', '98CC4D1528E4', '配电网关', '配电网关_E-AP-02_98CC4D1528E4', '20000000000662', 'H栋_一层', md5('H栋_一层'), md5('H栋'), md5('教科院'), 2),
 ('98CC4D150E66', 'admin', 'admin', '98CC4D150E66', '配电网关', '配电网关_E-AL-01_98CC4D150E66', '20000000000661', 'E栋_一层', md5('E栋_一层'), md5('E栋'), md5('教科院'), 1),
-('98CC4D150A3C', 'admin', 'admin', '98CC4D150A3C', '配电网关', '配电网关_E-AL-02_98CC4D150A3C_1', '20000000000657', 'E栋_一层', md5('E栋_一层'), md5('E栋'), md5('教科院'), 1),
-('98CC4D150A3C_1', 'admin', 'admin', '98CC4D150A3C_1', '配电网关', '配电网关_E-AL-02_98CC4D150A3C_2', '20000000000657', 'G栋_一层', md5('G栋_一层'), md5('G栋'), md5('教科院'), 1),
 ('98CC4D149A06', 'admin', 'admin', '98CC4D149A06', '配电网关', '配电网关_C-AL-01_98CC4D149A06', '20000000000660', 'C栋_一层', md5('C栋_一层'), md5('C栋'), md5('教科院'), 1),
 ('98CC4D151E00', 'admin', 'admin', '98CC4D151E00', '配电网关', '配电网关_C-AP-02_98CC4D151E00', '20000000000664', 'C栋_二层', md5('C栋_二层'), md5('C栋'), md5('教科院'), 2),
 ('98CC4D152928', 'admin', 'admin', '98CC4D152928', '配电网关', '配电网关_A-AL-03_98CC4D152928', '20000000000663', 'A栋_三层', md5('A栋_三层'), md5('A栋'), md5('教科院'), 1),
@@ -622,6 +620,10 @@ VALUES
 ('98CC4D151DD6', 'admin', 'admin', '98CC4D151DD6', '配电网关', '配电网关_C-AL-06-1_98CC4D151DD6', '21000000000445', 'C栋_六层', md5('C栋_六层'), md5('C栋'), md5('教科院'), 1);
 
 
+INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type)
+VALUES
+('98CC4D150A3C_1', 'admin', 'admin', '98CC4D150A3C_1', '配电网关', '配电网关_E-AL-02_98CC4D150A3C_1', '20000000000657', 'E栋_一层', md5('E栋_一层'), md5('E栋'), md5('教科院'), 1),
+('98CC4D150A3C_2', 'admin', 'admin', '98CC4D150A3C_2', '配电网关', '配电网关_E-AL-02_98CC4D150A3C_2', '21000000000657', 'G栋_一层', md5('G栋_一层'), md5('G栋'), md5('教科院'), 1),
 
 -- Insert water meters
 INSERT INTO o_eco_water_meter (id, created_by, updated_by, model_name, dev_name, channel_no, cm_code, location, building_id, park_id, type)
