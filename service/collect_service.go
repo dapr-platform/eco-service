@@ -238,7 +238,7 @@ func CollectWaterMeterRealData() error {
 }
 
 // 手动收集指定日期的网关数据
-func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
+func ManuCollectGatewayHourlyStatsByDay(start, end, macAddr string) error {
 	common.Logger.Infof("Starting manual data collection from %s to %s", start, end)
 
 	if start == "" || end == "" {
@@ -264,6 +264,15 @@ func ManuCollectGatewayHourlyStatsByDay(start, end string) error {
 	gateways, err := GetAllEcgateways()
 	if err != nil {
 		return errors.Wrap(err, "Failed to get gateways")
+	}
+	if macAddr != "" {
+		filteredGateways := make([]model.Ecgateway, 0)
+		for _, gateway := range gateways {
+			if gateway.MacAddr == macAddr {
+				filteredGateways = append(filteredGateways, gateway)
+			}
+		}
+		gateways = filteredGateways
 	}
 
 	common.Logger.Infof("Found %d gateways to collect data from", len(gateways))
@@ -611,7 +620,7 @@ func ManuFillGatewayHourStats(month, value string) error {
 
 // 调试获取网关小时数据
 func DebugGetBoxHourStats(mac string, year string, month string, day string) (map[string]interface{}, error) {
-	
+
 	projectCode, err := client.GetBoxProjectCode(mac)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to get project code for gateway %s", mac)

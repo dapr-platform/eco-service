@@ -103,13 +103,15 @@ func DebugGetBoxHourStatsHandler(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Param start query string false "Start time (2024-01-01)"
 // @Param end query string false "End time (2024-01-01)"
+// @Param mac_addr query string false "mac_addr"
 // @Success 200 {object} common.Response "success"
 // @Router /manu_collect [get]
 func ManuCollectHandler(w http.ResponseWriter, r *http.Request) {
 	start := r.URL.Query().Get("start")
 	end := r.URL.Query().Get("end")
+	macAddr := r.URL.Query().Get("mac_addr")
 	go func() {
-		err := service.ManuCollectGatewayHourlyStatsByDay(start, end)
+		err := service.ManuCollectGatewayHourlyStatsByDay(start, end, macAddr)
 		if err != nil {
 			common.Logger.Error("手动收集数据失败," + err.Error())
 		}
