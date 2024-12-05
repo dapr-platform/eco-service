@@ -664,6 +664,8 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 			var err error
 			if strings.HasSuffix(gateways[i].MacAddr, "_1") {
 				projectCode, err = client.GetBoxProjectCode(strings.TrimSuffix(gateways[i].MacAddr, "_1"))
+			} else if strings.HasSuffix(gateways[i].MacAddr, "_2") {
+				projectCode, err = client.GetBoxProjectCode(strings.TrimSuffix(gateways[i].MacAddr, "_2"))
 			} else {
 				projectCode, err = client.GetBoxProjectCode(gateways[i].MacAddr)
 			}
@@ -696,6 +698,8 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 			for j, gateway := range gatewayBatch {
 				if strings.HasSuffix(gateway.MacAddr, "_1") {
 					macAddrs[j] = strings.TrimSuffix(gateway.MacAddr, "_1")
+				} else if strings.HasSuffix(gateway.MacAddr, "_2") {
+					macAddrs[j] = strings.TrimSuffix(gateway.MacAddr, "_2")
 				} else {
 					macAddrs[j] = gateway.MacAddr
 				}
@@ -802,6 +806,8 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 			var err error
 			if strings.HasSuffix(gateway.MacAddr, "_1") {
 				projectCode, err = client.GetBoxProjectCode(strings.TrimSuffix(gateway.MacAddr, "_1"))
+			} else if strings.HasSuffix(gateway.MacAddr, "_2") {
+				projectCode, err = client.GetBoxProjectCode(strings.TrimSuffix(gateway.MacAddr, "_2"))
 			} else {
 				projectCode, err = client.GetBoxProjectCode(gateway.MacAddr)
 			}
@@ -834,6 +840,8 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 			for j, gateway := range gatewayBatch {
 				if strings.HasSuffix(gateway.MacAddr, "_1") {
 					macAddrs[j] = strings.TrimSuffix(gateway.MacAddr, "_1")
+				} else if strings.HasSuffix(gateway.MacAddr, "_2") {
+					macAddrs[j] = strings.TrimSuffix(gateway.MacAddr, "_2")
 				} else {
 					macAddrs[j] = gateway.MacAddr
 				}
@@ -887,6 +895,9 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 					if strings.HasSuffix(gateway.MacAddr, "_1") {
 						macAddr = strings.TrimSuffix(gateway.MacAddr, "_1")
 						addr = 1
+					} else if strings.HasSuffix(gateway.MacAddr, "_2") {
+						macAddr = strings.TrimSuffix(gateway.MacAddr, "_2")
+						addr = 2
 					} else {
 						macAddr = gateway.MacAddr
 					}
