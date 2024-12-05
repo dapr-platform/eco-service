@@ -611,15 +611,14 @@ func ManuFillGatewayHourStats(month, value string) error {
 
 // 调试获取网关小时数据
 func DebugGetBoxHourStats(mac string, year string, month string, day string) (map[string]interface{}, error) {
-	box, err := common.DbGetOne[model.Ecgateway](context.Background(), common.GetDaprClient(), model.EcgatewayTableInfo.Name, "mac_addr="+mac)
+	
+	projectCode, err := client.GetBoxProjectCode(mac)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to get gateway %s", mac)
+		return nil, errors.Wrapf(err, "Failed to get project code for gateway %s", mac)
 	}
-	if box == nil {
-		return nil, errors.New("gateway not found")
-	}
+
 	reqBody := map[string]string{
-		"projectCode": box.ProjectCode,
+		"projectCode": projectCode,
 		"mac":         mac,
 		"year":        year,
 		"month":       month,
