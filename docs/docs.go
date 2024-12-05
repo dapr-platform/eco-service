@@ -723,7 +723,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecbuilding"
+                    "楼栋信息"
                 ],
                 "summary": "query objects",
                 "parameters": [
@@ -827,7 +827,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecbuilding"
+                    "楼栋信息"
                 ],
                 "summary": "save",
                 "parameters": [
@@ -879,7 +879,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecbuilding"
+                    "楼栋信息"
                 ],
                 "summary": "batch delete",
                 "parameters": [
@@ -922,7 +922,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecbuilding"
+                    "楼栋信息"
                 ],
                 "summary": "batch update",
                 "parameters": [
@@ -963,7 +963,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecbuilding"
+                    "楼栋信息"
                 ],
                 "summary": "GroupBy",
                 "parameters": [
@@ -1020,7 +1020,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecbuilding"
+                    "楼栋信息"
                 ],
                 "summary": "page query",
                 "parameters": [
@@ -1143,7 +1143,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecbuilding"
+                    "楼栋信息"
                 ],
                 "summary": "delete",
                 "parameters": [
@@ -1190,7 +1190,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecfloor"
+                    "楼层信息"
                 ],
                 "summary": "query objects",
                 "parameters": [
@@ -1300,7 +1300,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecfloor"
+                    "楼层信息"
                 ],
                 "summary": "save",
                 "parameters": [
@@ -1352,7 +1352,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecfloor"
+                    "楼层信息"
                 ],
                 "summary": "batch delete",
                 "parameters": [
@@ -1395,7 +1395,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecfloor"
+                    "楼层信息"
                 ],
                 "summary": "batch update",
                 "parameters": [
@@ -1436,7 +1436,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecfloor"
+                    "楼层信息"
                 ],
                 "summary": "GroupBy",
                 "parameters": [
@@ -1493,7 +1493,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecfloor"
+                    "楼层信息"
                 ],
                 "summary": "page query",
                 "parameters": [
@@ -1622,7 +1622,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecfloor"
+                    "楼层信息"
                 ],
                 "summary": "delete",
                 "parameters": [
@@ -1669,7 +1669,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecgateway"
+                    "配电网关信息"
                 ],
                 "summary": "query objects",
                 "parameters": [
@@ -1774,6 +1774,12 @@ const docTemplate = `{
                         "description": "type",
                         "name": "type",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "collect_type",
+                        "name": "collect_type",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1815,7 +1821,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecgateway"
+                    "配电网关信息"
                 ],
                 "summary": "save",
                 "parameters": [
@@ -1867,7 +1873,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecgateway"
+                    "配电网关信息"
                 ],
                 "summary": "batch delete",
                 "parameters": [
@@ -1910,7 +1916,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecgateway"
+                    "配电网关信息"
                 ],
                 "summary": "batch update",
                 "parameters": [
@@ -1951,7 +1957,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecgateway"
+                    "配电网关信息"
                 ],
                 "summary": "GroupBy",
                 "parameters": [
@@ -2008,7 +2014,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecgateway"
+                    "配电网关信息"
                 ],
                 "summary": "page query",
                 "parameters": [
@@ -2121,6 +2127,12 @@ const docTemplate = `{
                         "description": "type",
                         "name": "type",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "collect_type",
+                        "name": "collect_type",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2173,7 +2185,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecgateway"
+                    "配电网关信息"
                 ],
                 "summary": "delete",
                 "parameters": [
@@ -2220,7 +2232,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecpark"
+                    "园区信息"
                 ],
                 "summary": "query objects",
                 "parameters": [
@@ -2312,7 +2324,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecpark"
+                    "园区信息"
                 ],
                 "summary": "save",
                 "parameters": [
@@ -2364,7 +2376,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecpark"
+                    "园区信息"
                 ],
                 "summary": "batch delete",
                 "parameters": [
@@ -2407,7 +2419,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecpark"
+                    "园区信息"
                 ],
                 "summary": "batch update",
                 "parameters": [
@@ -2448,7 +2460,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecpark"
+                    "园区信息"
                 ],
                 "summary": "GroupBy",
                 "parameters": [
@@ -2505,7 +2517,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecpark"
+                    "园区信息"
                 ],
                 "summary": "page query",
                 "parameters": [
@@ -2616,7 +2628,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecpark"
+                    "园区信息"
                 ],
                 "summary": "delete",
                 "parameters": [
@@ -2663,7 +2675,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecwater_meter"
+                    "水信息"
                 ],
                 "summary": "query objects",
                 "parameters": [
@@ -2803,7 +2815,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecwater_meter"
+                    "水信息"
                 ],
                 "summary": "save",
                 "parameters": [
@@ -2855,7 +2867,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecwater_meter"
+                    "水信息"
                 ],
                 "summary": "batch delete",
                 "parameters": [
@@ -2898,7 +2910,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecwater_meter"
+                    "水信息"
                 ],
                 "summary": "batch update",
                 "parameters": [
@@ -2939,7 +2951,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecwater_meter"
+                    "水信息"
                 ],
                 "summary": "GroupBy",
                 "parameters": [
@@ -2996,7 +3008,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecwater_meter"
+                    "水信息"
                 ],
                 "summary": "page query",
                 "parameters": [
@@ -3155,7 +3167,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Ecwater_meter"
+                    "水信息"
                 ],
                 "summary": "delete",
                 "parameters": [
@@ -3236,6 +3248,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "End time (2024-01-01)",
                         "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "mac_addr",
+                        "name": "mac_addr",
                         "in": "query"
                     }
                 ],
@@ -3498,6 +3516,10 @@ const docTemplate = `{
                 "cm_code": {
                     "description": "通信码",
                     "type": "string"
+                },
+                "collect_type": {
+                    "description": "采集类型(0:配电平台,1:IOT)",
+                    "type": "integer"
                 },
                 "created_by": {
                     "description": "创建人",
