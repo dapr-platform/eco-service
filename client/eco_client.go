@@ -82,7 +82,9 @@ func GetBoxProjectCode(mac string) (string, error) {
 		return "", err
 	}
 	if boxResp.Code != "0" {
-		return "", fmt.Errorf("invalid-mac")
+		respStr, _ := json.Marshal(boxResp)
+		common.Logger.Errorf("Failed to get project code: %s\n", string(respStr))
+		return "", fmt.Errorf("get-project-code-failed " + string(respStr))
 	}
 	return boxResp.Data.ProjectCode, nil
 }
