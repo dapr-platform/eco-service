@@ -307,9 +307,6 @@ CREATE TABLE f_eco_gateway_1h (
     level INTEGER NOT NULL DEFAULT 0,
     power_consumption DECIMAL(20,2) NOT NULL,
     FOREIGN KEY (gateway_id) REFERENCES o_eco_gateway(id),
-    FOREIGN KEY (floor_id) REFERENCES o_eco_floor(id),
-    FOREIGN KEY (building_id) REFERENCES o_eco_building(id),
-    FOREIGN KEY (park_id) REFERENCES o_eco_park(id),
     PRIMARY KEY (id, time)
 );
 SELECT create_hypertable('f_eco_gateway_1h', 'time');
@@ -530,8 +527,7 @@ VALUES
 (md5('A栋'), 'admin', 'admin', 'A栋', md5('教科院'), 1),
 (md5('B栋'), 'admin', 'admin', 'B栋', md5('教科院'), 2),
 (md5('C栋'), 'admin', 'admin', 'C栋', md5('教科院'), 3),
-(md5('E栋'), 'admin', 'admin', 'E栋', md5('教科院'), 4),
-(md5('G栋'), 'admin', 'admin', 'G栋', md5('教科院'), 5),
+(md5('E栋'), 'admin', 'admin', 'E/G栋', md5('教科院'), 4),
 (md5('H栋'), 'admin', 'admin', 'H栋', md5('教科院'), 6),
 (md5('功能厅'), 'admin', 'admin', '功能厅', md5('教科院'), 7),
 (md5('充电桩'), 'admin', 'admin', '充电桩', md5('教科院'), 8);
@@ -559,7 +555,6 @@ VALUES
 (md5('C栋_六层'), 'admin', 'admin', '六层', md5('C栋'), md5('教科院'), 6),
 (md5('C栋_七层'), 'admin', 'admin', '七层', md5('C栋'), md5('教科院'), 7),
 (md5('E栋'), 'admin', 'admin', '整栋', md5('E栋'), md5('教科院'), 1),
-(md5('G栋'), 'admin', 'admin', '整栋', md5('G栋'), md5('教科院'), 1),
 (md5('H栋'), 'admin', 'admin', '整栋', md5('H栋'), md5('教科院'), 1),
 (md5('功能厅'), 'admin', 'admin', '整栋', md5('功能厅'), md5('教科院'), 1),
 (md5('充电桩'), 'admin', 'admin', '整栋', md5('充电桩'), md5('教科院'), 1);
@@ -584,9 +579,8 @@ VALUES
 ('98CC4D151D3A', 'admin', 'admin', '98CC4D151D3A', '配电网关', '配电网关_C-AL-02_98CC4D151D3A', '20000000000658', 'C栋', '', md5('C栋'), md5('教科院'), 1, 1),
 ('98CC4D151C56', 'admin', 'admin', '98CC4D151C56', '配电网关', '配电网关_C-AP-01_98CC4D151C56', '20000000000666', 'C栋', '', md5('C栋'), md5('教科院'), 2, 1),
 ('98CC4D151E00', 'admin', 'admin', '98CC4D151E00', '配电网关', '配电网关_C-AP-02_98CC4D151E00', '20000000000664', 'C栋', '', md5('C栋'), md5('教科院'), 2, 1),
-('98CC4D150E66', 'admin', 'admin', '98CC4D150E66', '配电网关', '配电网关_E-AL-01_98CC4D150E66', '20000000000661', 'E栋', '', md5('E栋'), md5('教科院'), 1, 1),
-('98CC4D150A3C_1', 'admin', 'admin', '98CC4D150A3C_1', '配电网关', '配电网关_E-AL-02_98CC4D150A3C_1', '20000000000657', 'E栋', '', md5('E栋'), md5('教科院'), 1, 1),
-('98CC4D150A3C_2', 'admin', 'admin', '98CC4D150A3C_2', '配电网关', '配电网关_E-AL-02_98CC4D150A3C_2', '20000000000657', 'G栋', '', md5('G栋'), md5('教科院'), 1, 1),
+('98CC4D150E66', 'admin', 'admin', '98CC4D150E66', '配电网关', '配电网关_E-AL-01_98CC4D150E66', '20000000000661', 'E栋', '', md5('E栋'), md5('教科院'), 2, 1),
+('98CC4D150A3C', 'admin', 'admin', '98CC4D150A3C', '配电网关', '配电网关_E-AL-02_98CC4D150A3C', '20000000000657', 'E栋', '', md5('E栋'), md5('教科院'), 2, 1),
 ('98CC4D149A0C', 'admin', 'admin', '98CC4D149A0C', '配电网关', '配电网关_E-AP-01_98CC4D149A0C', '20000000000667', 'H栋', '', md5('H栋'), md5('教科院'), 2, 1),
 ('98CC4D1528E4', 'admin', 'admin', '98CC4D1528E4', '配电网关', '配电网关_E-AP-02_98CC4D1528E4', '20000000000662', 'H栋', '', md5('H栋'), md5('教科院'), 2, 1),
 ('98CC4D151D88', 'admin', 'admin', '98CC4D151D88', '配电网关', '配电网关_A-AL-01_98CC4D151D88', '20000000000036', 'A栋_一层', md5('A栋_一层'), md5('A栋'), md5('教科院'), 1,2),

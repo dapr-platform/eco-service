@@ -88,8 +88,11 @@ func GetBoxProjectCode(mac string) (string, error) {
 	}
 	return boxResp.Data.ProjectCode, nil
 }
+func GetBoxesMonthStats(params map[string]string) ([]byte, error) {
+	return GetFunc("GET_BOXES_MON_STATS", params)
 
-func GetBoxesHourStats(params map[string]string) ([]byte, error) {
+}
+func GetFunc(method string, params map[string]string) ([]byte, error) {
 	if err := defaultClient.ensureValidToken(); err != nil {
 		common.Logger.Errorf("Failed to ensure valid token: %v\n", err)
 		return nil, err
@@ -97,7 +100,7 @@ func GetBoxesHourStats(params map[string]string) ([]byte, error) {
 
 	// Prepare parameters
 	data := url.Values{}
-	data.Set("method", "GET_BOXES_HOUR_STATS")
+	data.Set("method", method)
 	data.Set("client_id", config.ECO_APP_KEY)
 	data.Set("access_token", defaultClient.accessToken)
 	data.Set("timestamp", time.Now().Format("20060102150405"))
@@ -125,4 +128,16 @@ func GetBoxesHourStats(params map[string]string) ([]byte, error) {
 	}
 
 	return resp, nil
+}
+
+func GetBoxesHourStats(params map[string]string) ([]byte, error) {
+	return GetFunc("GET_BOXES_HOUR_STATS", params)
+}
+
+func GetBoxesDayStats(params map[string]string) ([]byte, error) {
+	return GetFunc("GET_BOXES_DAY_STATS", params)
+}
+
+func GetBoxesYearStats(params map[string]string) ([]byte, error) {
+	return GetFunc("GET_BOXES_YEAR_STATS", params)
 }

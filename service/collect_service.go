@@ -671,6 +671,52 @@ func DebugGetBoxHourStats(mac string, year string, month string, day string) (ma
 	return resp.Data, nil
 }
 
+
+
+// 调试获取网关小时数据
+func DebugGetBoxMonthStats(mac string, year string, month string) (map[string]interface{}, error) {
+
+	projectCode, err := client.GetBoxProjectCode(mac)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to get project code for gateway %s", mac)
+	}
+
+	reqBody := map[string]string{
+		"projectCode": projectCode,
+		"mac":         mac,
+		"year":        year,
+		"month":       month,
+	}
+
+	common.Logger.Infof("Requesting data for batch of %d gateways, date: %s", 1,
+		time.Date(cast.ToInt(year), time.Month(cast.ToInt(month)), 1, 0, 0, 0, 0, time.Local).Format("2006-01-02"))
+
+	respBytes, err := client.GetBoxesMonthStats(reqBody)
+	if err != nil {
+		common.Logger.Errorf("API request failed: %v", err)
+		return nil, errors.Wrap(err, "Failed to get box hour stats")
+	}
+
+	var resp struct {
+		Code    string                 `json:"code"`
+		Message string                 `json:"message"`
+		Data    map[string]interface{} `json:"data"`
+	}
+
+	if err := json.Unmarshal(respBytes, &resp); err != nil {
+		common.Logger.Errorf("Failed to parse API response: %v", err)
+		return nil, errors.Wrap(err, "Failed to unmarshal response")
+	}
+
+	if resp.Code != "0" {
+		common.Logger.Errorf("API returned error code: %s, message: %s", resp.Code, resp.Message)
+		return nil, fmt.Errorf("API error: %s", resp.Message)
+	}
+
+	common.Logger.Infof("Received data for %d gateways", len(resp.Data))
+	return resp.Data, nil
+}
+
 // 收集网关全天数据
 func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) error {
 	// Group gateways by project code

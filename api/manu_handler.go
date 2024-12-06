@@ -1,6 +1,7 @@
 package api
 
 import (
+	"eco-service/client"
 	"eco-service/service"
 	"net/http"
 
@@ -14,6 +15,8 @@ func InitManuCollectRoute(r chi.Router) {
 	r.Get(common.BASE_CONTEXT+"/check_collect_date", CheckCollectPowerHandler)
 	r.Get(common.BASE_CONTEXT+"/manu_collect_water_data", ManuCollectWaterDataHandler)
 	r.Get(common.BASE_CONTEXT+"/debug_get_box_hour_stats", DebugGetBoxHourStatsHandler)
+	r.Get(common.BASE_CONTEXT+"/debug_get_month_stats", DebugGetMonthStatsHandler)
+	r.Post(common.BASE_CONTEXT+"/debug_method_invoke", DebugMethodInvokeHandler)
 	r.Get(common.BASE_CONTEXT+"/manu_fill_gateway_hour_stats", ManuFillGatewayHourStatsHandler)
 	r.Get(common.BASE_CONTEXT+"/manu_fill_park_water_hour_stats", ManuFillParkWaterHourStatsHandler)
 	r.Get(common.BASE_CONTEXT+"/force_refresh_continuous_aggregate", ForceRefreshContinuousAggregateHandler)
@@ -89,6 +92,50 @@ func ManuFillGatewayHourStatsHandler(w http.ResponseWriter, r *http.Request) {
 // @Router /debug_get_box_hour_stats [get]
 func DebugGetBoxHourStatsHandler(w http.ResponseWriter, r *http.Request) {
 	data, err := service.DebugGetBoxHourStats(r.URL.Query().Get("mac_addr"), r.URL.Query().Get("year"), r.URL.Query().Get("month"), r.URL.Query().Get("day"))
+	if err != nil {
+		common.Logger.Error("手动收集数据失败," + err.Error())
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
+	}
+	common.HttpResult(w, common.OK.WithData(data))
+}
+
+// @Summary Manually invoke method
+// @Description Manually invoke method
+// @Tags Manually
+// @Produce  json
+// @Param method query string true "method"
+// @Param params body string true "params"
+// @Success 200 {object} common.Response "success"
+// @Router /debug_method_invoke [post]
+func DebugMethodInvokeHandler(w http.ResponseWriter, r *http.Request) {
+	var body map[string]string
+	err := common.ReadRequestBody(r, &body)
+	if err != nil {
+		common.Logger.Error("解析参数失败," + err.Error())
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
+	}
+	data, err := client.GetFunc(r.URL.Query().Get("method"), body)
+	if err != nil {
+		common.Logger.Error("手动收集数据失败," + err.Error())
+		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+		return
+	}
+	common.HttpResult(w, common.OK.WithData(data))
+}
+
+// @Summary Manually collect data
+// @Description Manually collect data for month
+// @Tags Manually
+// @Produce  json
+// @Param mac_addr query string true "mac_addr"
+// @Param year query string true "year"
+// @Param month query string true "month"
+// @Success 200 {object} common.Response "success"
+// @Router /debug_get_month_stats [get]
+func DebugGetMonthStatsHandler(w http.ResponseWriter, r *http.Request) {
+	data, err := service.DebugGetBoxMonthStats(r.URL.Query().Get("mac_addr"), r.URL.Query().Get("year"), r.URL.Query().Get("month"))
 	if err != nil {
 		common.Logger.Error("手动收集数据失败," + err.Error())
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
