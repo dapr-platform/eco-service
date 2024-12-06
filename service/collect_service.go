@@ -7,6 +7,7 @@ import (
 	"eco-service/model"
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -40,6 +41,8 @@ var waterNeedRefreshContinuousAggregateMap = map[string]string{
 	"f_eco_park_water_1m": "month",
 	"f_eco_park_water_1y": "year",
 }
+var COLLECT_TYPE_PLATFORM = 0
+var COLLECT_TYPE_IOT = 1
 
 // 初始化函数,启动定时任务收集数据
 func init() {
@@ -53,7 +56,7 @@ func init() {
 
 			common.Logger.Info("Starting scheduled data collection...")
 
-			gateways, err := GetAllEcgateways()
+			gateways, err := GetAllEcgateways(COLLECT_TYPE_PLATFORM)
 			if err != nil {
 				common.Logger.Errorf("Failed to get gateways: %v", err)
 				continue
@@ -132,7 +135,7 @@ func CheckCollectData(start, end string, collectType int) ([]map[string]interfac
 	totalCount := 0
 	if collectType == 0 {
 		tablename = "f_eco_gateway_1h"
-		gateways, err := GetAllEcgateways()
+		gateways, err := GetAllEcgateways(COLLECT_TYPE_PLATFORM)
 		if err != nil {
 			return nil, err
 		}
@@ -156,6 +159,84 @@ func CheckCollectData(start, end string, collectType int) ([]map[string]interfac
 		return nil, err
 	}
 	return data, nil
+}
+
+// 收集电力网关实时数据，从IOT平台收集 //TODO: 需要测试
+func CollectPowerRealData() error {
+	gateways, err := GetAllEcgateways(COLLECT_TYPE_IOT)
+	if err != nil {
+		return errors.Wrap(err, "Failed to get gateways")
+	}
+	common.Logger.Infof("Found %d gateways to collect data from", len(gateways))
+	now := time.Now().Truncate(time.Hour)
+	for _, gateway := range gateways {
+		common.Logger.Infof("Processing gateway: %s (ID: %s)", gateway.CmCode, gateway.ID)
+		resp, err := client.GetRealDataByCmCode[client.PowerMeterData](gateway.CmCode)
+		if err != nil {
+			common.Logger.Errorf("Failed to get real data for meter %s: %v", gateway.CmCode, err)
+			continue
+		}
+
+		if resp.ResultCode != "0000" {
+			common.Logger.Errorf("Error response for meter %s: %s", gateway.CmCode, resp.Message.Message)
+			continue
+		}
+
+		// Calculate hourly usage by comparing with stored cumulative flow
+		currentCumFlow := resp.QueryData.RtData.Energe
+		hourlyUsage := currentCumFlow - gateway.RealDataValue
+		if hourlyUsage < 0 {
+			// 当水表超过量程时，currentCumFlow从0重新开始计算
+			// 计算水表的最大量程(根据TotalValue的位数)
+			maxValue := math.Pow10(len(strconv.FormatFloat(gateway.RealDataValue, 'f', -1, 64)))
+			// 加上最大量程得到正确用量
+			hourlyUsage = currentCumFlow + (maxValue - gateway.RealDataValue)
+		}
+
+		initial := false
+		if gateway.RealDataValue == 0 {
+			initial = true
+			common.Logger.Infof("Initial data collection for meter %s, setting baseline value to %.2f", gateway.CmCode, currentCumFlow)
+		}
+
+		// Update meter's cumulative flow
+		gateway.RealDataValue = currentCumFlow
+		common.Logger.Debugf("Attempting to update meter %s with data: %+v", gateway.CmCode, gateway)
+
+		if err := common.DbUpsert[model.Ecgateway](context.Background(), common.GetDaprClient(), gateway,
+			model.EcgatewayTableInfo.Name, model.Ecgateway_FIELD_NAME_id); err != nil {
+			common.Logger.Errorf("Failed to update meter %s: %v", gateway.CmCode, err)
+			continue
+		}
+		common.Logger.Debugf("Updated cumulative flow for meter %s to %.2f", gateway.CmCode, currentCumFlow)
+
+		if initial {
+			continue
+		}
+
+		// Insert hourly usage into 1h table
+		stat := model.Eco_gateway_1h{
+			ID:               gateway.ID + "_" + now.Format("2006010215"),
+			Time:             common.LocalTime(now),
+			GatewayID:        gateway.ID,
+			FloorID:          gateway.FloorID,
+			BuildingID:       gateway.BuildingID,
+			Type:             gateway.Type,
+			Level:            gateway.Level,
+			ParkID:           gateway.ParkID,
+			PowerConsumption: hourlyUsage,
+		}
+
+		if err := common.DbUpsert[model.Eco_gateway_1h](context.Background(), common.GetDaprClient(), stat, model.Eco_gateway_1hTableInfo.Name, model.Eco_gateway_1h_FIELD_NAME_id); err != nil {
+			common.Logger.Errorf("Failed to insert hourly data for meter %s: %v", gateway.CmCode, err)
+			continue
+		}
+
+		common.Logger.Infof("Successfully collected data for meter %s: hourly usage %.2f", gateway.CmCode, hourlyUsage)
+
+	}
+
+	return nil
 }
 
 // 收集水表实时数据
@@ -191,6 +272,14 @@ func CollectWaterMeterRealData() error {
 		// Calculate hourly usage by comparing with stored cumulative flow
 		currentCumFlow := resp.QueryData.RtData.CumFlow
 		hourlyUsage := currentCumFlow - meter.TotalValue
+		if hourlyUsage < 0 {
+			// 当水表超过量程时，currentCumFlow从0重新开始计算
+			// 计算水表的最大量程(根据TotalValue的位数)
+			maxValue := math.Pow10(len(strconv.FormatFloat(meter.TotalValue, 'f', -1, 64)))
+			// 加上最大量程得到正确用量
+			hourlyUsage = currentCumFlow + (maxValue - meter.TotalValue)
+		}
+
 		initial := false
 		if meter.TotalValue == 0 {
 			initial = true
@@ -261,7 +350,7 @@ func ManuCollectGatewayHourlyStatsByDay(start, end, macAddr string) error {
 		return errors.New("End date must be after start date")
 	}
 
-	gateways, err := GetAllEcgateways()
+	gateways, err := GetAllEcgateways(COLLECT_TYPE_PLATFORM)
 	if err != nil {
 		return errors.Wrap(err, "Failed to get gateways")
 	}
@@ -486,7 +575,7 @@ func ManuFillGatewayHourStats(month, value string) error {
 	common.Logger.Infof("Parsed inputs - Start time: %s, Total value: %.2f", startTime.Format("2006-01"), totalValue)
 
 	// Get all gateways
-	gateways, err := GetAllEcgateways()
+	gateways, err := GetAllEcgateways(COLLECT_TYPE_PLATFORM)
 	if err != nil {
 		return errors.Wrap(err, "Failed to get gateways")
 	}
@@ -670,8 +759,6 @@ func DebugGetBoxHourStats(mac string, year string, month string, day string) (ma
 	common.Logger.Infof("Received data for %d gateways", len(resp.Data))
 	return resp.Data, nil
 }
-
-
 
 // 调试获取网关小时数据
 func DebugGetBoxMonthStats(mac string, year string, month string) (map[string]interface{}, error) {
@@ -1105,8 +1192,8 @@ func refreshContinuousAggregate(collectTime time.Time, refreshDefineMap map[stri
 	return nil
 }
 
-func GetAllEcgateways() ([]model.Ecgateway, error) {
-	qstr := model.Ecgateway_FIELD_NAME_collect_type + "=0"
+func GetAllEcgateways(collectType int) ([]model.Ecgateway, error) {
+	qstr := model.Ecgateway_FIELD_NAME_collect_type + "=" + strconv.Itoa(collectType)
 	datas, err := common.DbQuery[model.Ecgateway](context.Background(), common.GetDaprClient(), model.EcgatewayTableInfo.Name, qstr)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to query gateways")

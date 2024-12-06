@@ -24,6 +24,32 @@ type QueryData[T any] struct {
 	RtData T `json:"rtData"`
 	State  any `json:"state"`
 }
+
+type PowerMeterData struct {
+	Netport            int     `json:"netport"`
+	Csq               int     `json:"csq"` 
+	CsqErrorType      int     `json:"csq_error_type"`
+	Syson             int     `json:"syson"`
+	SbTimeRepairType  int     `json:"sb_time_repair_type"`
+	EnergeRepairType  int     `json:"energe_repair_type"`
+	NetportErrorType  int     `json:"netport_error_type"`
+	SysonErrorType    int     `json:"syson_error_type"`
+	Energe            float64 `json:"energe"`
+	SbTimeRepair      int64   `json:"sb_time_repair"`
+	EnergeErrorType   int     `json:"energe_error_type"`
+	SbTime            int64   `json:"sb_time"`
+	EnergeRepair      float64 `json:"energe_repair"`
+	SysonRepairType   int     `json:"syson_repair_type"`
+	SbTimeErrorType   int     `json:"sb_time_error_type"`
+	SysonRepair       int     `json:"syson_repair"`
+	CsqRepair         int     `json:"csq_repair"`
+	NetportRepair     int     `json:"netport_repair"`
+	NetportRepairType int     `json:"netport_repair_type"`
+	CsqRepairType     int     `json:"csq_repair_type"`
+	Timestamp         int64   `json:"timestamp"`
+}
+
+
 type WaterMeterData struct {
 	MonthlyUsage          float64 `json:"monthlyuseage"`
 	InsFlowRepairType     int     `json:"insflow_repair_type"`

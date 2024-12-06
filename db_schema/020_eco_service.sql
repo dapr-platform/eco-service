@@ -82,7 +82,8 @@ CREATE TABLE o_eco_gateway (
     park_id VARCHAR(32) NOT NULL DEFAULT '',
     type INTEGER NOT NULL,
     level INTEGER NOT NULL DEFAULT 0,
-    collect_type INTEGER NOT NULL DEFAULT 0
+    collect_type INTEGER NOT NULL DEFAULT 0,
+    real_data_value DECIMAL(20,2) NOT NULL DEFAULT 0
 );
 ALTER TABLE o_eco_gateway ADD CONSTRAINT uk_eco_gateway_mac_addr UNIQUE(mac_addr);
 COMMENT ON TABLE o_eco_gateway IS '配电网关信息表';
@@ -103,6 +104,10 @@ COMMENT ON COLUMN o_eco_gateway.park_id IS '园区ID';
 COMMENT ON COLUMN o_eco_gateway.type IS '网关类型(1:AL,2:AP)';
 COMMENT ON COLUMN o_eco_gateway.collect_type IS '采集类型(0:配电平台,1:IOT)';
 COMMENT ON COLUMN o_eco_gateway.level IS '层级(0:园区,1:楼栋,2:楼层)';
+COMMENT ON COLUMN o_eco_gateway.real_data_value IS '实时数据值';
+
+
+
 
 CREATE TABLE o_eco_water_meter (
     id VARCHAR(32) PRIMARY KEY,

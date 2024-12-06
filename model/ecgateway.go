@@ -35,11 +35,12 @@ Table: o_eco_gateway
 [14] type                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []
 [15] level                                          INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: [0]
 [16] collect_type                                   INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: [0]
+[17] real_data_value                                NUMERIC              null: false  primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: [0]
 
 
 JSON Sample
 -------------------------------------
-{    "id": "lOAFkaPJDbmqjylcuOSfJTXOC",    "created_by": "aZirXsUAwLKZNtuNtdGuAbLTy",    "created_time": 20,    "updated_by": "XxGPnjKTOQAfJHOjpnhrTMvUN",    "updated_time": 62,    "model_name": "IQHLgEWtwjaadxPTYoWgBwqLE",    "dev_name": "fqcrHKMwmZPSgfjkcdPjOnQcy",    "mac_addr": "EDBqjREKusfqDamgHWABvKDPd",    "cm_code": "tgUmSRAFsGhjhAljkyiNsBHlI",    "project_code": "JMlcLrucJcERwsDOGdpyHKSau",    "location": "DBwufdWKZBInGdNSuvKmghHvs",    "floor_id": "VUXiipCYRjiRnVEgjSdISYGdG",    "building_id": "UTeUsiLStRFVKtaaSTbsvPSNN",    "park_id": "IyFQeZTMNwaFxCxGDocMYpwkW",    "type": 82,    "level": 10,    "collect_type": 24}
+{    "id": "NQsxbsEgFUsHaGvSDjseDJqsO",    "created_by": "LChDAJZArMKKyfroweoGMSxXL",    "created_time": 48,    "updated_by": "VYyepAhabyPJXLkaSUkFIminl",    "updated_time": 39,    "model_name": "nSLwqURxvBOkrmVQRmQDFaEWP",    "dev_name": "NEmPWBGfNDkAfRBmFsatEbWtf",    "mac_addr": "CVaSnmiAbYKSagvrFAGWRRNAO",    "cm_code": "iLYricspeKWwQpTbTiEOGICDB",    "project_code": "CTfFeqaFZVUMnqcReCKtFrvrh",    "location": "GxKDDdrNYPJCNNGsGiSIMvMOB",    "floor_id": "IkYyCDBqdcTKFVSfITpdlukMW",    "building_id": "VxvWEJuNGpyBwGWIYBPpCdpcq",    "park_id": "waRFiKZsRwWxqFwnhXwoZucmX",    "type": 2,    "level": 95,    "collect_type": 92,    "real_data_value": 0.3559830465666074}
 
 
 
@@ -79,6 +80,8 @@ var (
 	Ecgateway_FIELD_NAME_level = "level"
 
 	Ecgateway_FIELD_NAME_collect_type = "collect_type"
+
+	Ecgateway_FIELD_NAME_real_data_value = "real_data_value"
 )
 
 // Ecgateway struct is a row record of the o_eco_gateway table in the  database
@@ -116,6 +119,8 @@ type Ecgateway struct {
 	Level int32 `json:"level"` //层级(0:园区,1:楼栋,2:楼层)
 
 	CollectType int32 `json:"collect_type"` //采集类型(0:配电平台,1:IOT)
+
+	RealDataValue float64 `json:"real_data_value"` //实时数据值
 
 }
 
@@ -478,6 +483,27 @@ var EcgatewayTableInfo = &TableInfo{
 			ProtobufFieldName:  "collect_type",
 			ProtobufType:       "int32",
 			ProtobufPos:        17,
+		},
+
+		&ColumnInfo{
+			Index:              17,
+			Name:               "real_data_value",
+			Comment:            `实时数据值`,
+			Notes:              ``,
+			Nullable:           false,
+			DatabaseTypeName:   "NUMERIC",
+			DatabaseTypePretty: "NUMERIC",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "NUMERIC",
+			ColumnLength:       -1,
+			GoFieldName:        "RealDataValue",
+			GoFieldType:        "float64",
+			JSONFieldName:      "real_data_value",
+			ProtobufFieldName:  "real_data_value",
+			ProtobufType:       "float",
+			ProtobufPos:        18,
 		},
 	},
 }
