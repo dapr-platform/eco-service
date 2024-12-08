@@ -1059,6 +1059,9 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 				if gatewayData, ok := resp.Data[macAddr].(map[string]interface{}); ok {
 					for hour := 0; hour < 24; hour++ {
 						hourStr := fmt.Sprintf("%02d", hour)
+						if hourStr == "23" { //TODO 23点的数据用22点的，因为底层硬件问题，以后再改回来
+							hourStr = "22"
+						}
 						if hourData, ok := gatewayData[hourStr].([]interface{}); ok {
 							stats := processHourStats(hourData)
 							hourTime := time.Date(collectTime.Year(), collectTime.Month(), collectTime.Day(), hour, 0, 0, 0, collectTime.Location())
@@ -1155,7 +1158,7 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 				hourTime = time.Date(hourTime.Year(), hourTime.Month(), hourTime.Day(),
 					hourTime.Hour(), 0, 0, 0, hourTime.Location())
 				reqHourStr := hourTime.Format("15")
-				if hourTime.Format("15") == "23"{
+				if hourTime.Format("15") == "23" { //TODO 23点的数据用22点的，因为底层硬件问题，以后再改回来
 					reqHourStr = "22"
 				}
 				reqBody := map[string]string{
