@@ -14,6 +14,7 @@ func InitManuCollectRoute(r chi.Router) {
 	r.Get(common.BASE_CONTEXT+"/manu_collect", ManuCollectHandler)
 	r.Get(common.BASE_CONTEXT+"/check_collect_date", CheckCollectPowerHandler)
 	r.Get(common.BASE_CONTEXT+"/manu_collect_water_data", ManuCollectWaterDataHandler)
+	r.Get(common.BASE_CONTEXT+"/manu_collect_power_data", ManuCollectPowerDataHandler)
 	r.Get(common.BASE_CONTEXT+"/debug_get_box_hour_stats", DebugGetBoxHourStatsHandler)
 	r.Get(common.BASE_CONTEXT+"/debug_get_month_stats", DebugGetMonthStatsHandler)
 	r.Post(common.BASE_CONTEXT+"/debug_method_invoke", DebugMethodInvokeHandler)
@@ -61,7 +62,6 @@ func ManuFillParkWaterHourStatsHandler(w http.ResponseWriter, r *http.Request) {
 	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }
 
-
 // @Summary Manually fill power collect iot data
 // @Description Manually fill power collect iot data
 // @Tags Manually
@@ -83,7 +83,6 @@ func ManuFillPowerCollectIotDataHandler(w http.ResponseWriter, r *http.Request) 
 	}()
 	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }
-
 
 // @Summary Manually fill gateway hour stats
 // @Description Manually fill gateway hour stats
@@ -200,6 +199,19 @@ func ManuCollectHandler(w http.ResponseWriter, r *http.Request) {
 func ManuCollectWaterDataHandler(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		service.CollectWaterMeterRealData()
+	}()
+	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
+}
+
+// @Summary Manually collect power data
+// @Description Manually collect power data
+// @Tags Manually
+// @Produce  json
+// @Success 200 {object} common.Response "success"
+// @Router /manu_collect_power_data [get]
+func ManuCollectPowerDataHandler(w http.ResponseWriter, r *http.Request) {
+	go func() {
+		service.CollectPowerRealData()
 	}()
 	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }

@@ -3827,6 +3827,26 @@ const docTemplate = `{
                 }
             }
         },
+        "/manu_collect_power_data": {
+            "get": {
+                "description": "Manually collect power data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manually"
+                ],
+                "summary": "Manually collect power data",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/manu_collect_water_data": {
             "get": {
                 "description": "Manually collect water data",
