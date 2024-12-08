@@ -176,7 +176,7 @@ func CollectPowerRealData() error {
 	now := time.Now().Truncate(time.Hour)
 	for _, gateway := range gateways {
 		common.Logger.Infof("Processing gateway: %s (ID: %s)", gateway.CmCode, gateway.ID)
-		resp, err := client.GetRealDataByCmCode[client.PowerMeterData](gateway.CmCode)
+		resp, err := client.GetRealDataByCmCode[client.PowerMeterRealData](gateway.CmCode)
 		if err != nil {
 			common.Logger.Errorf("Failed to get real data for meter %s: %v", gateway.CmCode, err)
 			continue
@@ -188,7 +188,7 @@ func CollectPowerRealData() error {
 		}
 
 		// Calculate hourly usage by comparing with stored cumulative flow
-		currentCumFlow := resp.QueryData.RtData.Energe
+		currentCumFlow := resp.QueryData.RtData.Total
 		hourlyUsage := currentCumFlow - gateway.RealDataValue
 		if hourlyUsage < 0 {
 			// 当网关超过量程时，currentCumFlow从0重新开始计算

@@ -25,6 +25,27 @@ type QueryData[T any] struct {
 	State  any `json:"state"`
 }
 
+type PowerMeterRealData struct {
+	Elc2RepairType      int     `json:"elc2_repair_type"`
+	TotalPower          float64 `json:"totalpower"`
+	TotalPowerRepairType int    `json:"totalpower_repair_type"`
+	Elc1ErrorType       int     `json:"elc1_error_type"`
+	TotalRepairType     int     `json:"total_repair_type"`
+	TotalRepair         float64 `json:"total_repair"`
+	TotalPowerRepair    float64 `json:"totalpower_repair"`
+	TotalPowerErrorType int     `json:"totalpower_error_type"`
+	Total               float64 `json:"total"`
+	Elc2Repair          float64 `json:"elc2_repair"`
+	Elc1Repair          string  `json:"elc1_repair"`
+	Elc2                float64 `json:"elc2"`
+	Elc1                string  `json:"elc1"`
+	TotalErrorType      int     `json:"total_error_type"`
+	Elc1RepairType      int     `json:"elc1_repair_type"`
+	Elc2ErrorType       int     `json:"elc2_error_type"`
+	Timestamp           int64   `json:"timestamp"`
+}
+
+
 type PowerMeterData struct {
 	Netport            int     `json:"netport"`
 	Csq               int     `json:"csq"` 

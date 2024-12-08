@@ -612,6 +612,11 @@ INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev
 VALUES
 ('23000000000022', 'admin', 'admin', '23000000000022', '配电网关', '配电网关_充电桩_23000000000022', '23000000000022', '充电桩', '', md5('充电桩'), md5('教科院'), 2, 1, 1);
 
+--多功能厅
+INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type,level,collect_type)
+VALUES
+('98CC4D151DA4', 'admin', 'admin', '98CC4D151DA4', '配电网关', '配电网关_功能厅_98CC4D151DA4', '23100000000022', '功能厅', '', md5('功能厅'), md5('教科院'), 2, 1, 0);
+
 -- Insert water meters
 INSERT INTO o_eco_water_meter (id, created_by, updated_by, model_name, dev_name, channel_no, cm_code, location, building_id, park_id, type)
 VALUES
