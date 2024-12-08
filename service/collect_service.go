@@ -94,7 +94,7 @@ func init() {
 		}
 	}()
 
-	// Start goroutine to collect water meter data every hour at 59 minutes past
+	// Start goroutine to collect iot real data every hour at 59 minutes past
 	go func() {
 		for {
 			now := time.Now()
@@ -106,12 +106,17 @@ func init() {
 			time.Sleep(next.Sub(now))
 
 			common.Logger.Info("Starting water meter data collection...")
-
-			if err := CollectWaterMeterRealData(); err != nil {
-				common.Logger.Errorf("Failed to collect water meter data: %v", err)
-			}
-
-			common.Logger.Info("Water meter data collection completed")
+			go func() {
+				if err := CollectWaterMeterRealData(); err != nil {
+					common.Logger.Errorf("Failed to collect water meter data: %v", err)
+				}
+			}()
+			go func() {
+				if err := CollectPowerRealData(); err != nil {
+					common.Logger.Errorf("Failed to collect power meter data: %v", err)
+				}
+			}()
+			common.Logger.Info("Iot real data collection completed")
 		}
 	}()
 }
@@ -161,7 +166,7 @@ func CheckCollectData(start, end string, collectType int) ([]map[string]interfac
 	return data, nil
 }
 
-// 收集电力网关实时数据，从IOT平台收集 //TODO: 需要测试
+// 收集电力网关实时数据，从IOT平台收集
 func CollectPowerRealData() error {
 	gateways, err := GetAllEcgateways(COLLECT_TYPE_IOT)
 	if err != nil {
@@ -186,8 +191,8 @@ func CollectPowerRealData() error {
 		currentCumFlow := resp.QueryData.RtData.Energe
 		hourlyUsage := currentCumFlow - gateway.RealDataValue
 		if hourlyUsage < 0 {
-			// 当水表超过量程时，currentCumFlow从0重新开始计算
-			// 计算水表的最大量程(根据TotalValue的位数)
+			// 当网关超过量程时，currentCumFlow从0重新开始计算
+			// 计算网关的最大量程(根据TotalValue的位数)
 			maxValue := math.Pow10(len(strconv.FormatFloat(gateway.RealDataValue, 'f', -1, 64)))
 			// 加上最大量程得到正确用量
 			hourlyUsage = currentCumFlow + (maxValue - gateway.RealDataValue)
@@ -387,6 +392,153 @@ func ManuCollectGatewayHourlyStatsByDay(start, end, macAddr string) error {
 		common.Logger.Infof("Successfully collected and processed data for %s", currentDate.Format("2006-01-02"))
 	}
 
+	return nil
+}
+
+func ManuFillPowerCollectIotData(cmCode, start, end, value string) error {
+	qstr := model.Ecgateway_FIELD_NAME_cm_code + "=" + cmCode
+	gateway, err := common.DbGetOne[model.Ecgateway](context.Background(), common.GetDaprClient(), model.EcgatewayTableInfo.Name, qstr)
+	if err != nil {
+		return errors.Wrap(err, "Failed to get gateway")
+	}
+	if gateway == nil {
+		return errors.New("Gateway not found")
+	}
+
+	// Parse month string to time
+	startTime, err := time.Parse("2006-01-02", start)
+	if err != nil {
+		return errors.Wrap(err, "Failed to parse start")
+	}
+
+	endTime, err := time.Parse("2006-01-02", end)
+	if err != nil {
+		return errors.Wrap(err, "Failed to parse end")
+	}
+
+	// 验证开始时间不能大于结束时间
+	if startTime.After(endTime) {
+		return errors.New("Start time cannot be after end time")
+	}
+
+	// Parse value to float64
+	totalValue, err := cast.ToFloat64E(value)
+	if err != nil {
+		return errors.Wrap(err, "Failed to parse value")
+	}
+
+	// 验证值必须大于0
+	if totalValue <= 0 {
+		return errors.New("Value must be greater than 0")
+	}
+
+	common.Logger.Infof("Parsed inputs - Start time: %s, Total value: %.2f", startTime.Format("2006-01"), totalValue)
+
+	// Calculate days in month
+	totalDays := int(endTime.Sub(startTime).Hours())/24 + 1 // 修复日期计算,加1包含结束日期
+
+	common.Logger.Infof("Generating daily values for %d days", totalDays)
+
+	// First generate daily values that sum to total
+	dailyValues := make([]float64, totalDays)
+	var dailyTotal float64
+
+	// 使用固定种子以保证可重复性
+	rand.Seed(uint64(time.Now().UnixNano()))
+
+	// Generate random daily values
+	for i := 0; i < totalDays; i++ {
+		// Random factor between 0.8 and 1.2
+		factor := 0.8 + (rand.Float64() * 0.4)
+		dailyValues[i] = factor
+		dailyTotal += factor
+	}
+
+	// Normalize daily values to sum to total
+	for i := range dailyValues {
+		dailyValues[i] = (dailyValues[i] / dailyTotal) * totalValue
+	}
+
+	// For each day in the month
+	for day := 0; day < totalDays; day++ {
+		currentDate := startTime.AddDate(0, 0, day)
+		dailyValue := dailyValues[day]
+
+		// Generate hourly values for this day
+		hourlyValues := make([]float64, 24)
+		var hourlyTotal float64
+
+		// Generate random hourly values with peak/off-peak patterns
+		isWeekend := currentDate.Weekday() == time.Saturday || currentDate.Weekday() == time.Sunday
+		for hour := 0; hour < 24; hour++ {
+			var baseFactor float64
+			if isWeekend {
+				switch {
+				case hour >= 7 && hour < 10: // 早高峰
+					baseFactor = 1.5 + (rand.Float64() * 0.3) // 1.5-1.8
+				case hour >= 11 && hour < 14: // 午高峰
+					baseFactor = 1.3 + (rand.Float64() * 0.3) // 1.3-1.6
+				case hour >= 17 && hour < 20: // 晚高峰
+					baseFactor = 1.4 + (rand.Float64() * 0.3) // 1.4-1.7
+				case hour >= 23 || hour < 6: // 深夜
+					baseFactor = 0.2 + (rand.Float64() * 0.2) // 0.2-0.4
+				default: // 其他时段
+					baseFactor = 0.8 + (rand.Float64() * 0.3) // 0.8-1.1
+				}
+			} else {
+				switch {
+				case hour >= 6 && hour < 9: // 早高峰
+					baseFactor = 1.8 + (rand.Float64() * 0.4) // 1.8-2.2
+				case hour >= 11 && hour < 14: // 午高峰
+					baseFactor = 1.5 + (rand.Float64() * 0.3) // 1.5-1.8
+				case hour >= 17 && hour < 20: // 晚高峰
+					baseFactor = 1.6 + (rand.Float64() * 0.3) // 1.6-1.9
+				case hour >= 23 || hour < 5: // 深夜
+					baseFactor = 0.1 + (rand.Float64() * 0.2) // 0.1-0.3
+				default: // 其他时段
+					baseFactor = 0.7 + (rand.Float64() * 0.3) // 0.7-1.0
+				}
+			}
+			hourlyValues[hour] = baseFactor
+			hourlyTotal += baseFactor
+		}
+
+		// Normalize hourly values to sum to daily value
+		for hour := range hourlyValues {
+			hourlyValues[hour] = (hourlyValues[hour] / hourlyTotal) * dailyValue
+		}
+
+		// Insert hourly values into database
+		for hour := 0; hour < 24; hour++ {
+			timestamp := time.Date(currentDate.Year(), currentDate.Month(), currentDate.Day(), hour, 0, 0, 0, time.Local)
+
+			stat := model.Eco_gateway_1h{
+				ID:               gateway.ID + "_" + timestamp.Format("2006010215"),
+				Time:             common.LocalTime(timestamp),
+				GatewayID:        gateway.ID,
+				FloorID:          gateway.FloorID,
+				BuildingID:       gateway.BuildingID,
+				Type:             gateway.Type,
+				Level:            gateway.Level,
+				ParkID:           gateway.ParkID,
+				PowerConsumption: hourlyValues[hour],
+			}
+
+			err := common.DbUpsert(context.Background(), common.GetDaprClient(), stat, model.Eco_gateway_1hTableInfo.Name, model.Eco_gateway_1h_FIELD_NAME_id)
+			if err != nil {
+				return errors.Wrapf(err, "Failed to insert hour stats for %s", timestamp.Format("2006-01-02 15:04:05"))
+			}
+		}
+
+		common.Logger.Infof("Successfully inserted hourly values for %s", currentDate.Format("2006-01-02"))
+	}
+
+	// Refresh continuous aggregates
+	if err := refreshContinuousAggregate(startTime, gatewayNeedRefreshContinuousAggregateMap); err != nil {
+		return errors.Wrap(err, "Failed to refresh continuous aggregates")
+	}
+
+	common.Logger.Info("Successfully completed ManuFillParkWaterHourStats")
 	return nil
 }
 

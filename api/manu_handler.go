@@ -19,6 +19,7 @@ func InitManuCollectRoute(r chi.Router) {
 	r.Post(common.BASE_CONTEXT+"/debug_method_invoke", DebugMethodInvokeHandler)
 	r.Get(common.BASE_CONTEXT+"/manu_fill_gateway_hour_stats", ManuFillGatewayHourStatsHandler)
 	r.Get(common.BASE_CONTEXT+"/manu_fill_park_water_hour_stats", ManuFillParkWaterHourStatsHandler)
+	r.Get(common.BASE_CONTEXT+"/manu_fill_power_collect_iot_data", ManuFillPowerCollectIotDataHandler)
 	r.Get(common.BASE_CONTEXT+"/force_refresh_continuous_aggregate", ForceRefreshContinuousAggregateHandler)
 }
 
@@ -59,6 +60,30 @@ func ManuFillParkWaterHourStatsHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }
+
+
+// @Summary Manually fill power collect iot data
+// @Description Manually fill power collect iot data
+// @Tags Manually
+// @Produce  json
+// @Param cm_code query string true "cm_code"
+// @Param start query string true "start"
+// @Param end query string true "end"
+// @Param value query string true "value"
+// @Success 200 {object} common.Response "success"
+// @Router /manu_fill_power_collect_iot_data [get]
+func ManuFillPowerCollectIotDataHandler(w http.ResponseWriter, r *http.Request) {
+	go func() {
+		err := service.ManuFillPowerCollectIotData(r.URL.Query().Get("cm_code"), r.URL.Query().Get("start"), r.URL.Query().Get("end"), r.URL.Query().Get("value"))
+		if err != nil {
+			common.Logger.Error("手动收集数据失败," + err.Error())
+			common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+			return
+		}
+	}()
+	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
+}
+
 
 // @Summary Manually fill gateway hour stats
 // @Description Manually fill gateway hour stats

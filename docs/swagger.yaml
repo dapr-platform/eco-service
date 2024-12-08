@@ -136,6 +136,9 @@ definitions:
       project_code:
         description: 项目编码
         type: string
+      real_data_value:
+        description: 实时数据值
+        type: number
       type:
         description: 网关类型(1:AL,2:AP)
         type: integer
@@ -1407,6 +1410,10 @@ paths:
         in: query
         name: collect_type
         type: string
+      - description: real_data_value
+        in: query
+        name: real_data_value
+        type: string
       produces:
       - application/json
       responses:
@@ -1665,6 +1672,10 @@ paths:
       - description: collect_type
         in: query
         name: collect_type
+        type: string
+      - description: real_data_value
+        in: query
+        name: real_data_value
         type: string
       produces:
       - application/json
@@ -2703,6 +2714,40 @@ paths:
           schema:
             $ref: '#/definitions/common.Response'
       summary: Manually fill park water hour stats
+      tags:
+      - Manually
+  /manu_fill_power_collect_iot_data:
+    get:
+      description: Manually fill power collect iot data
+      parameters:
+      - description: cm_code
+        in: query
+        name: cm_code
+        required: true
+        type: string
+      - description: start
+        in: query
+        name: start
+        required: true
+        type: string
+      - description: end
+        in: query
+        name: end
+        required: true
+        type: string
+      - description: value
+        in: query
+        name: value
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: Manually fill power collect iot data
       tags:
       - Manually
 swagger: "2.0"

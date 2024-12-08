@@ -1867,6 +1867,12 @@ const docTemplate = `{
                         "description": "collect_type",
                         "name": "collect_type",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "real_data_value",
+                        "name": "real_data_value",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2225,6 +2231,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "collect_type",
                         "name": "collect_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "real_data_value",
+                        "name": "real_data_value",
                         "in": "query"
                     }
                 ],
@@ -3920,6 +3932,56 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/manu_fill_power_collect_iot_data": {
+            "get": {
+                "description": "Manually fill power collect iot data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manually"
+                ],
+                "summary": "Manually fill power collect iot data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "cm_code",
+                        "name": "cm_code",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "start",
+                        "name": "start",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "end",
+                        "name": "end",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "value",
+                        "name": "value",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/common.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -4112,6 +4174,10 @@ const docTemplate = `{
                 "project_code": {
                     "description": "项目编码",
                     "type": "string"
+                },
+                "real_data_value": {
+                    "description": "实时数据值",
+                    "type": "number"
                 },
                 "type": {
                     "description": "网关类型(1:AL,2:AP)",
