@@ -1154,14 +1154,17 @@ func collectGatewaysHours(collectTime time.Time, hoursAgo int, gateways []model.
 				hourTime := collectTime.Add(time.Duration(-i) * time.Hour)
 				hourTime = time.Date(hourTime.Year(), hourTime.Month(), hourTime.Day(),
 					hourTime.Hour(), 0, 0, 0, hourTime.Location())
-
+				reqHourStr := hourTime.Format("15")
+				if hourTime.Format("15") == "23"{
+					reqHourStr = "22"
+				}
 				reqBody := map[string]string{
 					"projectCode": projectCode,
 					"mac":         strings.Join(macAddrs, ","),
 					"year":        hourTime.Format("2006"),
 					"month":       hourTime.Format("01"),
 					"day":         hourTime.Format("02"),
-					"hour":        hourTime.Format("15"),
+					"hour":        reqHourStr,
 				}
 
 				common.Logger.Infof("Requesting data for batch of %d gateways, hour: %s",
