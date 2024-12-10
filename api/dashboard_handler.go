@@ -1,6 +1,7 @@
 package api
 
 import (
+	"eco-service/entity"
 	"eco-service/service"
 	"fmt"
 	"net/http"
@@ -188,12 +189,35 @@ func BuildingFloorPowerConsumptionHandler(w http.ResponseWriter, r *http.Request
 		common.HttpResult(w, common.ErrParam.AppendMsg(err.Error()))
 		return
 	}
-	data, err := service.GetBuildingFloorsPowerConsumption(buildingId, period, queryTime, 0)
-	if err != nil {
-		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
-		return
+	specialBuildIdMap := map[string]bool{
+		common.GetMD5Hash("E栋"):  true,
+		common.GetMD5Hash("G栋"): true,
+		common.GetMD5Hash("H栋"): true,
+		common.GetMD5Hash("功能厅"): true,
+		common.GetMD5Hash("充电桩"): true,
 	}
-	common.HttpResult(w, common.OK.WithData(data))
+	if specialBuildIdMap[buildingId] {
+		buildingData, err := service.GetBuildingsPowerConsumption(period, queryTime, 0)
+		if err != nil {
+			common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+			return
+		}
+		data := []entity.LabelData{}
+		for _, v := range buildingData {
+			if v.Id == buildingId {
+				data = append(data, v)
+			}
+		}
+		common.HttpResult(w, common.OK.WithData(data))
+	} else {
+		data, err := service.GetBuildingFloorsPowerConsumption(buildingId, period, queryTime, 0)
+		if err != nil {
+			common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
+			return
+		}
+		common.HttpResult(w, common.OK.WithData(data))
+	}
+
 }
 
 // @Summary 建筑楼层用电量范围
