@@ -607,6 +607,12 @@ VALUES
 ('98CC4D151E02', 'admin', 'admin', '98CC4D151E02', '配电网关', '配电网关_C-AL-05-1_98CC4D151E02', '21000000000416', 'C栋_五层', md5('C栋_五层'), md5('C栋'), md5('教科院'), 1, 2),
 ('98CC4D151DD6', 'admin', 'admin', '98CC4D151DD6', '配电网关', '配电网关_C-AL-06-1_98CC4D151DD6', '21000000000445', 'C栋_六层', md5('C栋_六层'), md5('C栋'), md5('教科院'), 1, 2);
 
+
+INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type,level,collect_type)
+VALUES
+('98CC4D15209A', 'admin', 'admin', '98CC4D15209A', '配电网关', '配电网关_C-AL-07-1_98CC4D15209A', '23100000000022', 'C栋_七层',  md5('C栋_七层'), md5('C栋'), md5('教科院'), 1, 2, 0);
+
+
 --充电桩
 INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type,level,collect_type)
 VALUES
