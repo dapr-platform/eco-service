@@ -3891,6 +3891,12 @@ const docTemplate = `{
                         "name": "value",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "macs",
+                        "name": "macs",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3955,14 +3961,14 @@ const docTemplate = `{
         },
         "/manu_fill_power_collect_iot_data": {
             "get": {
-                "description": "Manually fill power collect iot data",
+                "description": "Manually fill power collect by iot data",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Manually"
                 ],
-                "summary": "Manually fill power collect iot data",
+                "summary": "Manually fill power collect by iot data",
                 "parameters": [
                     {
                         "type": "string",

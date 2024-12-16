@@ -706,7 +706,7 @@ func ManuFillParkWaterHourStats(cmCode, start, end, value string) error {
 }
 
 // 手动填充网关小时数据
-func ManuFillGatewayHourStats(month, value string) error {
+func ManuFillGatewayHourStats(month, value, macs string) error {
 	common.Logger.Infof("Starting ManuFillGatewayHourStats for month: %s, value: %s", month, value)
 
 	// Parse month string to time
@@ -730,6 +730,15 @@ func ManuFillGatewayHourStats(month, value string) error {
 	gateways, err := GetAllEcgateways(COLLECT_TYPE_PLATFORM)
 	if err != nil {
 		return errors.Wrap(err, "Failed to get gateways")
+	}
+
+	if macs != "" {
+		gateways = []model.Ecgateway{}
+		for _, gateway := range gateways {
+			if strings.Contains(macs, gateway.MacAddr) {
+				gateways = append(gateways, gateway)
+			}
+		}
 	}
 	buildingGateways := []model.Ecgateway{}
 	for _, gateway := range gateways {

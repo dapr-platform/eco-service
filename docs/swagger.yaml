@@ -2685,6 +2685,10 @@ paths:
         name: value
         required: true
         type: string
+      - description: macs
+        in: query
+        name: macs
+        type: string
       produces:
       - application/json
       responses:
@@ -2731,7 +2735,7 @@ paths:
       - Manually
   /manu_fill_power_collect_iot_data:
     get:
-      description: Manually fill power collect iot data
+      description: Manually fill power collect by iot data
       parameters:
       - description: cm_code
         in: query
@@ -2760,7 +2764,7 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/common.Response'
-      summary: Manually fill power collect iot data
+      summary: Manually fill power collect by iot data
       tags:
       - Manually
 swagger: "2.0"

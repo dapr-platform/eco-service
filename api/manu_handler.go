@@ -62,8 +62,8 @@ func ManuFillParkWaterHourStatsHandler(w http.ResponseWriter, r *http.Request) {
 	common.HttpResult(w, common.OK.WithData("后台运行，请查看日志"))
 }
 
-// @Summary Manually fill power collect iot data
-// @Description Manually fill power collect iot data
+// @Summary Manually fill power collect by iot data
+// @Description Manually fill power collect by iot data
 // @Tags Manually
 // @Produce  json
 // @Param cm_code query string true "cm_code"
@@ -90,11 +90,12 @@ func ManuFillPowerCollectIotDataHandler(w http.ResponseWriter, r *http.Request) 
 // @Produce  json
 // @Param month query string true "month"
 // @Param value query string true "value"
+// @Param macs query string false "macs"
 // @Success 200 {object} common.Response "success"
 // @Router /manu_fill_gateway_hour_stats [get]
 func ManuFillGatewayHourStatsHandler(w http.ResponseWriter, r *http.Request) {
 	go func() {
-		err := service.ManuFillGatewayHourStats(r.URL.Query().Get("month"), r.URL.Query().Get("value"))
+		err := service.ManuFillGatewayHourStats(r.URL.Query().Get("month"), r.URL.Query().Get("value"), r.URL.Query().Get("macs"))
 		if err != nil {
 			common.Logger.Error("手动收集数据失败," + err.Error())
 			common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
