@@ -1024,8 +1024,8 @@ func collectGatewaysFullDay(collectTime time.Time, gateways []model.Ecgateway) e
 				"day":         collectTime.Format("02"),
 			}
 
-			common.Logger.Infof("Requesting data for batch of %d gateways, date: %s",
-				len(gatewayBatch), collectTime.Format("2006-01-02"))
+			common.Logger.Infof("Requesting data for batch of %d gateways, date: %s, req: %v",
+				len(gatewayBatch), collectTime.Format("2006-01-02"), reqBody)
 
 			respBytes, err := client.GetBoxesHourStats(reqBody)
 			if err != nil {
