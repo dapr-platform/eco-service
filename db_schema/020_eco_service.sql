@@ -642,7 +642,7 @@ INSERT INTO o_eco_floor (id, created_by, updated_by, floor_name, building_id, pa
 VALUES
 (md5('G栋'), 'admin', 'admin', '整栋', md5('G栋'), md5('教科院'), 1);
 
-ALTER TABLE o_eco_gateway ADD COLUMN factor decimal(10,2) DEFAULT 1;
+ALTER TABLE o_eco_gateway ADD COLUMN factor decimal(10,4) DEFAULT 1;
 
 
 --宿舍楼

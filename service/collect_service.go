@@ -190,6 +190,7 @@ func CollectPowerRealData() error {
 		// Calculate hourly usage by comparing with stored cumulative flow
 		currentCumFlow := resp.QueryData.RtData.Total
 		if gateway.Factor != 1 {
+			common.Logger.Infof("Factor for meter %s is %.4f, currentCumFlow is %.3f", gateway.CmCode, gateway.Factor, currentCumFlow)
 			currentCumFlow = currentCumFlow * gateway.Factor
 		}
 		hourlyUsage := currentCumFlow - gateway.RealDataValue
