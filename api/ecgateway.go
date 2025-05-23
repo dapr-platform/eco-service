@@ -126,6 +126,7 @@ func batchUpsertEcgatewayHandler(w http.ResponseWriter, r *http.Request) {
 // @Param level query string false "level"
 // @Param collect_type query string false "collect_type"
 // @Param real_data_value query string false "real_data_value"
+// @Param factor query string false "factor"
 // @Produce  json
 // @Success 200 {object} common.Response{data=common.PageGeneric[model.Ecgateway]} "objects array"
 // @Failure 500 {object} common.Response ""
@@ -165,6 +166,7 @@ func EcgatewayPageListHandler(w http.ResponseWriter, r *http.Request) {
 // @Param level query string false "level"
 // @Param collect_type query string false "collect_type"
 // @Param real_data_value query string false "real_data_value"
+// @Param factor query string false "factor"
 // @Produce  json
 // @Success 200 {object} common.Response{data=[]model.Ecgateway} "objects array"
 // @Failure 500 {object} common.Response ""

@@ -36,11 +36,12 @@ Table: o_eco_gateway
 [15] level                                          INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: [0]
 [16] collect_type                                   INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: [0]
 [17] real_data_value                                NUMERIC              null: false  primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: [0]
+[18] factor                                         NUMERIC              null: true   primary: false  isArray: false  auto: false  col: NUMERIC         len: -1      default: [1]
 
 
 JSON Sample
 -------------------------------------
-{    "id": "DLADZkTjIhIoAcTYFPPwamsjj",    "created_by": "JkGJcgPEHdNMiJCuWIaaOrujv",    "created_time": 53,    "updated_by": "kctjjAOpwFtILErtschoqvgbk",    "updated_time": 30,    "model_name": "vZeUbAfoIDmLHFQrQaarQIlAj",    "dev_name": "AxXshvvxwelnRZxqMaGVVMgif",    "mac_addr": "hXqXoUiiQLCinlPqHePQPbfPO",    "cm_code": "sRhuAoZhgJjvBIYsewAhVyTHS",    "project_code": "nLGTkIpcidkMYdkKJgsmDPxpV",    "location": "YDaHgNhgNSgUfvMVtHgVBqWCG",    "floor_id": "UrYpKnsgZutqakMMymOBsdyUM",    "building_id": "wMdVNElPQnvFkgBhCWoCmUidh",    "park_id": "TFfyKdyLGPGPBOviyOryOdqyw",    "type": 4,    "level": 40,    "collect_type": 43,    "real_data_value": 0.04801308646764216}
+{    "id": "eqBivuVGAQCTFFdigfMEYybLh",    "created_by": "ngnDoplcQCJdbUXEFaIKYZWQQ",    "created_time": 13,    "updated_by": "tcfdUPJemfqpWxIxRQOQtSbHu",    "updated_time": 48,    "model_name": "yRNLIuZYJnqZpqDQULVOlBwTb",    "dev_name": "IjdrVPdOqEASeXcXdxtGiQCnO",    "mac_addr": "EpJyBvINBxUWdajGbAFmabbLK",    "cm_code": "FxyPaaOmjLXSkAQelWcGsNknS",    "project_code": "uUJeXMVtRekdifWegggJdlTet",    "location": "OElRsGeaExhpXvdHvXBYaigsK",    "floor_id": "OtjuccQZWEXMEGTlIIrmWiwlo",    "building_id": "sZXlQNMEtBrBKHEqbqFfarjOr",    "park_id": "QlSFwwgrZxtsPTQdqvecMBkuD",    "type": 54,    "level": 42,    "collect_type": 75,    "real_data_value": 0.2116569206258075,    "factor": 0.6985447204968475}
 
 
 
@@ -82,6 +83,8 @@ var (
 	Ecgateway_FIELD_NAME_collect_type = "collect_type"
 
 	Ecgateway_FIELD_NAME_real_data_value = "real_data_value"
+
+	Ecgateway_FIELD_NAME_factor = "factor"
 )
 
 // Ecgateway struct is a row record of the o_eco_gateway table in the  database
@@ -121,6 +124,8 @@ type Ecgateway struct {
 	CollectType int32 `json:"collect_type"` //采集类型(0:配电平台,1:IOT)
 
 	RealDataValue float64 `json:"real_data_value"` //实时数据值
+
+	Factor float64 `json:"factor"` //factor
 
 }
 
@@ -504,6 +509,27 @@ var EcgatewayTableInfo = &TableInfo{
 			ProtobufFieldName:  "real_data_value",
 			ProtobufType:       "float",
 			ProtobufPos:        18,
+		},
+
+		&ColumnInfo{
+			Index:              18,
+			Name:               "factor",
+			Comment:            `factor`,
+			Notes:              ``,
+			Nullable:           true,
+			DatabaseTypeName:   "NUMERIC",
+			DatabaseTypePretty: "NUMERIC",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "NUMERIC",
+			ColumnLength:       -1,
+			GoFieldName:        "Factor",
+			GoFieldType:        "float64",
+			JSONFieldName:      "factor",
+			ProtobufFieldName:  "factor",
+			ProtobufType:       "float",
+			ProtobufPos:        19,
 		},
 	},
 }
