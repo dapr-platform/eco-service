@@ -629,12 +629,28 @@ VALUES
 ('30002050', 'admin', 'admin', '水表', 'A座高区水表', '30002050', '24000000000001', 'A栋', md5('A栋'), md5('教科院'), 2),
 ('3000205C', 'admin', 'admin', '水表', 'A座低区水表', '3000205C', '24000000000002', 'A栋', md5('A栋'), md5('教科院'), 1);
 
+-- 2025-5-23 begin
+update o_eco_building set building_name = 'E栋' where id = md5('E栋');
+
+-- Insert buildings
+INSERT INTO o_eco_building (id, created_by, updated_by, building_name, park_id, index)
+VALUES 
+(md5('G栋'), 'admin', 'admin', 'G栋', md5('教科院'), 5);
+
+-- Insert floors
+INSERT INTO o_eco_floor (id, created_by, updated_by, floor_name, building_id, park_id, index)
+VALUES
+(md5('G栋'), 'admin', 'admin', '整栋', md5('G栋'), md5('教科院'), 1);
+
+ALTER TABLE o_eco_gateway ADD COLUMN factor decimal(10,2) DEFAULT 1;
 
 
+--宿舍楼
+INSERT INTO o_eco_gateway (id, created_by, updated_by, mac_addr, model_name, dev_name, cm_code, location, floor_id, building_id, park_id, type,level,collect_type,factor)
+VALUES
+('23000000000023', 'admin', 'admin', '23000000000023', '配电网关', '配电网关_宿舍楼_23000000000023', '23000000000023', '宿舍楼', '', md5('G栋'), md5('教科院'), 1, 1, 1,0.625);
 
-
-
-
+-- 2025-5-23 end
 -- +goose StatementEnd
 
 -- +goose Down

@@ -1127,6 +1127,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "_select",
+                        "name": "_select",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "id",
                         "name": "id",
                         "in": "query"
@@ -1186,22 +1193,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/definitions/common.Page"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "items": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "$ref": "#/definitions/model.Ecbuilding"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            ]
+                                            "$ref": "#/definitions/common.PageGeneric-model_Ecbuilding"
                                         }
                                     }
                                 }
@@ -1600,6 +1592,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "_select",
+                        "name": "_select",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "id",
                         "name": "id",
                         "in": "query"
@@ -1665,22 +1664,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/definitions/common.Page"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "items": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "$ref": "#/definitions/model.Ecfloor"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            ]
+                                            "$ref": "#/definitions/common.PageGeneric-model_Ecfloor"
                                         }
                                     }
                                 }
@@ -2133,6 +2117,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "_select",
+                        "name": "_select",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "id",
                         "name": "id",
                         "in": "query"
@@ -2252,22 +2243,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/definitions/common.Page"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "items": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "$ref": "#/definitions/model.Ecgateway"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            ]
+                                            "$ref": "#/definitions/common.PageGeneric-model_Ecgateway"
                                         }
                                     }
                                 }
@@ -3103,6 +3079,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "_select",
+                        "name": "_select",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "id",
                         "name": "id",
                         "in": "query"
@@ -3150,22 +3133,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/definitions/common.Page"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "items": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "$ref": "#/definitions/model.Ecpark"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            ]
+                                            "$ref": "#/definitions/common.PageGeneric-model_Ecpark"
                                         }
                                     }
                                 }
@@ -3594,6 +3562,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "_select",
+                        "name": "_select",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "id",
                         "name": "id",
                         "in": "query"
@@ -3689,22 +3664,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/definitions/common.Page"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "items": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "$ref": "#/definitions/model.Ecwater_meter"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            ]
+                                            "$ref": "#/definitions/common.PageGeneric-model_Ecwater_meter"
                                         }
                                     }
                                 }
@@ -4015,6 +3975,106 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "items": {},
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "common.PageGeneric-model_Ecbuilding": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Ecbuilding"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "common.PageGeneric-model_Ecfloor": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Ecfloor"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "common.PageGeneric-model_Ecgateway": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Ecgateway"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "common.PageGeneric-model_Ecpark": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Ecpark"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "common.PageGeneric-model_Ecwater_meter": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Ecwater_meter"
+                    }
+                },
                 "page": {
                     "type": "integer"
                 },

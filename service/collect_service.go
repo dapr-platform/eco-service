@@ -189,6 +189,9 @@ func CollectPowerRealData() error {
 
 		// Calculate hourly usage by comparing with stored cumulative flow
 		currentCumFlow := resp.QueryData.RtData.Total
+		if gateway.Factor != 1 {
+			currentCumFlow = currentCumFlow * gateway.Factor
+		}
 		hourlyUsage := currentCumFlow - gateway.RealDataValue
 		if hourlyUsage < 0 {
 			// 当网关超过量程时，currentCumFlow从0重新开始计算

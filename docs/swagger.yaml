@@ -10,6 +10,71 @@ definitions:
       total:
         type: integer
     type: object
+  common.PageGeneric-model_Ecbuilding:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.Ecbuilding'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  common.PageGeneric-model_Ecfloor:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.Ecfloor'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  common.PageGeneric-model_Ecgateway:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.Ecgateway'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  common.PageGeneric-model_Ecpark:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.Ecpark'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  common.PageGeneric-model_Ecwater_meter:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.Ecwater_meter'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
   common.Response:
     properties:
       data: {}
@@ -971,6 +1036,11 @@ paths:
         in: query
         name: _order
         type: string
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
       - description: id
         in: query
         name: id
@@ -1013,14 +1083,7 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  allOf:
-                  - $ref: '#/definitions/common.Page'
-                  - properties:
-                      items:
-                        items:
-                          $ref: '#/definitions/model.Ecbuilding'
-                        type: array
-                    type: object
+                  $ref: '#/definitions/common.PageGeneric-model_Ecbuilding'
               type: object
         "500":
           description: Internal Server Error
@@ -1268,6 +1331,11 @@ paths:
         in: query
         name: _order
         type: string
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
       - description: id
         in: query
         name: id
@@ -1314,14 +1382,7 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  allOf:
-                  - $ref: '#/definitions/common.Page'
-                  - properties:
-                      items:
-                        items:
-                          $ref: '#/definitions/model.Ecfloor'
-                        type: array
-                    type: object
+                  $ref: '#/definitions/common.PageGeneric-model_Ecfloor'
               type: object
         "500":
           description: Internal Server Error
@@ -1605,6 +1666,11 @@ paths:
         in: query
         name: _order
         type: string
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
       - description: id
         in: query
         name: id
@@ -1687,14 +1753,7 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  allOf:
-                  - $ref: '#/definitions/common.Page'
-                  - properties:
-                      items:
-                        items:
-                          $ref: '#/definitions/model.Ecgateway'
-                        type: array
-                    type: object
+                  $ref: '#/definitions/common.PageGeneric-model_Ecgateway'
               type: object
         "500":
           description: Internal Server Error
@@ -2215,6 +2274,11 @@ paths:
         in: query
         name: _order
         type: string
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
       - description: id
         in: query
         name: id
@@ -2249,14 +2313,7 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  allOf:
-                  - $ref: '#/definitions/common.Page'
-                  - properties:
-                      items:
-                        items:
-                          $ref: '#/definitions/model.Ecpark'
-                        type: array
-                    type: object
+                  $ref: '#/definitions/common.PageGeneric-model_Ecpark'
               type: object
         "500":
           description: Internal Server Error
@@ -2524,6 +2581,11 @@ paths:
         in: query
         name: _order
         type: string
+      - description: _select
+        in: query
+        name: _select
+        required: true
+        type: string
       - description: id
         in: query
         name: id
@@ -2590,14 +2652,7 @@ paths:
             - $ref: '#/definitions/common.Response'
             - properties:
                 data:
-                  allOf:
-                  - $ref: '#/definitions/common.Page'
-                  - properties:
-                      items:
-                        items:
-                          $ref: '#/definitions/model.Ecwater_meter'
-                        type: array
-                    type: object
+                  $ref: '#/definitions/common.PageGeneric-model_Ecwater_meter'
               type: object
         "500":
           description: Internal Server Error
