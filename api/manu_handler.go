@@ -147,7 +147,7 @@ func DebugMethodInvokeHandler(w http.ResponseWriter, r *http.Request) {
 		common.HttpResult(w, common.ErrService.AppendMsg(err.Error()))
 		return
 	}
-	common.HttpResult(w, common.OK.WithData(data))
+	common.HttpResult(w, common.OK.WithData(string(data)))
 }
 
 // @Summary Manually collect data
